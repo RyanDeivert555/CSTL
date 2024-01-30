@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Computer Science/C/cstl/build",
+  "command": "C:\\w64devkit\\bin\\cc.exe   -Wall -Wextra -Wpedantic -o CMakeFiles\\main.dir\\src\\main.c.obj -c \"C:\\Computer Science\\C\\cstl\\src\\main.c\"",
+  "file": "C:/Computer Science/C/cstl/src/main.c",
+  "output": "CMakeFiles/main.dir/src/main.c.obj"
+}
+]
