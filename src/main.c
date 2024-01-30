@@ -33,9 +33,11 @@ void test_vec(void) {
     vec_char vec2 = vec_char_from_buffer(" world", sizeof(" world") - 1);
     vec_char_append(&vec1, vec2);
     vec_char_push(&vec1, '\n');
+
     vec_char_print(vec1);
 
     vec_char_free(&vec1);
+    vec_char_free(&vec2);
     printf("vec test end\n");
 }
 
