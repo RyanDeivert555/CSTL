@@ -20,7 +20,7 @@
         size_t length; \
     } list_##T; \
     \
-    list_##T list_##T##_new() { \
+    list_##T list_##T##_new(void) { \
         list_##T result = {0}; \
         result.head = NULL; \
         result.length = 0; \
