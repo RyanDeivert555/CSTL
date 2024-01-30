@@ -26,4 +26,3 @@
         \
         return map.buffer[index]; \
     }
-    

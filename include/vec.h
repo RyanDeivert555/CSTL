@@ -12,11 +12,7 @@
     } vec_##T; \
     \
     vec_##T vec_##T##_new(void) { \
-        vec_##T result = { \
-            .ptr = NULL, \
-            .length = 0, \
-            .capacity = 0, \
-        }; \
+        vec_##T result = {0}; \
         \
         return result; \
     } \

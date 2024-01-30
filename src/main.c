@@ -30,6 +30,8 @@ void test_vec(void) {
     for (char* it = iter_char_begin(vec1); it != iter_char_end(vec1); ++it) {
         *it += 1;
     }
+    vec_char vec2 = vec_char_from_buffer(" world", sizeof(" world") - 1);
+    vec_char_append(&vec1, vec2);
     vec_char_push(&vec1, '\n');
     vec_char_print(vec1);
 
