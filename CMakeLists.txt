@@ -9,4 +9,5 @@ add_executable(${PROJECT_NAME}
     include/vec.h
     include/list.h
     include/hashmap.h
+    include/array.h
 )
