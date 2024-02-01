@@ -1,30 +1,34 @@
 #pragma once
 #include <assert.h>
 
-// TODO: make hashmap resizable? (user needs length for hashing though...)
-// FIXME: this really sucks. learn how to write a hashmap
 #define ARRAY_HASHMAP_DEFINE(TBufferSize, K, V) \
-    typedef struct hashmap_##K##_to_##V { \
+    typedef struct array_hashmap_##K##_to_##V { \
         V buffer[TBufferSize]; \
+        size_t length; \
         size_t (*hasher)(K); \
-    } hashmap_##K##_to_##V; \
+    } array_hashmap_##K##_to_##V; \
     \
-    hashmap_##K##_to_##V hashmap_##K##_to_##V##_new(size_t (*hasher)(K)) { \
-        hashmap_##K##_to_##V result = {0}; \
+    array_hashmap_##K##_to_##V array_hashmap_##K##_to_##V##_new(size_t (*hasher)(K)) { \
+        array_hashmap_##K##_to_##V result = {0}; \
+        result.length = TBufferSize; \
         result.hasher = hasher; \
         \
         return result; \
     } \
     \
-    void hashmap_##K##_to_##V##_insert(hashmap_##K##_to_##V* map, K key, V value) { \
-        size_t index = map->hasher(key); \
-        assert(index < TBufferSize); \
+    size_t array_hashmap_##K##_to_##V##_hash(array_hashmap_##K##_to_##V map, K key) { \
+        return map.hasher(key) % map.length; \
+    } \
+    \
+    void array_hashmap_##K##_to_##V##_insert(array_hashmap_##K##_to_##V* map, K key, V value) { \
+        size_t index = array_hashmap_##K##_to_##V##_hash(*map, key); \
+        assert(index < map->length); \
         map->buffer[index] = value; \
     } \
     \
-    V hashmap_##K##_to_##V##_get(hashmap_##K##_to_##V map, K key) { \
-        size_t index = map.hasher(key); \
-        assert(index < TBufferSize); \
+    V array_hashmap_##K##_to_##V##_get(array_hashmap_##K##_to_##V map, K key) { \
+        size_t index = array_hashmap_##K##_to_##V##_hash(map, key); \
+        assert(index < map.length); \
         \
         return map.buffer[index]; \
     }

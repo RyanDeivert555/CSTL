@@ -2,20 +2,23 @@
 #include "../include/vec.h"
 #include "../include/array_hashmap.h"
 #include "../include/list.h"
+#include "../include/hashmap.h"
 
 #define HASHMAP_BUFF_LEN 1000
 
 VEC_DEFINE(char)
 ARRAY_HASHMAP_DEFINE(HASHMAP_BUFF_LEN, int, int)
 LIST_DEFINE(float)
+HASHMAP_DEFINE(int, float)
 
 void test_vec(void);
-void test_hashmap(void);
+void test_array_hashmap(void);
 void test_list(void);
+void test_hashmap(void);
 
 int main(void) {
     test_vec();
-    test_hashmap();
+    test_array_hashmap();
     test_list();
     
     return 0;
@@ -48,17 +51,17 @@ size_t hash(int key) {
     key *= 0xc2b2ae35;
     key ^= key >> 16;
     
-    return (size_t)key % HASHMAP_BUFF_LEN;
+    return (size_t)key;
 }
 
-void test_hashmap(void) {
+void test_array_hashmap(void) {
     printf("hashmap test start\n");
-    hashmap_int_to_int map = hashmap_int_to_int_new(&hash);
+    array_hashmap_int_to_int map = array_hashmap_int_to_int_new(&hash);
     for (int i = 1; i <= 10; i++) {
-        hashmap_int_to_int_insert(&map, i * 10, i);
+        array_hashmap_int_to_int_insert(&map, i * 10, i);
     }
     for (int i = 0; i <= 10; i++) {
-        printf("%d ", hashmap_int_to_int_get(map, i * 10));
+        printf("%d ", array_hashmap_int_to_int_get(map, i * 10));
     }
     printf("\n");
 
@@ -82,4 +85,8 @@ void test_list(void) {
     printf("\n");
     list_float_free(&l1);
     printf("list test end\n");
+}
+
+void test_hashmap(void) {
+
 }
