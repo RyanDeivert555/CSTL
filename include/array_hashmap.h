@@ -1,6 +1,8 @@
 #pragma once
 #include <assert.h>
 
+// TODO: make hashmap resizable? (user needs length for hashing though...)
+// FIXME: this really sucks. learn how to write a hashmap
 #define ARRAY_HASHMAP_DEFINE(TBufferSize, K, V) \
     typedef struct hashmap_##K##_to_##V { \
         V buffer[TBufferSize]; \
