@@ -1,26 +1,26 @@
 #pragma once
 #include <assert.h>
 
-#define HASHMAP_DEFINE(TBufferSize, T, K) \
-    typedef struct hashmap_##T##_to_##K { \
-        T buffer[TBufferSize]; \
-        size_t (*hasher)(T); \
-    } hashmap_##T##_to_##K; \
+#define HASHMAP_DEFINE(TBufferSize, K, V) \
+    typedef struct hashmap_##K##_to_##V { \
+        V buffer[TBufferSize]; \
+        size_t (*hasher)(K); \
+    } hashmap_##K##_to_##V; \
     \
-    hashmap_##T##_to_##K hashmap_##T##_to_##K##_new(size_t (*hasher)(T)) { \
-        hashmap_##T##_to_##K result = {0}; \
+    hashmap_##K##_to_##V hashmap_##K##_to_##V##_new(size_t (*hasher)(K)) { \
+        hashmap_##K##_to_##V result = {0}; \
         result.hasher = hasher; \
         \
         return result; \
     } \
     \
-    void hashmap_##T##_to_##K##_insert(hashmap_##T##_to_##K* map, T key, K value) { \
+    void hashmap_##K##_to_##V##_insert(hashmap_##K##_to_##V* map, K key, V value) { \
         size_t index = map->hasher(key); \
         assert(index < TBufferSize); \
         map->buffer[index] = value; \
     } \
     \
-    K hashmap_##T##_to_##K##_get(hashmap_##T##_to_##K map, T key) { \
+    V hashmap_##K##_to_##V##_get(hashmap_##K##_to_##V map, K key) { \
         size_t index = map.hasher(key); \
         assert(index < TBufferSize); \
         \
