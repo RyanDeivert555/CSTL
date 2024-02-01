@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include "../include/vec.h"
-#include "../include/hashmap.h"
+#include "../include/array_hashmap.h"
 #include "../include/list.h"
 
 #define HASHMAP_BUFF_LEN 1000
 
 VEC_DEFINE(char)
-HASHMAP_DEFINE(HASHMAP_BUFF_LEN, int, int)
+ARRAY_HASHMAP_DEFINE(HASHMAP_BUFF_LEN, int, int)
 LIST_DEFINE(float)
 
 void test_vec(void);

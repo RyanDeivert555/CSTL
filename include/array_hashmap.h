@@ -1,7 +1,7 @@
 #pragma once
 #include <assert.h>
 
-#define HASHMAP_DEFINE(TBufferSize, K, V) \
+#define ARRAY_HASHMAP_DEFINE(TBufferSize, K, V) \
     typedef struct hashmap_##K##_to_##V { \
         V buffer[TBufferSize]; \
         size_t (*hasher)(K); \
