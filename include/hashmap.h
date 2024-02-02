@@ -34,11 +34,15 @@
         return result; \
     } \
     \
-    /* hasher which ensures the hash is within capacity */ \
     size_t hashmap_##K##_to_##V##_hash(hashmap_##K##_to_##V hashmap, K key) { \
         return hashmap.hasher(key) % hashmap.nodes.capacity; \
     } \
     \
     void hashmap_##K##_to_##V##_insert(hashmap_##K##_to_##V* hashmap, K key, V value) { \
-        \
+        size_t index = hashmap_##K##_to_##V##_hash(*hashmap, key); \
+        while (hashmap->nodes.capacity < index) { \
+            /* push could overwrite some nodes */ \
+            vec_node_##K##_to_##V##_ptr_push(&hashmap->nodes, NULL); \
+        } \
+        node_##K##_to_##V* node = hashmap->nodes.ptr[index]; \
     }
