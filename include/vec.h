@@ -12,8 +12,6 @@
     vec_##T vec_##T##_new(void); \
     void vec_##T##_free(vec_##T* vec); \
     void vec_##T##_grow(vec_##T* vec); \
-    void vec_##T##_set(vec_##T* vec, T elem, size_t index); \
-    T vec_##T##_get(vec_##T vec, size_t index); \
     void vec_##T##_push(vec_##T* vec, T elem); \
     T vec_##T##_pop(vec_##T* vec); \
     void vec_##T##_insert(vec_##T* vec, T elem, size_t index); \
@@ -22,7 +20,7 @@
     void vec_##T##_append(vec_##T* dest, vec_##T src); \
     void vec_##T##_clear(vec_##T* vec); \
     int vec_##T##_is_empty(vec_##T vec); \
-    vec_##T vec_##T##_from_buffer(T* buffer, size_t length); \
+    vec_##T vec_##T##_from_buffer(const T* buffer, size_t length); \
 
 #define VEC_IMPLEMENT(T) \
     vec_##T vec_##T##_new(void) { \
@@ -38,16 +36,6 @@
     void vec_##T##_grow(vec_##T* vec) { \
         vec->capacity = (vec->capacity == 0) ? 10 : 2 * vec->capacity; \
         vec->ptr = realloc(vec->ptr, vec->capacity * sizeof(T)); \
-    } \
-    \
-    void vec_##T##_set(vec_##T* vec, T elem, size_t index) { \
-        assert(index < vec->length); \
-        vec->ptr[index] = elem; \
-    } \
-    \
-    T vec_##T##_get(vec_##T vec, size_t index) { \
-        assert(index < vec.length); \
-        return vec.ptr[index]; \
     } \
     \
     void vec_##T##_push(vec_##T* vec, T elem) { \
@@ -106,7 +94,7 @@
         return vec.length == 0; \
     } \
     \
-    vec_##T vec_##T##_from_buffer(T* buffer, size_t length) { \
+    vec_##T vec_##T##_from_buffer(const T* buffer, size_t length) { \
         vec_##T result = vec_##T##_new(); \
         for (size_t i = 0; i < length; i++) { \
             vec_##T##_push(&result, buffer[i]); \

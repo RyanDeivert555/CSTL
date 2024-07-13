@@ -18,9 +18,7 @@ int main(void) {
 }
 
 void test_vec(void) {
-    vec_char vec1 = vec_char_from_buffer("fdkkn", 5);
-
-    vec_char_set(&vec1, vec_char_get(vec1, 0) + 1, 0);
+    vec_char vec1 = vec_char_from_buffer("gdkkn", 5);
 
     for (size_t i = 0; i < vec1.length; i++) {
         vec1.ptr[i] += 1;
