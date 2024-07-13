@@ -1,8 +1,8 @@
 #pragma once
 
-#define ARRAY_DEFINE(T, TSize) \
+#define ARRAY_DEFINE(T, Size) \
     typedef struct array_##T { \
-        T buffer[TSize]; \
+        T buffer[Size]; \
         size_t length; \
     } array_##T; \
     \

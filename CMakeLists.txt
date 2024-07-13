@@ -11,4 +11,5 @@ add_executable(${PROJECT_NAME}
     include/array_hashmap.h
     include/hashmap.h
     include/array.h
+    include/bounded_array.h
 )
