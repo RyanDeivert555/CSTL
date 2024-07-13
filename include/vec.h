@@ -18,7 +18,6 @@
     T vec_##T##_remove(vec_##T* vec, size_t index); \
     void vec_##T##_reserve(vec_##T* vec, size_t extra_spaces); \
     void vec_##T##_append(vec_##T* dest, vec_##T src); \
-    void vec_##T##_clear(vec_##T* vec); \
 
 #define VEC_IMPLEMENT(T) \
     vec_##T vec_##T##_new(void) { \
@@ -82,8 +81,4 @@
         vec_##T##_reserve(dest, count); \
         memcpy(&dest->ptr[dest->length], src.ptr, count * sizeof(T)); \
         dest->length += count; \
-    } \
-    \
-    void vec_##T##_clear(vec_##T* vec) { \
-        vec->length = 0; \
     }
