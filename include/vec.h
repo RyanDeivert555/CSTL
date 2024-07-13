@@ -34,7 +34,7 @@
     } \
     \
     void vec_##T##_grow(vec_##T* vec) { \
-        vec->capacity = (vec->capacity == 0) ? 10 : 2 * vec->capacity; \
+        vec->capacity = (vec->capacity == 0) ? 2 : 2 * vec->capacity; \
         vec->ptr = realloc(vec->ptr, vec->capacity * sizeof(T)); \
     } \
     \
