@@ -1,7 +1,8 @@
 #pragma once
-#include <stdio.h>
 #include <assert.h>
 #include <string.h> // IWYU pragma: keep
+
+// TODO: remove bloat functions
 
 #define VEC_DEFINE(T) \
     typedef struct vec_##T { \
@@ -23,11 +24,7 @@
     void vec_##T##_append(vec_##T* dest, vec_##T src); \
     void vec_##T##_clear(vec_##T* vec); \
     int vec_##T##_is_empty(vec_##T vec); \
-    int vec_##T##_print(vec_##T vec); \
     vec_##T vec_##T##_from_buffer(T* buffer, size_t length); \
-    vec_##T vec_##T##_fill(T element, size_t count); \
-    T* iter_##T##_begin(vec_##T vec); \
-    T* iter_##T##_end(vec_##T vec); \
 
 #define VEC_IMPLEMENT(T) \
     vec_##T vec_##T##_new(void) { \
@@ -110,11 +107,6 @@
     int vec_##T##_is_empty(vec_##T vec) { \
         return vec.length == 0; \
     } \
-    int vec_##T##_print(vec_##T vec) { \
-        int written_elements = fwrite(vec.ptr, sizeof(T), vec.length, stdout); \
-        \
-        return written_elements; \
-    } \
     \
     vec_##T vec_##T##_from_buffer(T* buffer, size_t length) { \
         vec_##T result = vec_##T##_new(); \
@@ -123,21 +115,4 @@
         } \
         \
         return result; \
-    } \
-    \
-    vec_##T vec_##T##_fill(T element, size_t count) { \
-        vec_##T result = vec_##T##_new(); \
-        for (size_t i = 0; i < count; i++) { \
-            vec_##T##_push(&result, element); \
-        } \
-        \
-        return result; \
-    } \
-    \
-    T* iter_##T##_begin(vec_##T vec) { \
-        return vec.ptr; \
-    } \
-    \
-    T* iter_##T##_end(vec_##T vec) { \
-        return vec.ptr + vec.length; \
     }

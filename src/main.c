@@ -28,14 +28,14 @@ void test_vec(void) {
 
     vec_char_set(&vec1, vec_char_get(vec1, 0) + 1, 0);
 
-    for (char* it = iter_char_begin(vec1); it != iter_char_end(vec1); ++it) {
-        *it += 1;
+    for (size_t i = 0; i < vec1.length; i++) {
+        vec1.ptr[i] += 1;
     }
     vec_char vec2 = vec_char_from_buffer(" world", sizeof(" world") - 1);
     vec_char_append(&vec1, vec2);
     vec_char_push(&vec1, '\n');
 
-    vec_char_print(vec1);
+    fwrite(vec1.ptr, sizeof(char), vec1.length, stdout);
 
     vec_char_free(&vec1);
     vec_char_free(&vec2);
