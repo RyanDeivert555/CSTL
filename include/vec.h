@@ -2,8 +2,6 @@
 #include <assert.h>
 #include <string.h> // IWYU pragma: keep
 
-// TODO: remove bloat functions
-
 #define VEC_DEFINE(T) \
     typedef struct vec_##T { \
         T* ptr; \
