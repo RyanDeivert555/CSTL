@@ -6,6 +6,9 @@
         size_t length; \
     } array_##T; \
     \
+    array_##T array_##T##_new(void); \
+
+#define ARRAY_IMPLEMENT(T, Size) \
     array_##T array_##T##_new(void) { \
         array_##T result = {0}; \
         \

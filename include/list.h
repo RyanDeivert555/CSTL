@@ -7,6 +7,21 @@
         struct node_##T* next; \
     } node_##T; \
     \
+    node_##T* node_##T##_new(T entry); \
+    \
+    typedef struct list_##T { \
+        node_##T* head; \
+        size_t length; \
+    } list_##T; \
+    \
+    list_##T list_##T##_new(void); \
+    void list_##T##_free(list_##T* list); \
+    void list_##T##_push_front(list_##T* list, T entry); \
+    void list_##T##_push_back(list_##T* list, T entry); \
+    void list_##T##_pop_front(list_##T* list); \
+    void list_##T##_pop_back(list_##T* list); \
+
+#define LIST_IMPLEMENT(T) \
     node_##T* node_##T##_new(T entry) { \
         node_##T* result = malloc(sizeof(node_##T)); \
         result->data = entry; \
@@ -15,15 +30,8 @@
         return result; \
     } \
     \
-    typedef struct list_##T { \
-        node_##T* head; \
-        size_t length; \
-    } list_##T; \
-    \
     list_##T list_##T##_new(void) { \
         list_##T result = {0}; \
-        result.head = NULL; \
-        result.length = 0; \
         \
         return result; \
     } \

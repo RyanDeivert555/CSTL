@@ -1,8 +1,7 @@
 #pragma once
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
-#include <string.h>
+#include <string.h> // IWYU pragma: keep
 
 #define VEC_DEFINE(T) \
     typedef struct vec_##T { \

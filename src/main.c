@@ -7,6 +7,7 @@
 VEC_DEFINE(char)
 VEC_IMPLEMENT(char)
 LIST_DEFINE(float)
+LIST_IMPLEMENT(float)
 
 void test_vec(void);
 void test_list(void);
@@ -36,16 +37,6 @@ void test_vec(void) {
     vec_char_free(&vec1);
     vec_char_free(&vec2);
     printf("vec test end\n");
-}
-
-size_t hash(int key) {
-    key ^= key >> 16;
-    key *= 0x85ebca6b;
-    key ^= key >> 13;
-    key *= 0xc2b2ae35;
-    key ^= key >> 16;
-    
-    return (size_t)key;
 }
 
 void test_list(void) {

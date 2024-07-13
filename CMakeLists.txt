@@ -8,8 +8,6 @@ add_executable(${PROJECT_NAME}
     src/main.c
     include/vec.h
     include/list.h
-    include/array_hashmap.h
-    include/hashmap.h
     include/array.h
     include/bounded_array.h
 )
