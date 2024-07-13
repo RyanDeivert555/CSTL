@@ -1,23 +1,18 @@
 #include <stdio.h>
 #include "../include/vec.h"
 #include "../include/list.h"
-#include "../include/bounded_array.h"
 
 VEC_DEFINE(char)
 VEC_IMPLEMENT(char)
 LIST_DEFINE(float)
 LIST_IMPLEMENT(float)
-BOUNDED_ARRAY_DEFINE(int, 100)
-BOUNDED_ARRAY_IMPLEMENTATION(int, 100)
 
 void test_vec(void);
 void test_list(void);
-void test_bounded_array(void);
 
 int main(void) {
     test_vec();
     test_list();
-    test_bounded_array();
     
     return 0;
 }
@@ -59,12 +54,4 @@ void test_list(void) {
     printf("\n");
     list_float_free(&l1);
     printf("list test end\n");
-}
-
-void test_bounded_array(void) {
-    printf("bounded array test start\n");
-    bounded_array_int_size_100 array = bounded_array_int_size_100_new();
-    bounded_array_int_size_100_append(&array, 0);
-
-    printf("bounded array test end\n");
 }
