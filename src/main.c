@@ -18,12 +18,21 @@ int main(void) {
 }
 
 void test_vec(void) {
-    vec_char vec1 = vec_char_from_buffer("gdkkn", 5);
+    vec_char vec1 = vec_char_new();
+    const char* hello = "gdkkn";
+    for (size_t i = 0; i < 5; i++) {
+        vec_char_push(&vec1, hello[i]);
+    }
 
     for (size_t i = 0; i < vec1.length; i++) {
         vec1.ptr[i] += 1;
     }
-    vec_char vec2 = vec_char_from_buffer(" world", sizeof(" world") - 1);
+    vec_char vec2 = vec_char_new();
+    const char* world = " world";
+    for (size_t i = 0; i < 6; i++) {
+        vec_char_push(&vec2, world[i]);
+    }
+
     vec_char_append(&vec1, vec2);
     vec_char_push(&vec1, '\n');
 
