@@ -43,10 +43,8 @@ void test_list(void) {
     for (float i = 0.0f; i < 10.0f; i++) {
         list_float_push_back(&l1, i);
         list_float_push_front(&l1, i);
-        list_float_pop_back(&l1);
+        assert(list_float_pop_back(&l1) == i);
     }
-
-
 
     float expected = 9.0f;
     node_float* current = l1.head;    

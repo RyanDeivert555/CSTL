@@ -18,8 +18,8 @@
     void list_##T##_free(list_##T* list); \
     void list_##T##_push_front(list_##T* list, T entry); \
     void list_##T##_push_back(list_##T* list, T entry); \
-    void list_##T##_pop_front(list_##T* list); \
-    void list_##T##_pop_back(list_##T* list); \
+    T list_##T##_pop_front(list_##T* list); \
+    T list_##T##_pop_back(list_##T* list); \
 
 #define LIST_IMPLEMENT(T) \
     node_##T* node_##T##_new(T entry) { \
@@ -71,26 +71,34 @@
         current->next = new_node; \
     } \
     \
-    void list_##T##_pop_front(list_##T* list) { \
+    T list_##T##_pop_front(list_##T* list) { \
         assert(list->length > 0); \
         list->length--; \
         node_##T* temp = list->head; \
+        T value = temp->data; \
         list->head = list->head->next; \
         free(temp); \
+        \
+        return value; \
     } \
     \
-    void list_##T##_pop_back(list_##T* list) { \
+    T list_##T##_pop_back(list_##T* list) { \
         assert(list->length > 0); \
         list->length--; \
         if (list->head->next == NULL) { \
+            T value = list->head->data; \
             free(list->head); \
             list->head = NULL; \
-            return; \
+            \
+            return value; \
         } \
         node_##T* second_last = list->head; \
         while (second_last->next->next) { \
             second_last = second_last->next; \
         } \
+        T value = second_last->next->data; \
         free(second_last->next); \
         second_last->next = NULL; \
+        \
+        return value; \
     }
