@@ -19,8 +19,6 @@
     void vec_##T##_reserve(vec_##T* vec, size_t extra_spaces); \
     void vec_##T##_append(vec_##T* dest, vec_##T src); \
     void vec_##T##_clear(vec_##T* vec); \
-    int vec_##T##_is_empty(vec_##T vec);
-
 
 #define VEC_IMPLEMENT(T) \
     vec_##T vec_##T##_new(void) { \
@@ -88,8 +86,4 @@
     \
     void vec_##T##_clear(vec_##T* vec) { \
         vec->length = 0; \
-    } \
-    \
-    int vec_##T##_is_empty(vec_##T vec) { \
-        return vec.length == 0; \
     }
