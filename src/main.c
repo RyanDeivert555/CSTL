@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "../include/vec.h"
 #include "../include/list.h"
+#include "../include/allocator.h"
 
 VEC_DEFINE(char)
 VEC_IMPLEMENT(char)
@@ -18,7 +19,9 @@ int main(void) {
 }
 
 void test_vec(void) {
-    vec_char vec1 = vec_char_new();
+    allocator allocator = basic_allocator();
+
+    vec_char vec1 = vec_char_new(allocator);
     const char* hello = "gdkkn";
     for (size_t i = 0; i < 5; i++) {
         vec_char_push(&vec1, hello[i]);
@@ -27,7 +30,7 @@ void test_vec(void) {
     for (size_t i = 0; i < vec1.length; i++) {
         vec1.ptr[i] += 1;
     }
-    vec_char vec2 = vec_char_new();
+    vec_char vec2 = vec_char_new(allocator);
     const char* world = " world";
     for (size_t i = 0; i < 6; i++) {
         vec_char_push(&vec2, world[i]);
@@ -46,7 +49,9 @@ void test_vec(void) {
 }
 
 void test_list(void) {
-    list_float l1 = list_float_new();
+    allocator allocator = basic_allocator();
+
+    list_float l1 = list_float_new(allocator);
     for (float i = 0.0f; i < 10.0f; i++) {
         list_float_push_back(&l1, i);
         list_float_push_front(&l1, i);

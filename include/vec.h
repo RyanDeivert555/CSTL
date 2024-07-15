@@ -1,15 +1,17 @@
 #pragma once
 #include <assert.h>
 #include <string.h> // IWYU pragma: keep
+#include "allocator.h" // IWYU pragma: keep
 
 #define VEC_DEFINE(T) \
     typedef struct vec_##T { \
         T* ptr; \
         size_t length; \
         size_t capacity; \
+        allocator allocator; \
     } vec_##T; \
     \
-    vec_##T vec_##T##_new(void); \
+    vec_##T vec_##T##_new(allocator allocator); \
     void vec_##T##_free(vec_##T* vec); \
     void vec_##T##_grow(vec_##T* vec); \
     void vec_##T##_push(vec_##T* vec, T elem); \
@@ -20,19 +22,20 @@
     void vec_##T##_append(vec_##T* dest, vec_##T src); \
 
 #define VEC_IMPLEMENT(T) \
-    vec_##T vec_##T##_new(void) { \
+    vec_##T vec_##T##_new(allocator allocator) { \
         vec_##T result = {0}; \
+        result.allocator = allocator; \
         \
         return result; \
     } \
     \
     void vec_##T##_free(vec_##T* vec) { \
-        free(vec->ptr); \
+        allocator_free(vec->allocator, vec->ptr); \
     } \
     \
     void vec_##T##_grow(vec_##T* vec) { \
         vec->capacity = (vec->capacity == 0) ? 2 : 2 * vec->capacity; \
-        vec->ptr = realloc(vec->ptr, vec->capacity * sizeof(T)); \
+        vec->ptr = allocator_realloc(vec->allocator, vec->ptr, vec->capacity * sizeof(T)); \
     } \
     \
     void vec_##T##_push(vec_##T* vec, T elem) { \
@@ -72,7 +75,7 @@
     } \
     \
     void vec_##T##_reserve(vec_##T* vec, size_t extra_spaces) { \
-        vec->ptr = realloc(vec->ptr, (vec->capacity + extra_spaces) * sizeof(T)); \
+        vec->ptr = allocator_realloc(vec->allocator, vec->ptr, (vec->capacity + extra_spaces) * sizeof(T)); \
         vec->capacity += extra_spaces; \
     } \
     \

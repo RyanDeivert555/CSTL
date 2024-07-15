@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include "allocator.h" // IWYU pragma: keep
 
 #define LIST_DEFINE(T) \
     typedef struct node_##T { \
@@ -7,14 +8,15 @@
         struct node_##T* next; \
     } node_##T; \
     \
-    node_##T* node_##T##_new(T entry); \
+    node_##T* node_##T##_new(allocator allocator, T entry); \
     \
     typedef struct list_##T { \
         node_##T* head; \
         size_t length; \
+        allocator allocator; \
     } list_##T; \
     \
-    list_##T list_##T##_new(void); \
+    list_##T list_##T##_new(allocator allocator); \
     void list_##T##_free(list_##T* list); \
     void list_##T##_push_front(list_##T* list, T entry); \
     void list_##T##_push_back(list_##T* list, T entry); \
@@ -22,16 +24,17 @@
     T list_##T##_pop_back(list_##T* list); \
 
 #define LIST_IMPLEMENT(T) \
-    node_##T* node_##T##_new(T entry) { \
-        node_##T* result = malloc(sizeof(node_##T)); \
+    node_##T* node_##T##_new(allocator allocator, T entry) { \
+        node_##T* result = allocator_alloc(allocator, sizeof(node_##T)); \
         result->data = entry; \
         result->next = NULL; \
         \
         return result; \
     } \
     \
-    list_##T list_##T##_new(void) { \
+    list_##T list_##T##_new(allocator allocator) { \
         list_##T result = {0}; \
+        result.allocator = allocator; \
         \
         return result; \
     } \
@@ -41,12 +44,12 @@
         while (current) { \
             node_##T* temp = current; \
             current = current->next; \
-            free(temp); \
+            allocator_free(list->allocator, temp); \
         } \
     } \
     \
     void list_##T##_push_front(list_##T* list, T entry) { \
-        node_##T* new_node = node_##T##_new(entry); \
+        node_##T* new_node = node_##T##_new(list->allocator, entry); \
         list->length++; \
         if (list->head == NULL) { \
             list->head = new_node; \
@@ -58,7 +61,7 @@
     } \
     \
     void list_##T##_push_back(list_##T* list, T entry) { \
-        node_##T* new_node = node_##T##_new(entry); \
+        node_##T* new_node = node_##T##_new(list->allocator, entry); \
         list->length++; \
         if (list->head == NULL) { \
             list->head = new_node; \
@@ -77,7 +80,7 @@
         node_##T* temp = list->head; \
         T value = temp->data; \
         list->head = list->head->next; \
-        free(temp); \
+        allocator_free(list->allocator, temp); \
         \
         return value; \
     } \
@@ -87,7 +90,7 @@
         list->length--; \
         if (list->head->next == NULL) { \
             T value = list->head->data; \
-            free(list->head); \
+            allocator_free(list->allocator, list->head); \
             list->head = NULL; \
             \
             return value; \
@@ -97,7 +100,7 @@
             second_last = second_last->next; \
         } \
         T value = second_last->next->data; \
-        free(second_last->next); \
+        allocator_free(list->allocator, second_last->next); \
         second_last->next = NULL; \
         \
         return value; \
