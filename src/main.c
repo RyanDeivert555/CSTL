@@ -89,7 +89,7 @@ void test_allocator(void) {
 
     assert(*num == 0);
 
-    assert(allocator_raw_realloc(a, (char**)&num, sizeof(int), sizeof(int) * 2));
+    assert(allocator_raw_realloc(a, (unsigned char**)&num, sizeof(int), sizeof(int) * 2));
 
     assert(num != NULL);
 
@@ -99,7 +99,7 @@ void test_allocator(void) {
     assert(num[0] = 1);
     assert(num[1] = 1);
 
-    allocator_raw_free(a, (char*)num, 1);
+    allocator_raw_free(a, (unsigned char*)num, 1);
 
     size_t len = 10;
     size_t* nums = allocator_alloc(size_t, a, len);
