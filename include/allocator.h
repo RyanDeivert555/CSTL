@@ -1,10 +1,11 @@
 #pragma once
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct allocator_vtable {
-    void* (*alloc)(void* ctx, size_t elem_size, size_t size);
-    void* (*realloc)(void* vtx, void* ptr, size_t elem_size, size_t size);
-    void (*free)(void* ctx, void* ptr, size_t elem_size, size_t size);
+    char* (*alloc)(void* ctx, size_t bytes);
+    bool (*realloc)(void* vtx, char** ptr, size_t current_size, size_t new_size);
+    void (*free)(void* ctx, char* ptr, size_t size);
 } allocator_vtable;
 
 typedef struct allocator {
@@ -12,8 +13,8 @@ typedef struct allocator {
     const allocator_vtable* vtable;
 } allocator;
 
-void* allocator_raw_alloc(allocator allocator, size_t elem_size, size_t size);
-void* allocator_raw_realloc(allocator allocator, void* ptr, size_t elem_size, size_t size);
-void allocator_raw_free(allocator allocator, void* ptr, size_t elem_size, size_t size);
+char* allocator_raw_alloc(allocator allocator, size_t bytes);
+bool allocator_raw_realloc(allocator allocator, char** ptr, size_t current_size, size_t new_size);
+void allocator_raw_free(allocator allocator, char* ptr, size_t size);
 
 allocator c_allocator(void);

@@ -79,6 +79,27 @@ int main(void) {
 // }
 
 void test_allocator(void) {
+    allocator a = c_allocator();
+
+    int* num = (int*)allocator_raw_alloc(a, sizeof(int));
+
+    assert(num != NULL);
+
+    *num = 0;
+
+    assert(*num == 0);
+
+    assert(allocator_raw_realloc(a, (char**)&num, sizeof(int), sizeof(int) * 2));
+
+    assert(num != NULL);
+
+    num[0] = 1;
+    num[1] = 1;
+
+    assert(num[0] = 1);
+    assert(num[1] = 1);
+
+    allocator_raw_free(a, (char*)num, 1);
 
     printf("allocator test passed\n");
 }
