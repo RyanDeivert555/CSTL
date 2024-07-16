@@ -14,19 +14,19 @@ void allocator_free(allocator allocator, void* ptr, size_t elem_size, size_t siz
     allocator.vtable.free(allocator.ctx, ptr, elem_size, size);
 }
 
-void* basic_alloc(void* ctx, size_t elem_size, size_t size) {
+static void* basic_alloc(void* ctx, size_t elem_size, size_t size) {
     (void)ctx;
     // TODO: should this use calloc?
     return malloc(elem_size * size);
 }
 
-void* basic_realloc(void* ctx, void* ptr, size_t elem_size, size_t size) {
+static void* basic_realloc(void* ctx, void* ptr, size_t elem_size, size_t size) {
     (void)ctx;
 
     return realloc(ptr, elem_size * size);
 }
 
-void basic_free(void* ctx, void* ptr, size_t elem_size, size_t size) {
+static void basic_free(void* ctx, void* ptr, size_t elem_size, size_t size) {
     (void)ctx;
     (void)elem_size;
     (void)size;
