@@ -104,14 +104,18 @@ void test_allocator(void) {
     size_t len = 10;
     size_t* nums = allocator_alloc(size_t, a, len);
 
-    for (size_t i = 0;i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         nums[i] = i;
     }
-    for (size_t i = 0;i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         assert(nums[i] == i);
     }
 
-    allocator_free(int, a, nums, len);
+    size_t new_len = 100;
+
+    assert(allocator_realloc(size_t, a, &nums, len, new_len));
+
+    allocator_free(size_t, a, nums, len);
 
     printf("allocator test passed\n");
 }
