@@ -16,4 +16,4 @@ void* allocator_alloc(allocator allocator, size_t elem_size, size_t size);
 void* allocator_realloc(allocator allocator, void* ptr, size_t elem_size, size_t size);
 void allocator_free(allocator allocator, void* ptr, size_t elem_size, size_t size);
 
-allocator basic_allocator(void);
+allocator c_allocator(void);

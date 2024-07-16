@@ -22,7 +22,7 @@ int main(void) {
 }
 
 void test_vec(void) {
-    allocator allocator = basic_allocator();
+    allocator allocator = c_allocator();
 
     vec_char vec1 = vec_char_new(allocator);
     const char* hello = "gdkkn";
@@ -54,7 +54,7 @@ void test_vec(void) {
 }
 
 void test_list(void) {
-    allocator allocator = basic_allocator();
+    allocator allocator = c_allocator();
 
     list_float l1 = list_float_new(allocator);
     for (float i = 0.0f; i < 10.0f; i++) {
