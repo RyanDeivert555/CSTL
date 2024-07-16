@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 #include "../include/vec.h"
 #include "../include/list.h"
 #include "../include/allocator.h"
@@ -14,6 +15,8 @@ void test_list(void);
 int main(void) {
     test_vec();
     test_list();
+
+    printf("all tests passed");
     
     return 0;
 }
@@ -46,6 +49,8 @@ void test_vec(void) {
 
     vec_char_free(&vec1);
     vec_char_free(&vec2);
+
+    printf("vec tests passed\n");
 }
 
 void test_list(void) {
@@ -65,5 +70,8 @@ void test_list(void) {
         current = current->next;
         expected -= 1.0f;
     }
+
     list_float_free(&l1);
+
+    printf("list tests passed\n");
 }
