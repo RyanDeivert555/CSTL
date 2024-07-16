@@ -3,15 +3,15 @@
 #include <assert.h>
 
 void* allocator_alloc(allocator allocator, size_t elem_size, size_t size) {
-    return allocator.vtable.alloc(allocator.ctx, elem_size, size);
+    return allocator.vtable->alloc(allocator.ctx, elem_size, size);
 }
 
 void* allocator_realloc(allocator allocator, void* ptr, size_t elem_size, size_t size) {
-    return allocator.vtable.realloc(allocator.ctx, ptr, elem_size, size);
+    return allocator.vtable->realloc(allocator.ctx, ptr, elem_size, size);
 }
 
 void allocator_free(allocator allocator, void* ptr, size_t elem_size, size_t size) {
-    allocator.vtable.free(allocator.ctx, ptr, elem_size, size);
+    allocator.vtable->free(allocator.ctx, ptr, elem_size, size);
 }
 
 static void* basic_alloc(void* ctx, size_t elem_size, size_t size) {
@@ -33,14 +33,16 @@ static void basic_free(void* ctx, void* ptr, size_t elem_size, size_t size) {
     free(ptr);
 }
 
+static allocator_vtable basic_allocator_vtable = {
+    .alloc = basic_alloc,
+    .realloc = basic_realloc,
+    .free = basic_free,
+};
+
 allocator basic_allocator(void) {
     allocator result = {
         .ctx = NULL,
-        .vtable = {
-            .alloc = basic_alloc,
-            .realloc = basic_realloc,
-            .free = basic_free,
-        },
+        .vtable = &basic_allocator_vtable,
     };
 
     return result;

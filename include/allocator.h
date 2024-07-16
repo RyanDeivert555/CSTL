@@ -9,7 +9,7 @@ typedef struct allocator_vtable {
 
 typedef struct allocator {
     void* ctx;
-    allocator_vtable vtable;
+    const allocator_vtable* vtable;
 } allocator;
 
 void* allocator_alloc(allocator allocator, size_t elem_size, size_t size);
