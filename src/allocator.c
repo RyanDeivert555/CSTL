@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <assert.h>
 
-void* allocator_alloc(allocator allocator, size_t elem_size, size_t size) {
+void* allocator_raw_alloc(allocator allocator, size_t elem_size, size_t size) {
     return allocator.vtable->alloc(allocator.ctx, elem_size, size);
 }
 
-void* allocator_realloc(allocator allocator, void* ptr, size_t elem_size, size_t size) {
+void* allocator_raw_realloc(allocator allocator, void* ptr, size_t elem_size, size_t size) {
     return allocator.vtable->realloc(allocator.ctx, ptr, elem_size, size);
 }
 
-void allocator_free(allocator allocator, void* ptr, size_t elem_size, size_t size) {
+void allocator_raw_free(allocator allocator, void* ptr, size_t elem_size, size_t size) {
     allocator.vtable->free(allocator.ctx, ptr, elem_size, size);
 }
 

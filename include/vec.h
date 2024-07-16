@@ -30,12 +30,12 @@
     } \
     \
     void vec_##T##_free(vec_##T* vec) { \
-        allocator_free(vec->allocator, vec->ptr, sizeof(T), vec->capacity); \
+        allocator_raw_free(vec->allocator, vec->ptr, sizeof(T), vec->capacity); \
     } \
     \
     void vec_##T##_grow(vec_##T* vec) { \
         vec->capacity = (vec->capacity == 0) ? 2 : 2 * vec->capacity; \
-        vec->ptr = allocator_realloc(vec->allocator, vec->ptr, sizeof(T), vec->capacity); \
+        vec->ptr = allocator_raw_realloc(vec->allocator, vec->ptr, sizeof(T), vec->capacity); \
     } \
     \
     void vec_##T##_push(vec_##T* vec, T elem) { \
@@ -75,7 +75,7 @@
     } \
     \
     void vec_##T##_reserve(vec_##T* vec, size_t extra_spaces) { \
-        vec->ptr = allocator_realloc(vec->allocator, vec->ptr, sizeof(T), (vec->capacity + extra_spaces)); \
+        vec->ptr = allocator_raw_realloc(vec->allocator, vec->ptr, sizeof(T), (vec->capacity + extra_spaces)); \
         vec->capacity += extra_spaces; \
     } \
     \
