@@ -29,3 +29,12 @@ void allocator_raw_free(allocator allocator, unsigned char* ptr, size_t size);
     allocator_raw_free(allocator, (unsigned char*)ptr, sizeof(T) * length)
 
 allocator c_allocator(void);
+
+typedef struct fba {
+    unsigned char* buffer;
+    size_t length;
+    size_t end_index;
+} fba;
+
+fba fba_new(unsigned char* buffer, size_t length);
+allocator fba_as_allocator(fba* fba);

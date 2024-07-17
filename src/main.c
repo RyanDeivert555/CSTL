@@ -12,11 +12,13 @@ LIST_IMPLEMENT(float)
 void test_vec(void);
 void test_list(void);
 void test_allocator(void);
+void test_fba(void);
 
 int main(void) {
     test_vec();
     test_list();
     test_allocator();
+    test_fba();
 
     printf("all tests passed");
     
@@ -118,4 +120,31 @@ void test_allocator(void) {
     allocator_free(size_t, a, nums, len);
 
     printf("allocator test passed\n");
+}
+
+void test_fba(void) {
+    unsigned char buffer[1000000];
+    fba fba = fba_new(buffer, 1000000);
+    allocator a = fba_as_allocator(&fba);
+
+    int* memory = allocator_create(int, a);
+
+    assert(memory != NULL);
+    *memory = 10;
+
+    size_t* more_memory = allocator_create(size_t, a);
+
+    assert(more_memory != NULL);
+    assert(*memory == 10);
+
+    size_t new_len = 10;
+
+    assert(allocator_realloc(size_t, a, &more_memory, 1, new_len));
+    // not last alloc, will not reallocate
+    assert(!allocator_realloc(int, a, &memory, 1, 100));
+
+    allocator_destroy(int, a, memory);
+    allocator_free(size_t, a, more_memory, new_len);
+
+    printf("fba test passed\n");
 }
