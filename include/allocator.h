@@ -30,6 +30,7 @@ void allocator_raw_free(allocator allocator, unsigned char* ptr, size_t size);
 
 allocator c_allocator(void);
 
+// TODO: fba not portable, requires -fno-strict-aliasing
 typedef struct fba {
     unsigned char* buffer;
     size_t length;
