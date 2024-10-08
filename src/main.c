@@ -4,6 +4,7 @@
 #include "../include/list.h"
 #include "../include/hashmap.h"
 #include "../include/allocator.h"
+#include "../include/fba.h"
 
 typedef const char* str;
 long long str_hash(str key) {
