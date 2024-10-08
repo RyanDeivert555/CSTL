@@ -2,21 +2,43 @@
 #include <stdio.h>
 #include "../include/vec.h"
 #include "../include/list.h"
+#include "../include/hashmap.h"
 #include "../include/allocator.h"
+
+typedef const char* str;
+long long str_hash(str key) {
+    long long result = 0;
+
+    while(*key) {
+        result = ((result << 5) + result) + *key;
+
+        key++;
+    }
+
+    return result;
+}
+
+int str_eql(str a, str b) {
+    return a == b;
+}
 
 VEC_DEFINE(char)
 VEC_IMPLEMENT(char)
 LIST_DEFINE(float)
 LIST_IMPLEMENT(float)
+HASHMAP_DEFINE(str, int)
+HASHMAP_IMPL(str, int, str_hash, str_eql)
 
 void test_vec(void);
 void test_list(void);
+void test_hashmap(void);
 void test_allocator(void);
 void test_fba(void);
 
 int main(void) {
     test_vec();
     test_list();
+    test_hashmap();
     test_allocator();
     test_fba();
 
@@ -78,6 +100,34 @@ void test_list(void) {
     list_float_free(&l1);
  
     printf("list tests passed\n");
+}
+
+void test_hashmap(void) {
+    allocator allocator = c_allocator();
+
+    hashmap_str_int map = hashmap_str_int_new(allocator);
+
+    hashmap_str_int_set(&map, "Ryan", 19);
+    hashmap_str_int_set(&map, "Aidan", 16);
+
+    int* v1 = hashmap_str_int_get(&map, "Ryan");
+    assert(v1 != NULL);
+    assert(*v1 == 19);
+
+    int* v2 = hashmap_str_int_get(&map, "Aidan");
+    assert(v2 != NULL);
+    assert(*v2 == 16);
+
+    int* v3 = hashmap_str_int_get(&map, "Bob");
+    assert(v3 == NULL);
+
+    hashmap_str_int_set(&map, "Ryan", 21);
+    int* v4 = hashmap_str_int_get(&map, "Ryan");
+    assert(v4 != NULL);
+    assert(*v4 == 21);
+
+    hashmap_str_int_free(&map);
+    printf("hashmap tests passed\n");
 }
 
 void test_allocator(void) {

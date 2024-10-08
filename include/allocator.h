@@ -39,3 +39,4 @@ typedef struct fba {
 
 fba fba_new(unsigned char* buffer, size_t length);
 allocator fba_as_allocator(fba* fba);
+
