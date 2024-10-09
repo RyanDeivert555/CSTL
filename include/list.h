@@ -13,15 +13,14 @@
     typedef struct list_##T { \
         node_##T* head; \
         size_t length; \
-        allocator allocator; \
     } list_##T; \
     \
-    list_##T list_##T##_new(allocator allocator); \
-    void list_##T##_free(list_##T* list); \
-    void list_##T##_push_front(list_##T* list, T entry); \
-    void list_##T##_push_back(list_##T* list, T entry); \
-    T list_##T##_pop_front(list_##T* list); \
-    T list_##T##_pop_back(list_##T* list); \
+    list_##T list_##T##_new(void); \
+    void list_##T##_free(allocator allocator, list_##T* list); \
+    void list_##T##_push_front(allocator allocator, list_##T* list, T entry); \
+    void list_##T##_push_back(allocator allocator, list_##T* list, T entry); \
+    T list_##T##_pop_front(allocator allocator, list_##T* list); \
+    T list_##T##_pop_back(allocator allocator, list_##T* list); \
 
 #define LIST_IMPLEMENT(T) \
     node_##T* node_##T##_new(allocator allocator, T entry) { \
@@ -32,24 +31,23 @@
         return result; \
     } \
     \
-    list_##T list_##T##_new(allocator allocator) { \
+    list_##T list_##T##_new(void) { \
         list_##T result = {0}; \
-        result.allocator = allocator; \
         \
         return result; \
     } \
     \
-    void list_##T##_free(list_##T* list) { \
+    void list_##T##_free(allocator allocator, list_##T* list) { \
         node_##T* current = list->head; \
         while (current) { \
             node_##T* temp = current; \
             current = current->next; \
-            allocator_destroy(node_##T, list->allocator, temp); \
+            allocator_destroy(node_##T, allocator, temp); \
         } \
     } \
     \
-    void list_##T##_push_front(list_##T* list, T entry) { \
-        node_##T* new_node = node_##T##_new(list->allocator, entry); \
+    void list_##T##_push_front(allocator allocator, list_##T* list, T entry) { \
+        node_##T* new_node = node_##T##_new(allocator, entry); \
         list->length++; \
         if (list->head == NULL) { \
             list->head = new_node; \
@@ -60,8 +58,8 @@
         list->head->next = old_head; \
     } \
     \
-    void list_##T##_push_back(list_##T* list, T entry) { \
-        node_##T* new_node = node_##T##_new(list->allocator, entry); \
+    void list_##T##_push_back(allocator allocator, list_##T* list, T entry) { \
+        node_##T* new_node = node_##T##_new(allocator, entry); \
         list->length++; \
         if (list->head == NULL) { \
             list->head = new_node; \
@@ -74,23 +72,23 @@
         current->next = new_node; \
     } \
     \
-    T list_##T##_pop_front(list_##T* list) { \
+    T list_##T##_pop_front(allocator allocator, list_##T* list) { \
         assert(list->length > 0); \
         list->length--; \
         node_##T* temp = list->head; \
         T value = temp->data; \
         list->head = list->head->next; \
-        allocator_destroy(node_##T, list->allocator, temp); \
+        allocator_destroy(node_##T, allocator, temp); \
         \
         return value; \
     } \
     \
-    T list_##T##_pop_back(list_##T* list) { \
+    T list_##T##_pop_back(allocator allocator, list_##T* list) { \
         assert(list->length > 0); \
         list->length--; \
         if (list->head->next == NULL) { \
             T value = list->head->data; \
-            allocator_destroy(node_##T, list->allocator, list->head); \
+            allocator_destroy(node_##T, allocator, list->head); \
             list->head = NULL; \
             \
             return value; \
@@ -100,7 +98,7 @@
             second_last = second_last->next; \
         } \
         T value = second_last->next->data; \
-        allocator_destroy(node_##T, list->allocator, second_last->next); \
+        allocator_destroy(node_##T, allocator, second_last->next); \
         second_last->next = NULL; \
         \
         return value; \
