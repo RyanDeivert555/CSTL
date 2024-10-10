@@ -84,3 +84,4 @@
         memcpy(&dest->ptr[dest->length], src.ptr, count * sizeof(T)); \
         dest->length += count; \
     }
+

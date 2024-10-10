@@ -2,6 +2,8 @@
 #include "allocator.h" // IWYU pragma: keep
 #include <stdlib.h> // IWYU pragma: keep
 
+// TODO: iterators for traversal
+
 #define HASHMAP_DEFINE(K, V) \
     typedef struct hashmap_##K##_##V##_pair { \
         K key; \

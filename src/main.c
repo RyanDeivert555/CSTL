@@ -10,7 +10,7 @@ typedef const char* str;
 long long str_hash(str key) {
     long long result = 0;
 
-    while(*key) {
+    while (*key) {
         result = ((result << 5) + result) + *key;
 
         key++;
@@ -49,7 +49,7 @@ int main(void) {
 }
 
 void test_vec(void) {
-    allocator a = c_allocator();
+    const allocator a = c_allocator();
  
     vec_char vec1 = vec_char_new();
     const char* hello = "gdkkn";
@@ -81,7 +81,7 @@ void test_vec(void) {
 }
  
 void test_list(void) {
-    allocator a = c_allocator();
+    const allocator a = c_allocator();
  
     list_float l1 = list_float_new();
     for (float i = 0.0f; i < 10.0f; i++) {
@@ -104,7 +104,7 @@ void test_list(void) {
 }
 
 void test_hashmap(void) {
-    allocator a = c_allocator();
+    const allocator a = c_allocator();
 
     hashmap_str_int map = hashmap_str_int_new();
 
@@ -132,7 +132,7 @@ void test_hashmap(void) {
 }
 
 void test_allocator(void) {
-    allocator a = c_allocator();
+    const allocator a = c_allocator();
 
     int* num = (int*)allocator_raw_alloc(a, sizeof(int));
 
@@ -176,7 +176,7 @@ void test_allocator(void) {
 void test_fba(void) {
     unsigned char buffer[1000000];
     fba fba = fba_new(buffer, 1000000);
-    allocator a = fba_as_allocator(&fba);
+    const allocator a = fba_as_allocator(&fba);
 
     int* memory = allocator_create(int, a);
 
