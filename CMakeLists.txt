@@ -14,3 +14,4 @@ add_executable(${PROJECT_NAME}
     src/allocator.c
     src/fba.c
 )
+
