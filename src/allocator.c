@@ -1,6 +1,5 @@
 #include "../include/allocator.h"
 #include <stdlib.h>
-#include <assert.h>
 
 unsigned char* allocator_raw_alloc(allocator allocator, size_t bytes) {
     return allocator.vtable->alloc(allocator.ctx, bytes);

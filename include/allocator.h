@@ -1,6 +1,6 @@
 #pragma once
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct allocator_vtable {
     unsigned char* (*alloc)(void* ctx, size_t bytes);

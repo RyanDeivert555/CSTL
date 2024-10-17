@@ -1,5 +1,4 @@
 #pragma once
-#include <assert.h>
 #include <string.h> // IWYU pragma: keep
 #include "allocator.h" // IWYU pragma: keep
 
