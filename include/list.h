@@ -22,7 +22,7 @@
     T list_##T##_pop_front(allocator allocator, list_##T* list); \
     T list_##T##_pop_back(allocator allocator, list_##T* list); \
 
-#define LIST_IMPLEMENT(T) \
+#define LIST_IMPL(T) \
     node_##T* node_##T##_new(allocator allocator, T entry) { \
         node_##T* result = allocator_create(node_##T, allocator); \
         result->data = entry; \

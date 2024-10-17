@@ -24,9 +24,9 @@ int str_eql(str a, str b) {
 }
 
 VEC_DEFINE(char)
-VEC_IMPLEMENT(char)
+VEC_IMPL(char)
 LIST_DEFINE(float)
-LIST_IMPLEMENT(float)
+LIST_IMPL(float)
 HASHMAP_DEFINE(str, int)
 HASHMAP_IMPL(str, int, str_hash, str_eql)
 

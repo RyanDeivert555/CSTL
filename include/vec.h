@@ -20,7 +20,7 @@
     void vec_##T##_reserve(allocator allocator, vec_##T* vec, size_t extra_spaces); \
     void vec_##T##_append(allocator allocator, vec_##T* dest, vec_##T src); \
 
-#define VEC_IMPLEMENT(T) \
+#define VEC_IMPL(T) \
     vec_##T vec_##T##_new(void) { \
         vec_##T result = {0}; \
         \
