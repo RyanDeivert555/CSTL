@@ -1,6 +1,7 @@
 #pragma once
 #include "allocator.h" // IWYU pragma: keep
 #include <stdlib.h> // IWYU pragma: keep
+#include <stdbool.h> // IWYU pragma: keep
 
 // TODO: iterators for traversal
 
@@ -8,7 +9,7 @@
     typedef struct hashmap_##K##_##V##_pair { \
         K key; \
         V value; \
-        int occupied; \
+        bool occupied; \
     } hashmap_##K##_##V##_pair; \
     \
     typedef struct hashmap_##K##_##V { \
@@ -38,7 +39,7 @@
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) { \
         size_t index = HashFunc(key) & (map->capacity - 1); \
         \
-        while (map->entries[index].occupied == 1) { \
+        while (map->entries[index].occupied) { \
             if (EqlFunc(key, map->entries[index].key)) { \
                 return &map->entries[index].value; \
             } \
@@ -55,7 +56,7 @@
     static void hashmap_##K##_##V##_set_entry(hashmap_##K##_##V##_pair* entries, size_t capacity, K key, V value, size_t* count) { \
         size_t index = HashFunc(key) & (capacity - 1); \
         \
-        while (entries[index].occupied == 1) { \
+        while (entries[index].occupied) { \
             if (EqlFunc(key, entries[index].key)) { \
                 entries[index].value = value; \
                 \
@@ -70,7 +71,7 @@
         \
         entries[index].key = key; \
         entries[index].value = value; \
-        entries[index].occupied = 1; \
+        entries[index].occupied = true; \
         if (count) { \
             (*count)++; \
         } \
@@ -78,8 +79,8 @@
     \
     void hashmap_##K##_##V##_realloc(allocator allocator, hashmap_##K##_##V* map) { \
         size_t new_capacity = (map->capacity == 0) ? 50 : map->capacity * 2; \
-        \
         hashmap_##K##_##V##_pair* new_entries = allocator_alloc(hashmap_##K##_##V##_pair, allocator, new_capacity); \
+        \
         for (size_t i = 0; i < map->capacity; i++) { \
             hashmap_##K##_##V##_pair* entry = &map->entries[i]; \
             if (entry->occupied) { \
