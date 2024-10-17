@@ -8,5 +8,6 @@ A library with generic implementations of common data stuctures
 - [x] hashmap
 - [x] unmanaged data structures
 - [ ] debug safety freed tracker
+- [ ] Use signed int types for safety
 - [ ] switch to C23
 
