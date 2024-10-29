@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h> // IWYU pragma: keep
 #include "allocator.h" // IWYU pragma: keep
 
 #define LIST_DEFINE(T) \
