@@ -1,34 +1,38 @@
 #include "../include/fba.h"
+#include <stdint.h>
 
-fba fba_new(unsigned char* buffer, size_t length) {
+fba fba_new(unsigned char* buffer, size_t capacity) {
     fba result = {
         .buffer = buffer,
-        .length = length,
-        .end_index = 0,
+        .capacity = capacity,
+        .size = 0,
     };
 
     return result;
 }
 
 static bool fba_is_last_alloc(fba* instance, unsigned char* buffer, size_t length) {
-    return buffer + length == instance->buffer + instance->end_index;
+    return buffer + length == instance->buffer + instance->size;
 }
 
-static unsigned char* fba_alloc(void* ctx, size_t bytes) {
+static unsigned char* fba_alloc(void* ctx, size_t bytes, size_t align) {
     fba* instance = (fba*)ctx;
 
-    size_t offset = instance->end_index;
+    unsigned char* current = instance->buffer + instance->size;
+    size_t padding = -(uintptr_t)current & (align - 1);
+    size_t offset = padding + bytes;
     
-    if (offset + bytes >= instance->length) {
+    if (instance->size + offset > instance->capacity) {
         return NULL;
-    } else {
-        instance->end_index += bytes;
-
-        return instance->buffer + offset;
     }
+
+    unsigned char* data = current + padding;
+    instance->size += offset;
+
+    return data;
 }
 
-static bool fba_realloc(void* ctx, unsigned char** ptr, size_t current_size, size_t new_size) {
+static bool fba_realloc(void* ctx, unsigned char** ptr, size_t current_size, size_t new_size, size_t align) {
     fba* instance = (fba*)ctx;
 
     if (!fba_is_last_alloc(instance, *ptr, current_size)) {
@@ -41,27 +45,27 @@ static bool fba_realloc(void* ctx, unsigned char** ptr, size_t current_size, siz
     
     if (new_size <= current_size) {
         size_t sub = current_size - new_size;
-        instance->end_index -= sub;
+        instance->size -= sub;
 
         return true;
     }
 
     size_t add = new_size - current_size;
 
-    if (add + instance->end_index > instance->length) {
+    if (add + instance->size > instance->capacity) {
         return false;
     }
 
-    instance->end_index += add;
+    instance->size += add;
 
     return true;
 }
 
-static void fba_free(void* ctx, unsigned char* ptr, size_t size) {
+static void fba_free(void* ctx, unsigned char* ptr, size_t size, size_t align) {
     fba* instance = (fba*)ctx;
 
     if (fba_is_last_alloc(instance, ptr, size)) {
-        instance->end_index -= size;
+        instance->size -= size;
     }
 }
 

@@ -7,7 +7,7 @@ add_compile_options(-Wall -Wextra -Wpedantic -g3)
 add_executable(${PROJECT_NAME}
     include/allocator.h
     include/fba.h
-    include/area.h
+    include/arena.h
     include/vec.h
     include/list.h
     include/hashmap.h

@@ -1,27 +1,29 @@
 #include "../include/allocator.h"
 #include <stdlib.h>
 
-unsigned char* allocator_raw_alloc(allocator allocator, size_t bytes) {
-    return allocator.vtable->alloc(allocator.ctx, bytes);
+unsigned char* allocator_raw_alloc(allocator allocator, size_t bytes, size_t align) {
+    return allocator.vtable->alloc(allocator.ctx, bytes, align);
 }
 
-bool allocator_raw_realloc(allocator allocator, unsigned char** ptr, size_t current_size, size_t new_size) {
-    return allocator.vtable->realloc(allocator.ctx, ptr, current_size, new_size);
+bool allocator_raw_realloc(allocator allocator, unsigned char** ptr, size_t current_size, size_t new_size, size_t align) {
+    return allocator.vtable->realloc(allocator.ctx, ptr, current_size, new_size, align);
 }
 
-void allocator_raw_free(allocator allocator, unsigned char* ptr, size_t size) {
-    allocator.vtable->free(allocator.ctx, ptr, size);
+void allocator_raw_free(allocator allocator, unsigned char* ptr, size_t size, size_t align) {
+    allocator.vtable->free(allocator.ctx, ptr, size, align);
 }
 
-static unsigned char* c_alloc(void* ctx, size_t bytes) {
+static unsigned char* c_alloc(void* ctx, size_t bytes, size_t align) {
     (void)ctx;
+    (void)align;
     
     return malloc(bytes);
 }
 
-static bool c_realloc(void* ctx, unsigned char** ptr, size_t current_size, size_t new_size) {
+static bool c_realloc(void* ctx, unsigned char** ptr, size_t current_size, size_t new_size, size_t align) {
     (void)ctx;
     (void)current_size;
+    (void)align;
 
     unsigned char* result = realloc(*ptr, new_size);
 
@@ -36,9 +38,10 @@ static bool c_realloc(void* ctx, unsigned char** ptr, size_t current_size, size_
     }
 }
 
-static void c_free(void* ctx, unsigned char* ptr, size_t size) {
+static void c_free(void* ctx, unsigned char* ptr, size_t size, size_t align) {
     (void)ctx;
     (void)size;
+    (void)align;
     free(ptr);
 }
 

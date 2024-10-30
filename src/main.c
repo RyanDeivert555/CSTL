@@ -134,17 +134,20 @@ void test_hashmap(void) {
 void test_allocator(void) {
     const allocator a = c_allocator();
 
-    int* num = (int*)allocator_raw_alloc(a, sizeof(int));
-
+    int* num = (int*)allocator_raw_alloc(a, sizeof(int), _Alignof(int));
     assert(num != NULL);
+    size_t address = (size_t)num;
+    assert(address % _Alignof(int) == 0);
 
     *num = 0;
 
     assert(*num == 0);
 
-    assert(allocator_raw_realloc(a, (unsigned char**)&num, sizeof(int), sizeof(int) * 2));
+    assert(allocator_raw_realloc(a, (unsigned char**)&num, sizeof(int), sizeof(int) * 2, _Alignof(int)));
 
     assert(num != NULL);
+    address = (size_t)num;
+    assert(address % _Alignof(int) == 0);
 
     num[0] = 1;
     num[1] = 1;
@@ -152,10 +155,12 @@ void test_allocator(void) {
     assert(num[0] = 1);
     assert(num[1] = 1);
 
-    allocator_raw_free(a, (unsigned char*)num, sizeof(int));
+    allocator_raw_free(a, (unsigned char*)num, sizeof(int), _Alignof(int));
 
     size_t len = 10;
     size_t* nums = allocator_alloc(size_t, a, len);
+    address = (size_t)nums;
+    assert(address % _Alignof(size_t) == 0);
 
     for (size_t i = 0; i < len; i++) {
         nums[i] = i;
@@ -174,16 +179,21 @@ void test_allocator(void) {
 }
 
 void test_fba(void) {
-    unsigned char buffer[1000000];
-    fba fba = fba_new(buffer, 1000000);
+    const size_t size = 1000000;
+    unsigned char* buffer = malloc(size);
+    fba fba = fba_new(buffer, size);
     const allocator a = fba_as_allocator(&fba);
 
     int* memory = allocator_create(int, a);
+    size_t address = (size_t)memory;
+    assert(address % _Alignof(int) == 0);
 
     assert(memory != NULL);
     *memory = 10;
 
     size_t* more_memory = allocator_create(size_t, a);
+    address = (size_t)more_memory;
+    assert(address % _Alignof(size_t) == 0);
 
     assert(more_memory != NULL);
     assert(*memory == 10);
@@ -196,6 +206,7 @@ void test_fba(void) {
 
     allocator_destroy(int, a, memory);
     allocator_free(size_t, a, more_memory, new_len);
+    free(buffer);
 
     printf("fba test passed\n");
 }
