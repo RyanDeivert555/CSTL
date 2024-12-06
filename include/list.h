@@ -16,11 +16,11 @@
     } list_##T; \
     \
     list_##T list_##T##_new(void); \
-    void list_##T##_free(allocator allocator, list_##T* list); \
-    void list_##T##_push_front(allocator allocator, list_##T* list, T entry); \
-    void list_##T##_push_back(allocator allocator, list_##T* list, T entry); \
-    T list_##T##_pop_front(allocator allocator, list_##T* list); \
-    T list_##T##_pop_back(allocator allocator, list_##T* list); \
+    void list_##T##_free(list_##T* list, allocator allocator); \
+    void list_##T##_push_front(list_##T* list, allocator allocator, T entry); \
+    void list_##T##_push_back(list_##T* list, allocator allocator, T entry); \
+    T list_##T##_pop_front(list_##T* list, allocator allocator); \
+    T list_##T##_pop_back(list_##T* list, allocator allocator); \
 
 #define LIST_IMPL(T) \
     node_##T* node_##T##_new(allocator allocator, T entry) { \
@@ -37,7 +37,7 @@
         return result; \
     } \
     \
-    void list_##T##_free(allocator allocator, list_##T* list) { \
+    void list_##T##_free(list_##T* list, allocator allocator) { \
         node_##T* current = list->head; \
         while (current) { \
             node_##T* temp = current; \
@@ -46,7 +46,7 @@
         } \
     } \
     \
-    void list_##T##_push_front(allocator allocator, list_##T* list, T entry) { \
+    void list_##T##_push_front(list_##T* list, allocator allocator, T entry) { \
         node_##T* new_node = node_##T##_new(allocator, entry); \
         list->length++; \
         if (list->head == NULL) { \
@@ -58,7 +58,7 @@
         list->head->next = old_head; \
     } \
     \
-    void list_##T##_push_back(allocator allocator, list_##T* list, T entry) { \
+    void list_##T##_push_back(list_##T* list, allocator allocator, T entry) { \
         node_##T* new_node = node_##T##_new(allocator, entry); \
         list->length++; \
         if (list->head == NULL) { \
@@ -72,7 +72,7 @@
         current->next = new_node; \
     } \
     \
-    T list_##T##_pop_front(allocator allocator, list_##T* list) { \
+    T list_##T##_pop_front(list_##T* list, allocator allocator) { \
         assert(list->length > 0); \
         list->length--; \
         node_##T* temp = list->head; \
@@ -83,7 +83,7 @@
         return value; \
     } \
     \
-    T list_##T##_pop_back(allocator allocator, list_##T* list) { \
+    T list_##T##_pop_back(list_##T* list, allocator allocator) { \
         assert(list->length > 0); \
         list->length--; \
         if (list->head->next == NULL) { \

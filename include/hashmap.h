@@ -20,10 +20,10 @@
     } hashmap_##K##_##V; \
     \
     hashmap_##K##_##V hashmap_##K##_##V##_new(void); \
-    void hashmap_##K##_##V##_free(allocator allocator, hashmap_##K##_##V* map); \
+    void hashmap_##K##_##V##_free(hashmap_##K##_##V* map, allocator allocator); \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key); \
-    void hashmap_##K##_##V##_realloc(allocator allocator, hashmap_##K##_##V* map); \
-    void hashmap_##K##_##V##_set(allocator allocator, hashmap_##K##_##V* map, K key, V value); \
+    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator); \
+    void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, allocator allocator, K key, V value); \
 
 #define HASHMAP_IMPL(K, V, HashFunc, EqlFunc) \
     hashmap_##K##_##V hashmap_##K##_##V##_new(void) { \
@@ -32,7 +32,7 @@
         return result; \
     } \
     \
-    void hashmap_##K##_##V##_free(allocator allocator, hashmap_##K##_##V* map) { \
+    void hashmap_##K##_##V##_free(hashmap_##K##_##V* map, allocator allocator) { \
         allocator_free(hashmap_##K##_##V##_pair, allocator, map->entries, map->capacity); \
     } \
     \
@@ -77,7 +77,7 @@
         } \
     } \
     \
-    void hashmap_##K##_##V##_realloc(allocator allocator, hashmap_##K##_##V* map) { \
+    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator) { \
         size_t new_capacity = (map->capacity == 0) ? 50 : map->capacity * 2; \
         hashmap_##K##_##V##_pair* new_entries = allocator_alloc(hashmap_##K##_##V##_pair, allocator, new_capacity); \
         \
@@ -93,9 +93,9 @@
         map->capacity = new_capacity; \
     } \
     \
-    void hashmap_##K##_##V##_set(allocator allocator, hashmap_##K##_##V* map, K key, V value) { \
+    void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, allocator allocator, K key, V value) { \
         if (map->count >= map->capacity / 2) { \
-            hashmap_##K##_##V##_realloc(allocator, map); \
+            hashmap_##K##_##V##_realloc(map, allocator); \
         } \
         hashmap_##K##_##V##_set_entry(map->entries, map->capacity, key, value, &map->count); \
     } \

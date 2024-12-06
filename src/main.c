@@ -54,7 +54,7 @@ void test_vec(void) {
     vec_char vec1 = vec_char_new();
     const char* hello = "gdkkn";
     for (size_t i = 0; i < 5; i++) {
-        vec_char_push(a, &vec1, hello[i]);
+        vec_char_push(&vec1, a, hello[i]);
     }
  
     for (size_t i = 0; i < vec1.length; i++) {
@@ -63,19 +63,19 @@ void test_vec(void) {
     vec_char vec2 = vec_char_new();
     const char* world = " world";
     for (size_t i = 0; i < 6; i++) {
-        vec_char_push(a, &vec2, world[i]);
+        vec_char_push(&vec2, a, world[i]);
     }
  
-    vec_char_append(a, &vec1, vec2);
-    vec_char_push(a, &vec1, '\n');
+    vec_char_append(&vec1, a, vec2);
+    vec_char_push(&vec1, a, '\n');
  
     const char* expected = "hello world\n";
     for (size_t i = 0; i < vec1.length; i++) {
         assert(expected[i] == vec1.ptr[i]);
     }
  
-    vec_char_free(a, &vec1);
-    vec_char_free(a, &vec2);
+    vec_char_free(&vec1, a);
+    vec_char_free(&vec2, a);
  
     printf("vec tests passed\n");
 }
@@ -85,9 +85,9 @@ void test_list(void) {
  
     list_float l1 = list_float_new();
     for (float i = 0.0f; i < 10.0f; i++) {
-        list_float_push_back(a, &l1, i);
-        list_float_push_front(a, &l1, i);
-        assert(list_float_pop_back(a, &l1) == i);
+        list_float_push_back(&l1, a, i);
+        list_float_push_front(&l1, a, i);
+        assert(list_float_pop_back(&l1, a) == i);
     }
 
     float expected = 9.0f;
@@ -98,7 +98,7 @@ void test_list(void) {
         expected -= 1.0f;
     }
  
-    list_float_free(a, &l1);
+    list_float_free(&l1, a);
  
     printf("list tests passed\n");
 }
@@ -108,8 +108,8 @@ void test_hashmap(void) {
 
     hashmap_str_int map = hashmap_str_int_new();
 
-    hashmap_str_int_set(a, &map, "Ryan", 19);
-    hashmap_str_int_set(a, &map, "Aidan", 16);
+    hashmap_str_int_set(&map, a, "Ryan", 19);
+    hashmap_str_int_set(&map, a, "Aidan", 16);
 
     int* v1 = hashmap_str_int_get(&map, "Ryan");
     assert(v1 != NULL);
@@ -122,12 +122,12 @@ void test_hashmap(void) {
     int* v3 = hashmap_str_int_get(&map, "Bob");
     assert(v3 == NULL);
 
-    hashmap_str_int_set(a, &map, "Ryan", 21);
+    hashmap_str_int_set(&map, a, "Ryan", 21);
     int* v4 = hashmap_str_int_get(&map, "Ryan");
     assert(v4 != NULL);
     assert(*v4 == 21);
 
-    hashmap_str_int_free(a, &map);
+    hashmap_str_int_free(&map, a);
     printf("hashmap tests passed\n");
 }
 
