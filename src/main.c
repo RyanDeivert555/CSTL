@@ -152,8 +152,8 @@ void test_allocator(void) {
     num[0] = 1;
     num[1] = 1;
 
-    assert(num[0] = 1);
-    assert(num[1] = 1);
+    assert(num[0] == 1);
+    assert(num[1] == 1);
 
     allocator_raw_free(a, (unsigned char*)num, sizeof(int), _Alignof(int));
 
