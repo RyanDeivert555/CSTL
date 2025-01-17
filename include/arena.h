@@ -3,8 +3,6 @@
 
 typedef struct arena {
     allocator child_allocator;
-    unsigned char* start;
-    unsigned char* end;
 } arena;
 
 arena arena_new(allocator child_allocator);

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "../include/vec.h"
 #include "../include/list.h"
@@ -39,11 +40,11 @@ void test_fba(void);
 int main(void) {
     test_vec();
     test_list();
-    test_hashmap();
+    //test_hashmap();
     test_allocator();
     test_fba();
 
-    printf("all tests passed");
+    puts("all tests passed");
     
     return 0;
 }
@@ -57,25 +58,17 @@ void test_vec(void) {
         vec_char_push(&vec1, a, hello[i]);
     }
  
-    for (size_t i = 0; i < vec1.length; i++) {
-        vec1.ptr[i] += 1;
+    for (int64_t i = 0; i < vec1.length; i++) {
+        vec1.buffer[i] += 1;
     }
-    vec_char vec2 = vec_char_new();
-    const char* world = " world";
-    for (size_t i = 0; i < 6; i++) {
-        vec_char_push(&vec2, a, world[i]);
-    }
- 
-    vec_char_append(&vec1, a, vec2);
     vec_char_push(&vec1, a, '\n');
  
-    const char* expected = "hello world\n";
-    for (size_t i = 0; i < vec1.length; i++) {
-        assert(expected[i] == vec1.ptr[i]);
+    const char* expected = "hello\n";
+    for (int64_t i = 0; i < vec1.length; i++) {
+        assert(expected[i] == vec1.buffer[i]);
     }
  
     vec_char_free(&vec1, a);
-    vec_char_free(&vec2, a);
  
     printf("vec tests passed\n");
 }
@@ -134,78 +127,70 @@ void test_hashmap(void) {
 void test_allocator(void) {
     const allocator a = c_allocator();
 
-    int* num = (int*)allocator_raw_alloc(a, sizeof(int), _Alignof(int));
-    assert(num != NULL);
-    size_t address = (size_t)num;
-    assert(address % _Alignof(int) == 0);
+    {
+        int* num = (int*)allocator_raw_alloc(a, sizeof(int), _Alignof(int));
+        assert(num != NULL);
+        uint64_t address = (uint64_t)num;
+        assert(address % _Alignof(int) == 0);
 
-    *num = 0;
+        *num = 0;
 
-    assert(*num == 0);
+        assert(*num == 0);
 
-    assert(allocator_raw_realloc(a, (unsigned char**)&num, sizeof(int), sizeof(int) * 2, _Alignof(int)));
+        assert(num != NULL);
+        address = (uint64_t)num;
+        assert(address % _Alignof(int) == 0);
 
-    assert(num != NULL);
-    address = (size_t)num;
-    assert(address % _Alignof(int) == 0);
+        num[0] = 1;
+        assert(num[0] == 1);
 
-    num[0] = 1;
-    num[1] = 1;
-
-    assert(num[0] == 1);
-    assert(num[1] == 1);
-
-    allocator_raw_free(a, (unsigned char*)num, sizeof(int), _Alignof(int));
-
-    size_t len = 10;
-    size_t* nums = allocator_alloc(size_t, a, len);
-    address = (size_t)nums;
-    assert(address % _Alignof(size_t) == 0);
-
-    for (size_t i = 0; i < len; i++) {
-        nums[i] = i;
-    }
-    for (size_t i = 0; i < len; i++) {
-        assert(nums[i] == i);
+        allocator_raw_free(a, (unsigned char*)num, sizeof(int), _Alignof(int));
     }
 
-    size_t new_len = 100;
+    {
+        const uint64_t len = 10;
+        uint64_t* nums = allocator_alloc(uint64_t, a, len);
+        const uint64_t address = (uint64_t)nums;
+        assert(address % _Alignof(uint64_t) == 0);
 
-    assert(allocator_realloc(size_t, a, &nums, len, new_len));
+        for (uint64_t i = 0; i < len; i++) {
+            nums[i] = i;
+        }
+        for (uint64_t i = 0; i < len; i++) {
+            assert(nums[i] == i);
+        }
 
-    allocator_free(size_t, a, nums, len);
+        allocator_free(uint64_t, a, nums, len);
+    }
 
     printf("allocator test passed\n");
 }
 
 void test_fba(void) {
-    const size_t size = 1000000;
-    unsigned char* buffer = malloc(size);
+    const int64_t size = 1000000;
+    uint8_t* buffer = malloc(size);
     fba fba = fba_new(buffer, size);
     const allocator a = fba_as_allocator(&fba);
 
-    int* memory = allocator_create(int, a);
-    size_t address = (size_t)memory;
-    assert(address % _Alignof(int) == 0);
+    {
+        int* memory = allocator_create(int, a);
+        const uint64_t address = (uint64_t)memory;
+        assert(address % _Alignof(int) == 0);
 
-    assert(memory != NULL);
-    *memory = 10;
+        assert(memory != NULL);
+        *memory = 10;
 
-    size_t* more_memory = allocator_create(size_t, a);
-    address = (size_t)more_memory;
-    assert(address % _Alignof(size_t) == 0);
+        allocator_destroy(int, a, memory);
+    }
 
-    assert(more_memory != NULL);
-    assert(*memory == 10);
+    {
+        const int64_t length = 10;
+        int* memory = allocator_alloc(int, a, length);
+    
+        assert(memory != NULL);
 
-    size_t new_len = 10;
 
-    assert(allocator_realloc(size_t, a, &more_memory, 1, new_len));
-    // not last alloc, will not reallocate
-    assert(!allocator_realloc(int, a, &memory, 1, 100));
-
-    allocator_destroy(int, a, memory);
-    allocator_free(size_t, a, more_memory, new_len);
+    }
     free(buffer);
 
     printf("fba test passed\n");

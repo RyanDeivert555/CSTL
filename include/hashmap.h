@@ -37,7 +37,7 @@
     } \
     \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) { \
-        size_t index = HashFunc(key) & (map->capacity - 1); \
+        size_t index = HashFunc(key) % map->capacity; \
         \
         while (map->entries[index].occupied) { \
             if (EqlFunc(key, map->entries[index].key)) { \
@@ -54,7 +54,7 @@
     } \
     \
     static void hashmap_##K##_##V##_set_entry(hashmap_##K##_##V##_pair* entries, size_t capacity, K key, V value, size_t* count) { \
-        size_t index = HashFunc(key) & (capacity - 1); \
+        size_t index = HashFunc(key) % capacity; \
         \
         while (entries[index].occupied) { \
             if (EqlFunc(key, entries[index].key)) { \

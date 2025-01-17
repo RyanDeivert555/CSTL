@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h> // IWYU pragma: keep
+#include <stdint.h> // IWYU pragma: keep
 #include "allocator.h" // IWYU pragma: keep
 
 #define LIST_DEFINE(T) \
@@ -12,7 +13,7 @@
     \
     typedef struct list_##T { \
         node_##T* head; \
-        size_t length; \
+        int64_t length; \
     } list_##T; \
     \
     list_##T list_##T##_new(void); \
@@ -76,7 +77,7 @@
         assert(list->length > 0); \
         list->length--; \
         node_##T* temp = list->head; \
-        T value = temp->data; \
+        const T value = temp->data; \
         list->head = list->head->next; \
         allocator_destroy(node_##T, allocator, temp); \
         \
@@ -87,7 +88,7 @@
         assert(list->length > 0); \
         list->length--; \
         if (list->head->next == NULL) { \
-            T value = list->head->data; \
+            const T value = list->head->data; \
             allocator_destroy(node_##T, allocator, list->head); \
             list->head = NULL; \
             \
@@ -97,7 +98,7 @@
         while (second_last->next->next) { \
             second_last = second_last->next; \
         } \
-        T value = second_last->next->data; \
+        const T value = second_last->next->data; \
         allocator_destroy(node_##T, allocator, second_last->next); \
         second_last->next = NULL; \
         \

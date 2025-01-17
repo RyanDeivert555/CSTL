@@ -1,8 +1,8 @@
 #include "../include/fba.h"
 #include <stdint.h>
 
-fba fba_new(unsigned char* buffer, size_t capacity) {
-    fba result = {
+fba fba_new(uint8_t* buffer, int64_t capacity) {
+    const fba result = {
         .buffer = buffer,
         .capacity = capacity,
         .size = 0,
@@ -11,67 +11,32 @@ fba fba_new(unsigned char* buffer, size_t capacity) {
     return result;
 }
 
-static bool fba_is_last_alloc(fba* instance, unsigned char* buffer, size_t length) {
-    return buffer + length == instance->buffer + instance->size;
-}
-
-static unsigned char* fba_alloc(void* ctx, size_t bytes, size_t align) {
+static uint8_t* fba_alloc(void* ctx, int64_t bytes, int64_t align) {
     fba* instance = (fba*)ctx;
 
-    unsigned char* current = instance->buffer + instance->size;
-    size_t padding = -(uintptr_t)current & (align - 1);
-    size_t offset = padding + bytes;
+    uint8_t* current = instance->buffer + instance->size;
+    const int64_t padding = -(uintptr_t)current & (align - 1);
+    const int64_t offset = padding + bytes;
     
     if (instance->size + offset > instance->capacity) {
         return NULL;
     }
 
-    unsigned char* data = current + padding;
+    uint8_t* data = current + padding;
     instance->size += offset;
 
     return data;
 }
 
-static bool fba_realloc(void* ctx, unsigned char** ptr, size_t current_size, size_t new_size, size_t align) {
-    fba* instance = (fba*)ctx;
-
-    if (!fba_is_last_alloc(instance, *ptr, current_size)) {
-        if (new_size > current_size) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    if (new_size <= current_size) {
-        size_t sub = current_size - new_size;
-        instance->size -= sub;
-
-        return true;
-    }
-
-    size_t add = new_size - current_size;
-
-    if (add + instance->size > instance->capacity) {
-        return false;
-    }
-
-    instance->size += add;
-
-    return true;
-}
-
-static void fba_free(void* ctx, unsigned char* ptr, size_t size, size_t align) {
-    fba* instance = (fba*)ctx;
-
-    if (fba_is_last_alloc(instance, ptr, size)) {
-        instance->size -= size;
-    }
+static void fba_free(void* ctx, uint8_t* ptr, int64_t size, int64_t align) {
+    (void)ctx;
+    (void)ptr;
+    (void)size;
+    (void)align;
 }
 
 static allocator_vtable fba_vtable = {
     .alloc = fba_alloc,
-    .realloc = fba_realloc,
     .free = fba_free,
 };
 
