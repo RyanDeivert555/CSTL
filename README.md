@@ -10,6 +10,5 @@ A library with generic implementations of common data stuctures
 - [ ] redesign allocator interface
 - [ ] Use signed int types for safety
 - [ ] debug safety freed tracker
-- [ ] switch to C23
 - [ ] hashmap iterator
 

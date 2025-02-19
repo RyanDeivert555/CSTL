@@ -25,7 +25,7 @@
 
 #define LIST_IMPL(T) \
     node_##T* node_##T##_new(allocator allocator, T entry) { \
-        node_##T* result = allocator_create(node_##T, allocator); \
+        node_##T* result = allocator_alloc(node_##T, allocator, 1); \
         result->data = entry; \
         result->next = NULL; \
         \
@@ -43,7 +43,7 @@
         while (current) { \
             node_##T* temp = current; \
             current = current->next; \
-            allocator_destroy(node_##T, allocator, temp); \
+            allocator_free(node_##T, allocator, temp, 1); \
         } \
     } \
     \
@@ -79,7 +79,7 @@
         node_##T* temp = list->head; \
         const T value = temp->data; \
         list->head = list->head->next; \
-        allocator_destroy(node_##T, allocator, temp); \
+        allocator_free(node_##T, allocator, temp, 1); \
         \
         return value; \
     } \
@@ -89,7 +89,7 @@
         list->length--; \
         if (list->head->next == NULL) { \
             const T value = list->head->data; \
-            allocator_destroy(node_##T, allocator, list->head); \
+            allocator_free(node_##T, allocator, list->head, 1); \
             list->head = NULL; \
             \
             return value; \
@@ -99,7 +99,7 @@
             second_last = second_last->next; \
         } \
         const T value = second_last->next->data; \
-        allocator_destroy(node_##T, allocator, second_last->next); \
+        allocator_free(node_##T, allocator, second_last->next, 1); \
         second_last->next = NULL; \
         \
         return value; \

@@ -20,7 +20,7 @@ long long str_hash(str key) {
     return result;
 }
 
-int str_eql(str a, str b) {
+bool str_eql(str a, str b) {
     return a == b;
 }
 
@@ -40,12 +40,12 @@ void test_fba(void);
 int main(void) {
     test_vec();
     test_list();
-    //test_hashmap();
+    test_hashmap();
     test_allocator();
     test_fba();
 
     puts("all tests passed");
-    
+
     return 0;
 }
 
@@ -54,7 +54,7 @@ void test_vec(void) {
  
     vec_char vec1 = vec_char_new();
     const char* hello = "gdkkn";
-    for (size_t i = 0; i < 5; i++) {
+    for (int64_t i = 0; i < 5; i++) {
         vec_char_push(&vec1, a, hello[i]);
     }
  
@@ -70,7 +70,7 @@ void test_vec(void) {
  
     vec_char_free(&vec1, a);
  
-    printf("vec tests passed\n");
+    puts("vec tests passed\n");
 }
  
 void test_list(void) {
@@ -93,7 +93,7 @@ void test_list(void) {
  
     list_float_free(&l1, a);
  
-    printf("list tests passed\n");
+    puts("list tests passed\n");
 }
 
 void test_hashmap(void) {
@@ -121,7 +121,8 @@ void test_hashmap(void) {
     assert(*v4 == 21);
 
     hashmap_str_int_free(&map, a);
-    printf("hashmap tests passed\n");
+
+    puts("hashmap tests passed\n");
 }
 
 void test_allocator(void) {
@@ -163,7 +164,7 @@ void test_allocator(void) {
         allocator_free(uint64_t, a, nums, len);
     }
 
-    printf("allocator test passed\n");
+    puts("allocator test passed\n");
 }
 
 void test_fba(void) {
@@ -173,14 +174,14 @@ void test_fba(void) {
     const allocator a = fba_as_allocator(&fba);
 
     {
-        int* memory = allocator_create(int, a);
+        int* memory = allocator_alloc(int, a, 1);
         const uint64_t address = (uint64_t)memory;
         assert(address % _Alignof(int) == 0);
 
         assert(memory != NULL);
         *memory = 10;
 
-        allocator_destroy(int, a, memory);
+        allocator_free(int, a, memory, 1);
     }
 
     {
@@ -188,11 +189,9 @@ void test_fba(void) {
         int* memory = allocator_alloc(int, a, length);
     
         assert(memory != NULL);
-
-
     }
     free(buffer);
 
-    printf("fba test passed\n");
+    puts("fba test passed\n");
 }
 

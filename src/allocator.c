@@ -14,7 +14,7 @@ static uint8_t* c_alloc(void* ctx, int64_t bytes, int64_t align) {
     (void)ctx;
     (void)align;
     
-    return (uint8_t*)malloc(bytes);
+    return (uint8_t*)calloc(1, bytes);
 }
 
 static void c_free(void* ctx, uint8_t* ptr, int64_t size, int64_t align) {

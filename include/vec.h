@@ -1,7 +1,7 @@
 #pragma once
+#include "allocator.h" // IWYU pragma: keep
 #include <string.h> // IWYU pragma: keep
 #include <stdint.h> // IWYU pragma: keep
-#include "allocator.h" // IWYU pragma: keep
 
 #define VEC_DEFINE(T) \
     typedef struct vec_##T { \
@@ -68,6 +68,7 @@
     } \
     \
     void vec_##T##_reserve(vec_##T* vec, allocator allocator, int64_t new_capacity) { \
+        assert(new_capacity >= 0); \
         T* new_buffer = allocator_alloc(T, allocator, new_capacity); \
         memcpy(new_buffer, vec->buffer, vec->length * sizeof(T)); \
         allocator_free(T, allocator, vec->buffer, vec->capacity); \
