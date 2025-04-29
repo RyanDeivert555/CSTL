@@ -20,7 +20,7 @@
 
 #define VEC_IMPL(T) \
     vec_##T vec_##T##_new(void) { \
-        vec_##T result = {0}; \
+        const vec_##T result = {0}; \
         \
         return result; \
     } \
