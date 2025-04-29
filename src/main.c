@@ -129,7 +129,7 @@ void test_allocator(void) {
     const allocator a = c_allocator();
 
     {
-        int* num = (int*)allocator_raw_alloc(a, sizeof(int), _Alignof(int));
+        int* num = (int*)allocator_raw_alloc(a, sizeof(int), 1, _Alignof(int));
         assert(num != NULL);
         uint64_t address = (uint64_t)num;
         assert(address % _Alignof(int) == 0);
@@ -145,7 +145,7 @@ void test_allocator(void) {
         num[0] = 1;
         assert(num[0] == 1);
 
-        allocator_raw_free(a, (unsigned char*)num, sizeof(int), _Alignof(int));
+        allocator_raw_free(a, (unsigned char*)num, sizeof(int), 1, _Alignof(int));
     }
 
     {
@@ -168,7 +168,7 @@ void test_allocator(void) {
 }
 
 void test_fba(void) {
-    const int64_t size = 1000000;
+    const int64_t size = 1 << 16;
     uint8_t* buffer = malloc(size);
     fba fba = fba_new(buffer, size);
     const allocator a = fba_as_allocator(&fba);

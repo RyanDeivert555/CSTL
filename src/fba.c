@@ -11,12 +11,12 @@ fba fba_new(uint8_t* buffer, int64_t capacity) {
     return result;
 }
 
-static uint8_t* fba_alloc(void* ctx, int64_t bytes, int64_t align) {
+static uint8_t* fba_alloc(void* ctx, int64_t size, int64_t count, int64_t align) {
     fba* instance = (fba*)ctx;
 
     uint8_t* current = instance->buffer + instance->size;
     const int64_t padding = -(uintptr_t)current & (align - 1);
-    const int64_t offset = padding + bytes;
+    const int64_t offset = padding + (size * count);
     
     if (instance->size + offset > instance->capacity) {
         return NULL;
@@ -28,10 +28,11 @@ static uint8_t* fba_alloc(void* ctx, int64_t bytes, int64_t align) {
     return data;
 }
 
-static void fba_free(void* ctx, uint8_t* ptr, int64_t size, int64_t align) {
+static void fba_free(void* ctx, uint8_t* ptr, int64_t size, int64_t count, int64_t align) {
     (void)ctx;
     (void)ptr;
     (void)size;
+    (void)count;
     (void)align;
 }
 
