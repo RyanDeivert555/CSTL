@@ -14,11 +14,13 @@ add_executable(${PROJECT_NAME}
     src/fba.c
 )
 
+# TODO: keep this?
 add_custom_target(
     check
     DEPENDS ${PROJECT_NAME}
     COMMAND valgrind --leak-check=full --track-origins=yes -s ./${PROJECT_NAME}
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -g3)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -g3 -fsanitize=address,undefined)
+target_link_libraries(${PROJECT_NAME} PRIVATE -lasan -lubsan)
 

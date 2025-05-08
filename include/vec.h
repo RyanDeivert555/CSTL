@@ -31,7 +31,7 @@
     \
     void vec_##T##_push(vec_##T* vec, allocator allocator, T elem) { \
         if (vec->length == vec->capacity) { \
-            const int64_t new_capacity = (vec->capacity == 0) ? 2 : vec->capacity * 2; \
+            const int64_t new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2; \
             vec_##T##_reserve(vec, allocator, new_capacity); \
         } \
         vec->buffer[vec->length] = elem; \
@@ -50,7 +50,7 @@
     void vec_##T##_insert(vec_##T* vec, allocator allocator, T elem, int64_t index) { \
         assert(index >= 0 && index <= vec->length); \
         if (vec->length == vec->capacity) { \
-            const int64_t new_capacity = (vec->capacity == 0) ? 2 : vec->capacity * 2; \
+            const int64_t new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2; \
             vec_##T##_reserve(vec, allocator, new_capacity); \
         } \
         memmove(&vec->buffer[index + 1], &vec->buffer[index], (vec->length - index) * sizeof(T)); \
@@ -70,7 +70,9 @@
     void vec_##T##_reserve(vec_##T* vec, allocator allocator, int64_t new_capacity) { \
         assert(new_capacity >= 0); \
         T* new_buffer = allocator_alloc(T, allocator, new_capacity); \
-        memcpy(new_buffer, vec->buffer, vec->length * sizeof(T)); \
+        if (vec->length != 0) { \
+            memcpy(new_buffer, vec->buffer, vec->length * sizeof(T)); \
+        } \
         allocator_free(T, allocator, vec->buffer, vec->capacity); \
         vec->buffer = new_buffer; \
         vec->capacity = new_capacity; \

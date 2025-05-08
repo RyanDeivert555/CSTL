@@ -101,6 +101,9 @@ void test_hashmap(void) {
 
     hashmap_str_int map = hashmap_str_int_new();
 
+    assert(hashmap_str_int_get(&map, "Ryan") == NULL);
+    assert(hashmap_str_int_get(&map, "Aidan") == NULL);
+
     hashmap_str_int_set(&map, a, "Ryan", 19);
     hashmap_str_int_set(&map, a, "Aidan", 16);
 
@@ -119,6 +122,9 @@ void test_hashmap(void) {
     int* v4 = hashmap_str_int_get(&map, "Ryan");
     assert(v4 != NULL);
     assert(*v4 == 21);
+
+    assert(hashmap_str_int_get(&map, "Bobo") == NULL);
+    assert(hashmap_str_int_get(&map, "Momo") == NULL);
 
     hashmap_str_int_free(&map, a);
 

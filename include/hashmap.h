@@ -36,6 +36,9 @@
     } \
     \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) { \
+        if (map->capacity == 0) { \
+            return NULL; \
+        } \
         int64_t index = HashFunc(key) % map->capacity; \
         \
         while (map->entries[index].occupied) { \
