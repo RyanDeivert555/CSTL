@@ -6,10 +6,9 @@ A library with generic implementations of common data stuctures
 - [x] allocator interface
 - [x] fba allocator
 - [x] unmanaged data structures
-- [x] hashmap
 - [x] Use signed int types for safety
+- [x] redesign allocator interface
 - [ ] Intrusive linked lists
-- [ ] hashmap iterator
-- [ ] redesign allocator interface
+- [ ] Redesign hashmaps
 - [ ] debug safety freed tracker
 
