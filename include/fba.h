@@ -1,6 +1,5 @@
 #pragma once
 #include "allocator.h"
-#include <stdint.h>
 
 typedef struct fba {
     u8* buffer;

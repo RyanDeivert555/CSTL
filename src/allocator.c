@@ -1,5 +1,4 @@
 #include "../include/allocator.h"
-#include <stdint.h>
 #include <stdlib.h>
 
 u8* allocator_raw_alloc(allocator allocator, i64 size, i64 count, i64 align) {
@@ -25,7 +24,7 @@ static void c_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     free(ptr);
 }
 
-static allocator_vtable c_allocator_vtable = {
+static const allocator_vtable c_allocator_vtable = {
     .alloc = c_alloc,
     .free = c_free,
 };

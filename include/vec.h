@@ -1,7 +1,7 @@
 #pragma once
 #include "allocator.h" // IWYU pragma: keep
-#include <string.h> // IWYU pragma: keep
 #include "common.h" // IWYU pragma: keep
+#include <string.h> // IWYU pragma: keep
 
 #define VEC_DEFINE(T) \
     typedef struct vec_##T { \

@@ -1,8 +1,7 @@
 #pragma once
 #include "allocator.h" // IWYU pragma: keep
-#include <stdlib.h> // IWYU pragma: keep
-#include <stdbool.h> // IWYU pragma: keep
 #include "common.h" // IWYU pragma: keep
+#include <stdbool.h> // IWYU pragma: keep
 
 // TODO: iterators for traversal
 

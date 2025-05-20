@@ -35,7 +35,7 @@ static void fba_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)align;
 }
 
-static allocator_vtable fba_vtable = {
+static const allocator_vtable fba_vtable = {
     .alloc = fba_alloc,
     .free = fba_free,
 };

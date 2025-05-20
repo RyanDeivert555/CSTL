@@ -1,7 +1,6 @@
 #pragma once
-#include <assert.h> // IWYU pragma: keep
-#include <stdint.h> // IWYU pragma: keep
 #include "allocator.h" // IWYU pragma: keep
+#include "common.h" // IWYU pragma: keep
 
 #define LIST_DEFINE(T) \
     typedef struct node_##T { \
