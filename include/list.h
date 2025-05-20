@@ -13,7 +13,7 @@
     \
     typedef struct list_##T { \
         node_##T* head; \
-        int64_t length; \
+        i64 length; \
     } list_##T; \
     \
     list_##T list_##T##_new(void); \
@@ -74,7 +74,7 @@
     } \
     \
     T list_##T##_pop_front(list_##T* list, allocator allocator) { \
-        assert(list->length > 0); \
+        Assert(list->length > 0); \
         list->length--; \
         node_##T* temp = list->head; \
         const T value = temp->data; \
@@ -85,7 +85,7 @@
     } \
     \
     T list_##T##_pop_back(list_##T* list, allocator allocator) { \
-        assert(list->length > 0); \
+        Assert(list->length > 0); \
         list->length--; \
         if (list->head->next == NULL) { \
             const T value = list->head->data; \

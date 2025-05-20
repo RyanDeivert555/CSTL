@@ -2,6 +2,7 @@
 #include "allocator.h" // IWYU pragma: keep
 #include <stdlib.h> // IWYU pragma: keep
 #include <stdbool.h> // IWYU pragma: keep
+#include "common.h" // IWYU pragma: keep
 
 // TODO: iterators for traversal
 
@@ -14,8 +15,8 @@
     \
     typedef struct hashmap_##K##_##V { \
         hashmap_##K##_##V##_pair* entries; \
-        int64_t count; \
-        int64_t capacity; \
+        i64 count; \
+        i64 capacity; \
     } hashmap_##K##_##V; \
     \
     hashmap_##K##_##V hashmap_##K##_##V##_new(void); \
@@ -39,7 +40,7 @@
         if (map->capacity == 0) { \
             return NULL; \
         } \
-        int64_t index = HashFunc(key) % map->capacity; \
+        i64 index = HashFunc(key) % map->capacity; \
         \
         while (map->entries[index].occupied) { \
             if (EqlFunc(key, map->entries[index].key)) { \
@@ -55,8 +56,8 @@
         return NULL; \
     } \
     \
-    static void hashmap_##K##_##V##_set_entry(hashmap_##K##_##V##_pair* entries, int64_t capacity, K key, V value, int64_t* count) { \
-        int64_t index = HashFunc(key) % capacity; \
+    static void hashmap_##K##_##V##_set_entry(hashmap_##K##_##V##_pair* entries, i64 capacity, K key, V value, i64* count) { \
+        i64 index = HashFunc(key) % capacity; \
         \
         while (entries[index].occupied) { \
             if (EqlFunc(key, entries[index].key)) { \
@@ -80,10 +81,10 @@
     } \
     \
     void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator) { \
-        const int64_t new_capacity = (map->capacity == 0) ? 50 : map->capacity * 2; \
+        const i64 new_capacity = (map->capacity == 0) ? 50 : map->capacity * 2; \
         hashmap_##K##_##V##_pair* new_entries = allocator_alloc(hashmap_##K##_##V##_pair, allocator, new_capacity); \
         \
-        for (int64_t i = 0; i < map->capacity; i++) { \
+        for (i64 i = 0; i < map->capacity; i++) { \
             hashmap_##K##_##V##_pair* entry = &map->entries[i]; \
             if (entry->occupied) { \
                 hashmap_##K##_##V##_set_entry(new_entries, new_capacity, entry->key, entry->value, NULL); \

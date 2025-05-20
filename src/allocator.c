@@ -2,22 +2,22 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-uint8_t* allocator_raw_alloc(allocator allocator, int64_t size, int64_t count, int64_t align) {
+u8* allocator_raw_alloc(allocator allocator, i64 size, i64 count, i64 align) {
     return allocator.vtable->alloc(allocator.ctx, size, count, align);
 }
 
-void allocator_raw_free(allocator allocator, uint8_t* ptr, int64_t size, int64_t count, int64_t align) {
+void allocator_raw_free(allocator allocator, u8* ptr, i64 size, i64 count, i64 align) {
     allocator.vtable->free(allocator.ctx, ptr, size, count, align);
 }
 
-static uint8_t* c_alloc(void* ctx, int64_t size, int64_t count, int64_t align) {
+static u8* c_alloc(void* ctx, i64 size, i64 count, i64 align) {
     (void)ctx;
     (void)align;
     
-    return (uint8_t*)calloc(count, size);
+    return (u8*)calloc(count, size);
 }
 
-static void c_free(void* ctx, uint8_t* ptr, int64_t size, int64_t count, int64_t align) {
+static void c_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)ctx;
     (void)size;
     (void)count;

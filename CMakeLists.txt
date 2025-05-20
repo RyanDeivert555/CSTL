@@ -12,6 +12,7 @@ set(
 
 set(
     INCLUDE
+    include/common.h
     include/allocator.h
     include/fba.h
     include/vec.h
