@@ -3,24 +3,35 @@ project(main)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(${PROJECT_NAME}
-    include/allocator.h
-    include/fba.h
-    include/vec.h
-    include/list.h
-    include/hashmap.h
+set(
+    SRC
     src/main.c
     src/allocator.c
     src/fba.c
 )
 
-# TODO: keep this?
-add_custom_target(
-    check
-    DEPENDS ${PROJECT_NAME}
-    COMMAND valgrind --leak-check=full --track-origins=yes -s ./${PROJECT_NAME}
-)
+set(
+    INCLUDE
+    include/allocator.h
+    include/fba.h
+    include/vec.h
+    include/list.h
+    include/hashmap.h
+)   
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -g3 -fsanitize=address,undefined)
-target_link_libraries(${PROJECT_NAME} PRIVATE -lasan -lubsan)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+add_executable(${PROJECT_NAME} ${INCLUDE} ${SRC})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(${PROJECT_NAME} PRIVATE -g3 -fsanitize=address,undefined)
+    target_link_libraries(${PROJECT_NAME} PRIVATE asan ubsan)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(${PROJECT_NAME} PRIVATE -O3)
+endif()
 
