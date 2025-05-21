@@ -51,23 +51,23 @@ int main(void) {
 void TestVec(void) {
     const Allocator a = StdAllocator();
  
-    Vec_u8 vec1 = Vec_u8_New();
+    Vec_u8 vec = Vec_u8_New();
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
-        Vec_u8_Push(&vec1, a, hello[i]);
+        Vec_u8_Push(&vec, a, hello[i]);
     }
  
-    for (i64 i = 0; i < vec1.length; i++) {
-        vec1.buffer[i] += 1;
+    for (i64 i = 0; i < vec.length; i++) {
+        vec.buffer[i] += 1;
     }
-    Vec_u8_Push(&vec1, a, '\n');
+    Vec_u8_Push(&vec, a, '\n');
  
     const char* expected = "hello\n";
-    for (i64 i = 0; i < vec1.length; i++) {
-        Assert(expected[i] == vec1.buffer[i]);
+    for (i64 i = 0; i < vec.length; i++) {
+        Assert(expected[i] == vec.buffer[i]);
     }
  
-    Vec_u8_Free(&vec1, a);
+    Vec_u8_Free(&vec, a);
  
     puts("vec tests passed\n");
 }
@@ -75,22 +75,22 @@ void TestVec(void) {
 void TestList(void) {
     const Allocator a = StdAllocator();
  
-    List_f32 l1 = List_f32_New();
+    List_f32 list = List_f32_New();
     for (float i = 0.0f; i < 10.0f; i++) {
-        List_f32_PushBack(&l1, a, i);
-        List_f32_PushFront(&l1, a, i);
-        Assert(List_f32_PopBack(&l1, a) == i);
+        List_f32_PushBack(&list, a, i);
+        List_f32_PushFront(&list, a, i);
+        Assert(List_f32_PopBack(&list, a) == i);
     }
 
     float expected = 9.0f;
-    Node_f32* current = l1.head;    
+    Node_f32* current = list.head;
     while (current) {
         Assert(expected == current->data);
         current = current->next;
         expected -= 1.0f;
     }
  
-    List_f32_Free(&l1, a);
+    List_f32_Free(&list, a);
  
     puts("list tests passed\n");
 }
