@@ -1,12 +1,12 @@
 #pragma once
 #include "allocator.h"
 
-typedef struct fba {
+typedef struct Fba {
     u8* buffer;
     i64 size;
     i64 capacity;
-} fba;
+} Fba;
 
-fba fba_new(u8* buffer, i64 capacity);
-allocator fba_as_allocator(fba* fba);
+Fba FbaNew(u8* buffer, i64 capacity);
+Allocator FbaAsAllocator(Fba* fba);
 

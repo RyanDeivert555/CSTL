@@ -6,36 +6,36 @@
 // TODO: iterators for traversal
 
 #define HASHMAP_DEFINE(K, V) \
-    typedef struct hashmap_##K##_##V##_pair { \
+    typedef struct Hashmap_##K##_##V##_Pair { \
         K key; \
         V value; \
         bool occupied; \
-    } hashmap_##K##_##V##_pair; \
+    } Hashmap_##K##_##V##_Pair; \
     \
-    typedef struct hashmap_##K##_##V { \
-        hashmap_##K##_##V##_pair* entries; \
+    typedef struct Hashmap_##K##_##V { \
+        Hashmap_##K##_##V##_Pair* entries; \
         i64 count; \
         i64 capacity; \
-    } hashmap_##K##_##V; \
+    } Hashmap_##K##_##V; \
     \
-    hashmap_##K##_##V hashmap_##K##_##V##_new(void); \
-    void hashmap_##K##_##V##_free(hashmap_##K##_##V* map, allocator allocator); \
-    V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key); \
-    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator); \
-    void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, allocator allocator, K key, V value); \
+    Hashmap_##K##_##V Hashmap_##K##_##V##_New(void); \
+    void Hashmap_##K##_##V##_Free(Hashmap_##K##_##V* map, Allocator allocator); \
+    V* Hashmap_##K##_##V##_Get(Hashmap_##K##_##V* map, K key); \
+    void Hashmap_##K##_##V##_Realloc(Hashmap_##K##_##V* map, Allocator allocator); \
+    void Hashmap_##K##_##V##_Set(Hashmap_##K##_##V* map, Allocator allocator, K key, V value); \
 
 #define HASHMAP_IMPL(K, V, HashFunc, EqlFunc) \
-    hashmap_##K##_##V hashmap_##K##_##V##_new(void) { \
-        hashmap_##K##_##V result = {0}; \
+    Hashmap_##K##_##V Hashmap_##K##_##V##_New(void) { \
+        Hashmap_##K##_##V result = {0}; \
         \
         return result; \
     } \
     \
-    void hashmap_##K##_##V##_free(hashmap_##K##_##V* map, allocator allocator) { \
-        allocator_free(hashmap_##K##_##V##_pair, allocator, map->entries, map->capacity); \
+    void Hashmap_##K##_##V##_Free(Hashmap_##K##_##V* map, Allocator allocator) { \
+        AllocatorFree(Hashmap_##K##_##V##_Pair, allocator, map->entries, map->capacity); \
     } \
     \
-    V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) { \
+    V* Hashmap_##K##_##V##_Get(Hashmap_##K##_##V* map, K key) { \
         if (map->capacity == 0) { \
             return NULL; \
         } \
@@ -55,7 +55,7 @@
         return NULL; \
     } \
     \
-    static void hashmap_##K##_##V##_set_entry(hashmap_##K##_##V##_pair* entries, i64 capacity, K key, V value, i64* count) { \
+    static void Hashmap_##K##_##V##_SetEntry(Hashmap_##K##_##V##_Pair* entries, i64 capacity, K key, V value, i64* count) { \
         i64 index = HashFunc(key) % capacity; \
         \
         while (entries[index].occupied) { \
@@ -79,26 +79,26 @@
         } \
     } \
     \
-    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator) { \
+    void Hashmap_##K##_##V##_Realloc(Hashmap_##K##_##V* map, Allocator allocator) { \
         const i64 new_capacity = (map->capacity == 0) ? 50 : map->capacity * 2; \
-        hashmap_##K##_##V##_pair* new_entries = allocator_alloc(hashmap_##K##_##V##_pair, allocator, new_capacity); \
+        Hashmap_##K##_##V##_Pair* new_entries = AllocatorAlloc(Hashmap_##K##_##V##_Pair, allocator, new_capacity); \
         \
         for (i64 i = 0; i < map->capacity; i++) { \
-            hashmap_##K##_##V##_pair* entry = &map->entries[i]; \
+            Hashmap_##K##_##V##_Pair* entry = &map->entries[i]; \
             if (entry->occupied) { \
-                hashmap_##K##_##V##_set_entry(new_entries, new_capacity, entry->key, entry->value, NULL); \
+                Hashmap_##K##_##V##_SetEntry(new_entries, new_capacity, entry->key, entry->value, NULL); \
             } \
         } \
         \
-        allocator_free(hashmap_##K##_##V##_pair, allocator, map->entries, map->capacity); \
+        AllocatorFree(Hashmap_##K##_##V##_Pair, allocator, map->entries, map->capacity); \
         map->entries = new_entries; \
         map->capacity = new_capacity; \
     } \
     \
-    void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, allocator allocator, K key, V value) { \
+    void Hashmap_##K##_##V##_Set(Hashmap_##K##_##V* map, Allocator allocator, K key, V value) { \
         if (map->count >= map->capacity / 2) { \
-            hashmap_##K##_##V##_realloc(map, allocator); \
+            Hashmap_##K##_##V##_Realloc(map, allocator); \
         } \
-        hashmap_##K##_##V##_set_entry(map->entries, map->capacity, key, value, &map->count); \
+        Hashmap_##K##_##V##_SetEntry(map->entries, map->capacity, key, value, &map->count); \
     } \
 

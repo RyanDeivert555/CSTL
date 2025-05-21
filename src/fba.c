@@ -1,7 +1,8 @@
 #include "../include/fba.h"
+#include "allocator.h"
 
-fba fba_new(u8* buffer, i64 capacity) {
-    const fba result = {
+Fba FbaNew(u8* buffer, i64 capacity) {
+    const Fba result = {
         .buffer = buffer,
         .capacity = capacity,
         .size = 0,
@@ -10,8 +11,8 @@ fba fba_new(u8* buffer, i64 capacity) {
     return result;
 }
 
-static u8* fba_alloc(void* ctx, i64 size, i64 count, i64 align) {
-    fba* instance = (fba*)ctx;
+static u8* FbaAlloc(void* ctx, i64 size, i64 count, i64 align) {
+    Fba* instance = (Fba*)ctx;
 
     u8* current = instance->buffer + instance->size;
     const i64 padding = -(uintptr_t)current & (align - 1);
@@ -27,7 +28,7 @@ static u8* fba_alloc(void* ctx, i64 size, i64 count, i64 align) {
     return data;
 }
 
-static void fba_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
+static void FbaFree(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)ctx;
     (void)ptr;
     (void)size;
@@ -35,14 +36,14 @@ static void fba_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)align;
 }
 
-static const allocator_vtable fba_vtable = {
-    .alloc = fba_alloc,
-    .free = fba_free,
+static const AllocatorVTable fba_vtable = {
+    .alloc = FbaAlloc,
+    .free = FbaFree,
 };
 
-allocator fba_as_allocator(fba* fba) {
-    const allocator result = {
-        .ctx = fba,
+Allocator FbaAsAllocator(Fba* Fba) {
+    const Allocator result = {
+        .ctx = Fba,
         .vtable = &fba_vtable,
     };
 

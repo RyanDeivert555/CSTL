@@ -4,41 +4,41 @@
 #include <string.h> // IWYU pragma: keep
 
 #define VEC_DEFINE(T) \
-    typedef struct vec_##T { \
+    typedef struct Vec_##T { \
         T* buffer; \
         i64 length; \
         i64 capacity; \
-    } vec_##T; \
+    } Vec_##T; \
     \
-    vec_##T vec_##T##_new(void); \
-    void vec_##T##_free(vec_##T* vec, allocator allocator); \
-    void vec_##T##_push(vec_##T* vec, allocator allocator, T elem); \
-    T vec_##T##_pop(vec_##T* vec); \
-    void vec_##T##_insert(vec_##T* vec, allocator allocator, T elem, i64 index); \
-    T vec_##T##_remove(vec_##T* vec, i64 index); \
-    void vec_##T##_reserve(vec_##T* vec, allocator allocator, i64 new_capacity); \
+    Vec_##T Vec_##T##_New(void); \
+    void Vec_##T##_Free(Vec_##T* vec, Allocator allocator); \
+    void Vec_##T##_Push(Vec_##T* vec, Allocator allocator, T elem); \
+    T Vec_##T##_Pop(Vec_##T* vec); \
+    void Vec_##T##_Insert(Vec_##T* vec, Allocator allocator, T elem, i64 index); \
+    T Vec_##T##_Remove(Vec_##T* vec, i64 index); \
+    void Vec_##T##_Reserve(Vec_##T* vec, Allocator allocator, i64 new_capacity); \
 
 #define VEC_IMPL(T) \
-    vec_##T vec_##T##_new(void) { \
-        const vec_##T result = {0}; \
+    Vec_##T Vec_##T##_New(void) { \
+        const Vec_##T result = {0}; \
         \
         return result; \
     } \
     \
-    void vec_##T##_free(vec_##T* vec, allocator allocator) { \
-        allocator_free(T, allocator, vec->buffer, vec->capacity); \
+    void Vec_##T##_Free(Vec_##T* vec, Allocator allocator) { \
+        AllocatorFree(T, allocator, vec->buffer, vec->capacity); \
     } \
     \
-    void vec_##T##_push(vec_##T* vec, allocator allocator, T elem) { \
+    void Vec_##T##_Push(Vec_##T* vec, Allocator allocator, T elem) { \
         if (vec->length == vec->capacity) { \
             const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2; \
-            vec_##T##_reserve(vec, allocator, new_capacity); \
+            Vec_##T##_Reserve(vec, allocator, new_capacity); \
         } \
         vec->buffer[vec->length] = elem; \
         vec->length++; \
     } \
     \
-    T vec_##T##_pop(vec_##T* vec) { \
+    T Vec_##T##_Pop(Vec_##T* vec) { \
         Assert(vec->length > 0); \
         const i64 last_index = vec->length - 1; \
         const T value = vec->buffer[last_index]; \
@@ -47,18 +47,18 @@
         return value; \
     } \
     \
-    void vec_##T##_insert(vec_##T* vec, allocator allocator, T elem, i64 index) { \
+    void Vec_##T##_Insert(Vec_##T* vec, Allocator allocator, T elem, i64 index) { \
         Assert(index >= 0 && index <= vec->length); \
         if (vec->length == vec->capacity) { \
             const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2; \
-            vec_##T##_reserve(vec, allocator, new_capacity); \
+            Vec_##T##_Reserve(vec, allocator, new_capacity); \
         } \
         memmove(&vec->buffer[index + 1], &vec->buffer[index], (vec->length - index) * sizeof(T)); \
         vec->buffer[index] = elem; \
         vec->length++; \
     } \
     \
-    T vec_##T##_remove(vec_##T* vec, i64 index) { \
+    T Vec_##T##_Remove(Vec_##T* vec, i64 index) { \
         Assert(index >= 0 && index < vec->length); \
         vec->length--; \
         const T res = vec->buffer[index]; \
@@ -67,13 +67,13 @@
         return res; \
     } \
     \
-    void vec_##T##_reserve(vec_##T* vec, allocator allocator, i64 new_capacity) { \
+    void Vec_##T##_Reserve(Vec_##T* vec, Allocator allocator, i64 new_capacity) { \
         Assert(new_capacity >= 0); \
-        T* new_buffer = allocator_alloc(T, allocator, new_capacity); \
+        T* new_buffer = AllocatorAlloc(T, allocator, new_capacity); \
         if (vec->length != 0) { \
             memcpy(new_buffer, vec->buffer, vec->length * sizeof(T)); \
         } \
-        allocator_free(T, allocator, vec->buffer, vec->capacity); \
+        AllocatorFree(T, allocator, vec->buffer, vec->capacity); \
         vec->buffer = new_buffer; \
         vec->capacity = new_capacity; \
     } \
