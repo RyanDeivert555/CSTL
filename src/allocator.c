@@ -1,4 +1,4 @@
-#include "../include/allocator.h"
+#include "allocator.h"
 #include <stdlib.h>
 
 u8* AllocatorRawAlloc(Allocator allocator, i64 size, i64 count, i64 align) {

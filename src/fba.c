@@ -1,4 +1,4 @@
-#include "../include/fba.h"
+#include "fba.h"
 #include "allocator.h"
 
 Fba FbaNew(u8* buffer, i64 capacity) {

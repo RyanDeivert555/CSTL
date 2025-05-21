@@ -1,8 +1,8 @@
-#include "../include/vec.h"
-#include "../include/list.h"
-#include "../include/hashmap.h"
-#include "../include/allocator.h"
-#include "../include/fba.h"
+#include "vec.h"
+#include "list.h"
+#include "hashmap.h"
+#include "allocator.h"
+#include "fba.h"
 #include <stdio.h>
 #include <stdlib.h>
 
