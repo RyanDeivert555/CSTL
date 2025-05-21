@@ -80,7 +80,7 @@
     } \
     \
     void Hashmap_##K##_##V##_Realloc(Hashmap_##K##_##V* map, Allocator allocator) { \
-        const i64 new_capacity = (map->capacity == 0) ? 50 : map->capacity * 2; \
+        const i64 new_capacity = (map->capacity == 0) ? 2 : map->capacity * 2; \
         Hashmap_##K##_##V##_Pair* new_entries = AllocatorAlloc(Hashmap_##K##_##V##_Pair, allocator, new_capacity); \
         \
         for (i64 i = 0; i < map->capacity; i++) { \
