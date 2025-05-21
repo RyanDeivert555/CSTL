@@ -4,6 +4,7 @@
 #include "../include/allocator.h"
 #include "../include/fba.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef const char* str;
 i64 str_hash(str key) {
@@ -156,13 +157,13 @@ void test_allocator(void) {
         const u64 len = 10;
         u64* nums = allocator_alloc(u64, a, len);
         const u64 address = (u64)nums;
-        assert(address % _Alignof(u64) == 0);
+        Assert(address % _Alignof(u64) == 0);
 
         for (u64 i = 0; i < len; i++) {
             nums[i] = i;
         }
         for (u64 i = 0; i < len; i++) {
-            assert(nums[i] == i);
+            Assert(nums[i] == i);
         }
 
         allocator_free(u64, a, nums, len);
@@ -180,9 +181,9 @@ void test_fba(void) {
     {
         int* memory = allocator_alloc(int, a, 1);
         const u64 address = (u64)memory;
-        assert(address % _Alignof(int) == 0);
+        Assert(address % _Alignof(int) == 0);
 
-        assert(memory != NULL);
+        Assert(memory != NULL);
         *memory = 10;
 
         allocator_free(i32, a, memory, 1);
@@ -192,7 +193,7 @@ void test_fba(void) {
         const i64 length = 10;
         i32* memory = allocator_alloc(i32, a, length);
     
-        assert(memory != NULL);
+        Assert(memory != NULL);
     }
     free(buffer);
 
