@@ -15,7 +15,7 @@ static u8* FbaAlloc(void* ctx, i64 size, i64 count, i64 align) {
     Fba* instance = (Fba*)ctx;
 
     u8* current = instance->buffer + instance->size;
-    const i64 padding = -(uintptr_t)current & (align - 1);
+    const i64 padding = -(u64)current & (align - 1);
     const i64 offset = padding + (size * count);
     
     if (instance->size + offset > instance->capacity) {
