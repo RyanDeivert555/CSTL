@@ -41,9 +41,9 @@ static const AllocatorVTable fba_vtable = {
     .free = FbaFree,
 };
 
-Allocator FbaAsAllocator(Fba* Fba) {
+Allocator FbaAsAllocator(Fba* fba) {
     const Allocator result = {
-        .ctx = Fba,
+        .ctx = fba,
         .vtable = &fba_vtable,
     };
 
