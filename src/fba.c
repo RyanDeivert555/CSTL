@@ -1,5 +1,6 @@
 #include "fba.h"
 #include "allocator.h"
+#include <stdbool.h>
 
 Fba FbaNew(u8* buffer, i64 capacity) {
     const Fba result = {
@@ -28,12 +29,18 @@ static u8* FbaAlloc(void* ctx, i64 size, i64 count, i64 align) {
     return data;
 }
 
+static bool FbaIsLastAlloc(Fba* self, u8* buffer, i64 size) {
+    return buffer + size == self->buffer + self->size;
+}
+
 static void FbaFree(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
-    (void)ctx;
-    (void)ptr;
-    (void)size;
-    (void)count;
     (void)align;
+
+    Fba* instance = (Fba*)ctx;
+
+    if (FbaIsLastAlloc(instance, ptr, size * count)) {
+        instance->size -= size * count;
+    }
 }
 
 static const AllocatorVTable fba_vtable = {

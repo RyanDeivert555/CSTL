@@ -1,8 +1,10 @@
+#include "common.h"
 #include "vec.h"
 #include "list.h"
 #include "hashmap.h"
 #include "allocator.h"
 #include "fba.h"
+#include "untyped_vec.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,6 +37,7 @@ void TestList(void);
 void TestHashmap(void);
 void TestAllocator(void);
 void TestFba(void);
+void TestUntypedVec(void);
 
 int main(void) {
     TestVec();
@@ -42,6 +45,7 @@ int main(void) {
     TestHashmap();
     TestAllocator();
     TestFba();
+    TestUntypedVec();
 
     puts("all tests passed");
 
@@ -187,6 +191,9 @@ void TestFba(void) {
         *memory = 10;
 
         AllocatorFree(i32, a, memory, 1);
+        const Fba* instance = a.ctx;
+        // Free last allocation
+        Assert(instance->size == 0);
     }
 
     {
@@ -194,9 +201,78 @@ void TestFba(void) {
         i32* memory = AllocatorAlloc(i32, a, length);
     
         Assert(memory != NULL);
+        AllocatorFree(i32, a, memory, length);
+        const Fba* instance = a.ctx;
+        // Free last allocation
+        Assert(instance->size == 0);
+    }
+    {
+        const i32* first = AllocatorAlloc(i32, a, 10);
+        const i32* second = AllocatorAlloc(i32, a, 10);
+        AllocatorFree(i32, a, first, 10);
+
+        const Fba* instance = a.ctx;
+        // not last allocation, no freeing
+        Assert(instance->size == 20 * sizeof(i32));
+        AllocatorFree(i32, a, second, 10);
+        Assert(instance->size == 10 * sizeof(i32));
+        AllocatorFree(i32, a, first, 10);
+        Assert(instance->size == 0);
     }
     free(buffer);
 
     puts("fba test passed\n");
+}
+
+void TestUntypedVec(void) {
+    const Allocator a = StdAllocator();
+
+    UntypedVec vec = UntypedVecNew();
+    const char* hello = "gdkkn";
+    for (i64 i = 0; i < 5; i++) {
+        UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &hello[i]);
+    }
+ 
+    for (i64 i = 0; i < vec.length; i++) {
+        u8* item = (u8*)UntypedVecGet(&vec, i, sizeof(u8));
+        *item += 1;
+    }
+    UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &(u8){'\n'});
+ 
+    const char* expected = "hello\n";
+    for (i64 i = 0; i < vec.length; i++) {
+        const u8 c = *(u8*)UntypedVecGet(&vec, i, sizeof(u8));
+        Assert(expected[i] == c);
+    }
+
+    UntypedVecRemove(&vec, vec.length - 1, sizeof(u8));
+
+    const u8* last = UntypedVecPop(&vec, sizeof(u8));
+    Assert(*last == 'o');
+
+    const u8* first = UntypedVecGet(&vec, 0, sizeof(u8));
+    Assert(*first == 'h');
+ 
+    UntypedVecFree(&vec, a, sizeof(u8), _Alignof(u8));
+
+    // test with integers now
+    vec = UntypedVecNew();
+    Assert(!vec.buffer && !vec.length && !vec.capacity);
+
+    const i32 nums[] = {0, 1, 2, 4, 8, 16, -1};
+    for (i64 i = 0; nums[i] != -1; i++) {
+        UntypedVecPush(&vec, a, sizeof(i32), _Alignof(i32), &nums[i]);
+    }
+
+    i64 index = 5;
+    while (vec.length != 0) {
+        const i32* top = UntypedVecPop(&vec, sizeof(i32));
+        Assert(*top == nums[index]);
+        index--;
+    }
+
+    UntypedVecFree(&vec, a, sizeof(i32), _Alignof(i32));
+ 
+    puts("untyped vec tests passed\n");
 }
 

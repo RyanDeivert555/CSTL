@@ -8,6 +8,7 @@ set(
     src/main.c
     src/allocator.c
     src/fba.c
+    src/untyped_vec.c
 )
 
 set(
@@ -18,7 +19,8 @@ set(
     include/vec.h
     include/list.h
     include/hashmap.h
-)   
+    include/untyped_vec.h
+)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
