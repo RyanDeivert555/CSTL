@@ -13,7 +13,7 @@ static u8* StdAlloc(void* ctx, i64 size, i64 count, i64 align) {
     (void)ctx;
     (void)align;
     
-    return (u8*)calloc(count, size);
+    return (u8*)malloc(count * size);
 }
 
 static void StdFree(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {

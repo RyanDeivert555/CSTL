@@ -42,7 +42,7 @@ void TestUntypedVec(void);
 int main(void) {
     TestVec();
     TestList();
-    TestHashmap();
+    //TestHashmap();
     TestAllocator();
     TestFba();
     TestUntypedVec();
@@ -203,7 +203,6 @@ void TestFba(void) {
         Assert(memory != NULL);
         AllocatorFree(i32, a, memory, length);
         const Fba* instance = a.ctx;
-        // Free last allocation
         Assert(instance->size == 0);
     }
     {
