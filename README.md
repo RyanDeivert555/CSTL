@@ -11,4 +11,5 @@ A library with generic implementations of common data stuctures
 - [ ] Intrusive linked lists
 - [ ] Redesign hashmaps
 - [ ] debug safety freed tracker
+- [ ] Remove TypeInfo struct, replace with macros
 

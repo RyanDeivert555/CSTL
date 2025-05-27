@@ -229,30 +229,30 @@ void TestUntypedVec(void) {
     UntypedVec vec = UntypedVecNew();
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
-        UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &hello[i]);
+        UntypedVecPush(&vec, a, GetTypeInfo(u8), &hello[i]);
     }
  
     for (i64 i = 0; i < vec.length; i++) {
-        u8* item = (u8*)UntypedVecGet(&vec, i, sizeof(u8));
+        u8* item = (u8*)UntypedVecGet(&vec, i, GetTypeInfo(u8));
         *item += 1;
     }
-    UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &(u8){'\n'});
+    UntypedVecPush(&vec, a, GetTypeInfo(u8), &(u8){'\n'});
  
     const char* expected = "hello\n";
     for (i64 i = 0; i < vec.length; i++) {
-        const u8 c = *(u8*)UntypedVecGet(&vec, i, sizeof(u8));
+        const u8 c = *(u8*)UntypedVecGet(&vec, i, GetTypeInfo(u8));
         Assert(expected[i] == c);
     }
 
-    UntypedVecRemove(&vec, vec.length - 1, sizeof(u8));
+    UntypedVecRemove(&vec, vec.length - 1, GetTypeInfo(u8));
 
-    const u8* last = UntypedVecPop(&vec, sizeof(u8));
+    const u8* last = UntypedVecPop(&vec, GetTypeInfo(u8));
     Assert(*last == 'o');
 
-    const u8* first = UntypedVecGet(&vec, 0, sizeof(u8));
+    const u8* first = UntypedVecGet(&vec, 0, GetTypeInfo(u8));
     Assert(*first == 'h');
  
-    UntypedVecFree(&vec, a, sizeof(u8), _Alignof(u8));
+    UntypedVecFree(&vec, a, GetTypeInfo(u8));
 
     // test with integers now
     vec = UntypedVecNew();
@@ -260,17 +260,17 @@ void TestUntypedVec(void) {
 
     const i32 nums[] = {0, 1, 2, 4, 8, 16, -1};
     for (i64 i = 0; nums[i] != -1; i++) {
-        UntypedVecPush(&vec, a, sizeof(i32), _Alignof(i32), &nums[i]);
+        UntypedVecPush(&vec, a, GetTypeInfo(i32), &nums[i]);
     }
 
     i64 index = 5;
     while (vec.length != 0) {
-        const i32* top = UntypedVecPop(&vec, sizeof(i32));
+        const i32* top = UntypedVecPop(&vec, GetTypeInfo(i32));
         Assert(*top == nums[index]);
         index--;
     }
 
-    UntypedVecFree(&vec, a, sizeof(i32), _Alignof(i32));
+    UntypedVecFree(&vec, a, GetTypeInfo(i32));
  
     puts("untyped vec tests passed\n");
 }

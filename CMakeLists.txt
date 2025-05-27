@@ -9,6 +9,7 @@ set(
     src/allocator.c
     src/fba.c
     src/untyped_vec.c
+    src/untyped_hashmap.c
 )
 
 set(
@@ -20,6 +21,7 @@ set(
     include/list.h
     include/hashmap.h
     include/untyped_vec.h
+    include/untyped_hashmap.h
 )
 
 if(NOT CMAKE_BUILD_TYPE)

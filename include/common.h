@@ -16,3 +16,10 @@ typedef double f64;
 
 #define Assert(c) while (!(c)) __builtin_unreachable()
 
+typedef struct TypeInfo {
+    i64 size;
+    i64 align;
+} TypeInfo;
+
+#define GetTypeInfo(T) (TypeInfo) { sizeof(T), _Alignof(T), }
+
