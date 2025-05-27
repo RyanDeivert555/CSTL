@@ -9,12 +9,12 @@ typedef struct UntypedVec {
 } UntypedVec;
 
 UntypedVec UntypedVecNew(void);
-void UntypedVecFree(UntypedVec* vec, Allocator allocator, TypeInfo type_info);
-void UntypedVecPush(UntypedVec* vec, Allocator allocator, TypeInfo type_info, const void* const item);
-void* UntypedVecPop(UntypedVec* vec, TypeInfo type_info);
-void UntypedVecInsert(UntypedVec* vec, Allocator allocator, i64 index, TypeInfo type_info, const void* const item);
-void UntypedVecRemove(UntypedVec* vec, i64 index, TypeInfo type_info);
-void UntypedVecReserve(UntypedVec* vec, Allocator allocator, TypeInfo type_info, i64 new_capacity);
-void* UntypedVecGet(UntypedVec* vec, i64 index, TypeInfo type_info);
-void UntypedVecSet(UntypedVec* vec, i64 index, TypeInfo type_info, const void* const item);
+void UntypedVecFree(UntypedVec* vec, Allocator allocator, i64 item_size, i64 item_align);
+void UntypedVecPush(UntypedVec* vec, Allocator allocator, i64 item_size, i64 item_align, const void* const item);
+void* UntypedVecPop(UntypedVec* vec, i64 item_size);
+void UntypedVecInsert(UntypedVec* vec, Allocator allocator, i64 index, i64 item_size, i64 item_align, const void* const item);
+void UntypedVecRemove(UntypedVec* vec, i64 index, i64 item_size);
+void UntypedVecReserve(UntypedVec* vec, Allocator allocator, i64 item_size, i64 item_align, i64 new_capacity);
+void* UntypedVecGet(UntypedVec* vec, i64 index, i64 item_size);
+void UntypedVecSet(UntypedVec* vec, i64 index, i64 item_size, const void* const item);
 
