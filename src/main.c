@@ -5,12 +5,13 @@
 #include "allocator.h"
 #include "fba.h"
 #include "untyped_vec.h"
+#include "untyped_hashmap.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 typedef const char* String;
 i64 StringHash(String key) {
-    i64 result = 0;
+    i64 result = 5381;
 
     while (*key) {
         result = ((result << 5) + result) + *key;
@@ -21,8 +22,16 @@ i64 StringHash(String key) {
     return result;
 }
 
+i64 UntypedStringHash(const void* key) {
+    return StringHash((String)key);
+}
+
 bool StringEqual(String a, String b) {
     return a == b;
+}
+
+bool UntypedStringEqual(const void* a, const void* b) {
+    return StringEqual((String)a, (String)b);
 }
 
 VEC_DEFINE(u8)
@@ -38,6 +47,7 @@ void TestHashmap(void);
 void TestAllocator(void);
 void TestFba(void);
 void TestUntypedVec(void);
+void TestUntypedHashmap(void);
 
 int main(void) {
     TestVec();
@@ -46,6 +56,7 @@ int main(void) {
     TestAllocator();
     TestFba();
     TestUntypedVec();
+    TestUntypedHashmap();
 
     puts("all tests passed");
 
@@ -260,7 +271,7 @@ void TestUntypedVec(void) {
 
     const i32 nums[] = {0, 1, 2, 4, 8, 16, -1};
     for (i64 i = 0; nums[i] != -1; i++) {
-        UntypedVecPush(&vec, a, sizeof(i32), _Alignof(u8), &nums[i]);
+        UntypedVecPush(&vec, a, sizeof(i32), _Alignof(i32), &nums[i]);
     }
 
     i64 index = 5;
@@ -273,5 +284,40 @@ void TestUntypedVec(void) {
     UntypedVecFree(&vec, a, sizeof(i32), _Alignof(i32));
  
     puts("untyped vec tests passed\n");
+}
+
+void TestUntypedHashmap(void) {
+    const Allocator a = StdAllocator();
+
+    UntypedHashmap map = UntypedHashmapNew(UntypedStringEqual, UntypedStringHash);
+
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Aidan", sizeof(i32)) == NULL);
+
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Ryan", sizeof(i32), _Alignof(i32), &(i32){20});
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Aidan", sizeof(i32), _Alignof(i32), &(i32){17});
+
+    i32* v1 = UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32));
+    Assert(v1 != NULL);
+    Assert(*v1 == 19);
+
+    i32* v2 = UntypedHashmapGet(&map, sizeof(String), "Aidan", sizeof(i32));
+    Assert(v2 != NULL);
+    Assert(*v2 == 16);
+
+    i32* v3 = UntypedHashmapGet(&map, sizeof(String), "Bob", sizeof(i32));
+    Assert(v3 == NULL);
+
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Ryan", sizeof(i32), _Alignof(i32), &(i32){21});
+    i32* v4 = UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32));
+    Assert(v4 != NULL);
+    Assert(*v4 == 21);
+
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Bobo", sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Momo", sizeof(i32)) == NULL);
+
+    UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
+
+    puts("untyped hashmap tests passed\n");
 }
 
