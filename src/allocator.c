@@ -11,9 +11,8 @@ void AllocatorRawFree(Allocator allocator, u8* ptr, i64 size, i64 count, i64 ali
 
 static u8* StdAlloc(void* ctx, i64 size, i64 count, i64 align) {
     (void)ctx;
-    (void)align;
-    
-    return (u8*)malloc(count * size);
+
+    return (u8*)aligned_alloc(align, size * count);
 }
 
 static void StdFree(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
