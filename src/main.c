@@ -151,7 +151,7 @@ void TestAllocator(void) {
     {
         i32* num = (i32*)AllocatorRawAlloc(a, sizeof(i32), 1, _Alignof(i32));
         Assert(num != NULL);
-        u64 address = (u64)num;
+        usize address = (usize)num;
         Assert(address % _Alignof(i32) == 0);
 
         *num = 0;
@@ -159,7 +159,7 @@ void TestAllocator(void) {
         Assert(*num == 0);
 
         Assert(num != NULL);
-        address = (u64)num;
+        address = (usize)num;
         Assert(address % _Alignof(i32) == 0);
 
         num[0] = 1;
@@ -169,9 +169,9 @@ void TestAllocator(void) {
     }
 
     {
-        const u64 len = 10;
+        const usize len = 10;
         u64* nums = AllocatorAlloc(u64, a, len);
-        const u64 address = (u64)nums;
+        const usize address = (usize)nums;
         Assert(address % _Alignof(u64) == 0);
 
         for (u64 i = 0; i < len; i++) {
@@ -194,9 +194,9 @@ void TestFba(void) {
     const Allocator a = FbaAsAllocator(&fba);
 
     {
-        int* memory = AllocatorAlloc(int, a, 1);
-        const u64 address = (u64)memory;
-        Assert(address % _Alignof(int) == 0);
+        i32* memory = AllocatorAlloc(i32, a, 1);
+        const usize address = (usize)memory;
+        Assert(address % _Alignof(i32) == 0);
 
         Assert(memory != NULL);
         *memory = 10;
@@ -208,7 +208,7 @@ void TestFba(void) {
     }
 
     {
-        const i64 length = 10;
+        const usize length = 10;
         i32* memory = AllocatorAlloc(i32, a, length);
     
         Assert(memory != NULL);
@@ -291,32 +291,31 @@ void TestUntypedHashmap(void) {
 
     UntypedHashmap map = UntypedHashmapNew(UntypedStringEqual, UntypedStringHash);
 
-    Assert(UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32)) == NULL);
-    Assert(UntypedHashmapGet(&map, sizeof(String), "Aidan", sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){1}, sizeof(i32)) == NULL);
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Ryan", sizeof(i32), _Alignof(i32), &(i32){20});
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Aidan", sizeof(i32), _Alignof(i32), &(i32){17});
-
-    i32* v1 = UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32));
+    UntypedHashmapSet(&map, a, sizeof(i32), _Alignof(i32), &(i32){0}, sizeof(i32), _Alignof(i32), &(i32){20});
+    i32* v1 = UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32));
     Assert(v1 != NULL);
-    Assert(*v1 == 19);
+    Assert(*v1 == 20);
 
-    i32* v2 = UntypedHashmapGet(&map, sizeof(String), "Aidan", sizeof(i32));
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(i32), &(i32){1}, sizeof(i32), _Alignof(i32), &(i32){17});
+    i32* v2 = UntypedHashmapGet(&map, sizeof(i32), &(i32){1}, sizeof(i32));
     Assert(v2 != NULL);
-    Assert(*v2 == 16);
+    Assert(*v2 == 17);
 
-    i32* v3 = UntypedHashmapGet(&map, sizeof(String), "Bob", sizeof(i32));
+    i32* v3 = UntypedHashmapGet(&map, sizeof(i32), &(i32){-1}, sizeof(i32));
     Assert(v3 == NULL);
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Ryan", sizeof(i32), _Alignof(i32), &(i32){21});
-    i32* v4 = UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32));
+    UntypedHashmapSet(&map, a, sizeof(i32), _Alignof(i32), &(i32){0}, sizeof(i32), _Alignof(i32), &(i32){21});
+    i32* v4 = UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32));
     Assert(v4 != NULL);
     Assert(*v4 == 21);
 
-    Assert(UntypedHashmapGet(&map, sizeof(String), "Bobo", sizeof(i32)) == NULL);
-    Assert(UntypedHashmapGet(&map, sizeof(String), "Momo", sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){-1}, sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){-2}, sizeof(i32)) == NULL);
 
-    UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
+    UntypedHashmapFree(&map, a, sizeof(i32), _Alignof(i32), sizeof(i32), _Alignof(i32));
 
     puts("untyped hashmap tests passed\n");
 }
