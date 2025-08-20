@@ -59,16 +59,17 @@ void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, i64 key_siz
 }
 
 void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, i64 key_size, i64 key_align, const void* const key, i64 value_size, i64 value_align, const void* const value) {
-    if (map->count * 2 >= map->capacity) {
-        const i64 new_capacity = (map->capacity == 0) ? 1 : map->capacity * 2;
+    // 80% load factor
+    if (map->count * 10 >= map->capacity * 8) {
+        // Larger starting capacity, prevent collisions
+        const i64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;
         UntypedHashmapRealloc(map, allocator, key_size, key_align, value_size, value_align, new_capacity);
     }
     const i64 hash = map->hash(key);
     i64 index = hash % map->capacity;
 
-    while (map->states[index] == STATE_OCCUPIED) {
-        if (map->compare(key, (u8*)map->keys + index * key_size)) {
-            Assert(index < map->capacity);
+    while (map->states[index] != STATE_EMPTY) {
+        if (map->states[index] == STATE_OCCUPIED && map->compare(key, (u8*)map->keys + index * key_size)) {
             // Overwrite found value
             memcpy((u8*)map->values + index * value_size, value, value_size);
             return;
@@ -91,8 +92,8 @@ void* UntypedHashmapGet(UntypedHashmap* map, i64 key_size, const void* const key
     const i64 hash = map->hash(key);
     i64 index = hash % map->capacity;
 
-    while (map->states[index] != STATE_OCCUPIED) {
-        if (map->compare(key, (u8*)map->keys + index * key_size)) {
+    while (map->states[index] != STATE_EMPTY) {
+        if (map->states[index] == STATE_OCCUPIED && map->compare(key, (u8*)map->keys + index * key_size)) {
             Assert(index < map->capacity);
 
             return (u8*)map->values + index * value_size;
@@ -101,6 +102,6 @@ void* UntypedHashmapGet(UntypedHashmap* map, i64 key_size, const void* const key
         index = (index + 1) % map->capacity;
     }
 
-    return (u8*)map->values + index * value_size;
+    return NULL;
 }
 
