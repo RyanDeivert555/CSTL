@@ -42,19 +42,8 @@ bool StringEqual(String a, String b) {
     return true;
 }
 
-i64 I32Hash(const void* key) {
-    u32 h = *(i32*)key;
-    h ^= h >> 16;
-    h *= 0x85ebca6bU;
-    h ^= h >> 13;
-    h *= 0xc2b2ae35U;
-    h ^= h >> 16;
-
-    return h;
-}
-
-bool I32Equal(const void* a, const void* b) {
-    return *(i32*)a == *(i32*)b;
+i64 UntypedStringHash(const void* key) {
+    return StringHash((String)key);
 }
 
 bool UntypedStringEqual(const void* a, const void* b) {
@@ -316,33 +305,33 @@ void TestUntypedVec(void) {
 void TestUntypedHashmap(void) {
     const Allocator a = StdAllocator();
 
-    UntypedHashmap map = UntypedHashmapNew(I32Equal, I32Hash);
+    UntypedHashmap map = UntypedHashmapNew(UntypedStringEqual, UntypedStringHash);
 
-    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32)) == NULL);
-    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){1}, sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Aidan", sizeof(i32)) == NULL);
 
-    UntypedHashmapSet(&map, a, sizeof(i32), _Alignof(i32), &(i32){0}, sizeof(i32), _Alignof(i32), &(i32){20});
-    i32* v1 = UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32));
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Ryan", sizeof(i32), _Alignof(i32), &(i32){20});
+    i32* v1 = UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32));
     Assert(v1 != NULL);
     Assert(*v1 == 20);
 
-    UntypedHashmapSet(&map, a, sizeof(i32), _Alignof(i32), &(i32){1}, sizeof(i32), _Alignof(i32), &(i32){17});
-    i32* v2 = UntypedHashmapGet(&map, sizeof(i32), &(i32){1}, sizeof(i32));
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Aidan", sizeof(i32), _Alignof(i32), &(i32){17});
+    i32* v2 = UntypedHashmapGet(&map, sizeof(String), "Aidan", sizeof(i32));
     Assert(v2 != NULL);
     Assert(*v2 == 17);
 
-    i32* v3 = UntypedHashmapGet(&map, sizeof(i32), &(i32){-1}, sizeof(i32));
+    i32* v3 = UntypedHashmapGet(&map, sizeof(String), "Momo", sizeof(i32));
     Assert(v3 == NULL);
 
-    UntypedHashmapSet(&map, a, sizeof(i32), _Alignof(i32), &(i32){0}, sizeof(i32), _Alignof(i32), &(i32){21});
-    i32* v4 = UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32));
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), "Ryan", sizeof(i32), _Alignof(i32), &(i32){21});
+    i32* v4 = UntypedHashmapGet(&map, sizeof(String), "Ryan", sizeof(i32));
     Assert(v4 != NULL);
     Assert(*v4 == 21);
 
-    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){-1}, sizeof(i32)) == NULL);
-    Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){-2}, sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Momo", sizeof(i32)) == NULL);
+    Assert(UntypedHashmapGet(&map, sizeof(String), "Bobo", sizeof(i32)) == NULL);
 
-    UntypedHashmapFree(&map, a, sizeof(i32), _Alignof(i32), sizeof(i32), _Alignof(i32));
+    UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
 
     puts("untyped hashmap tests passed\n");
 }
