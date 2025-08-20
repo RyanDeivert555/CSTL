@@ -22,13 +22,30 @@ void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, i64 key_siz
     void* new_values = AllocatorRawAlloc(allocator, value_size, new_capacity, value_align);
     UntypedHashmapState* new_states = AllocatorAlloc(UntypedHashmapState, allocator, new_capacity);
 
+    // Default to empty entries in case allocators do not zero memory
+    memset(new_states, 0, new_capacity * sizeof(UntypedHashmapState));
+
     if (map->count != 0) {
-        // Default to empty entries
-        memset(new_states, STATE_EMPTY, new_capacity * sizeof(UntypedHashmapState));
-        memcpy(new_keys, map->keys, map->capacity * key_size);
-        // TODO: rehash instead of memcpy
-        memcpy(new_values, map->values, map->capacity * value_size);
-        memmove(new_states, map->states, map->capacity * sizeof(UntypedHashmapState));
+        // Rehash keys and values into new buffers
+        for (i64 i = 0; i < map->capacity; i++) {
+            if (map->states[i] == STATE_EMPTY) {
+                continue;
+            }
+            const void* key = (u8*)map->keys + i * key_size;
+            const void* value = (u8*)map->values + i * value_size;
+
+            const i64 hash = map->hash(key);
+            i64 index = hash % new_capacity;
+
+            while (new_states[index] == STATE_OCCUPIED) {
+                index = (index + 1) % new_capacity;
+            }
+
+            Assert(index < new_capacity);
+            memcpy((u8*)new_keys + index * key_size, key, key_size);
+            memcpy((u8*)new_values + index * value_size, value, value_size);
+            new_states[index] = STATE_OCCUPIED;
+        }
     }
 
     AllocatorRawFree(allocator, (u8*)map->keys, key_size, map->capacity, key_align);
@@ -42,7 +59,7 @@ void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, i64 key_siz
 }
 
 void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, i64 key_size, i64 key_align, const void* const key, i64 value_size, i64 value_align, const void* const value) {
-    if (map->count >= map->capacity / 2) {
+    if (map->count * 2 >= map->capacity) {
         const i64 new_capacity = (map->capacity == 0) ? 1 : map->capacity * 2;
         UntypedHashmapRealloc(map, allocator, key_size, key_align, value_size, value_align, new_capacity);
     }
@@ -51,20 +68,18 @@ void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, i64 key_size, i
 
     while (map->states[index] == STATE_OCCUPIED) {
         if (map->compare(key, (u8*)map->keys + index * key_size)) {
+            Assert(index < map->capacity);
             // Overwrite found value
-            memmove((u8*)map->values + index * value_size, value, value_size);
+            memcpy((u8*)map->values + index * value_size, value, value_size);
             return;
         }
 
-        index++;
-        if (index >= map->capacity) {
-            index = 0;
-        }
+        index = (index + 1) % map->capacity;
     }
 
     map->count++;
-    memmove((u8*)map->keys + index * key_size, key, key_size);
-    memmove((u8*)map->values + index * value_size, value, value_size);
+    memcpy((u8*)map->keys + index * key_size, key, key_size);
+    memcpy((u8*)map->values + index * value_size, value, value_size);
     map->states[index] = STATE_OCCUPIED;
 }
 
@@ -76,17 +91,16 @@ void* UntypedHashmapGet(UntypedHashmap* map, i64 key_size, const void* const key
     const i64 hash = map->hash(key);
     i64 index = hash % map->capacity;
 
-    while (map->states[index] == STATE_OCCUPIED) {
+    while (map->states[index] != STATE_OCCUPIED) {
         if (map->compare(key, (u8*)map->keys + index * key_size)) {
+            Assert(index < map->capacity);
+
             return (u8*)map->values + index * value_size;
         }
 
-        index++;
-        if (index >= map->capacity) {
-            index = 0;
-        }
+        index = (index + 1) % map->capacity;
     }
 
-    return NULL;
+    return (u8*)map->values + index * value_size;
 }
 

@@ -22,12 +22,39 @@ i64 StringHash(String key) {
     return result;
 }
 
-i64 UntypedStringHash(const void* key) {
-    return StringHash((String)key);
+bool StringEqual(String a, String b) {
+    if (a == b) {
+        return true;
+    }
+    const i64 a_len = strlen(a);
+    const i64 b_len = strlen(b);
+
+    if (a_len != b_len) {
+        return false;
+    }
+
+    for (i64 i = 0; i < a_len; i++) {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
-bool StringEqual(String a, String b) {
-    return a == b;
+i64 I32Hash(const void* key) {
+    u32 h = *(i32*)key;
+    h ^= h >> 16;
+    h *= 0x85ebca6bU;
+    h ^= h >> 13;
+    h *= 0xc2b2ae35U;
+    h ^= h >> 16;
+
+    return h;
+}
+
+bool I32Equal(const void* a, const void* b) {
+    return *(i32*)a == *(i32*)b;
 }
 
 bool UntypedStringEqual(const void* a, const void* b) {
@@ -289,7 +316,7 @@ void TestUntypedVec(void) {
 void TestUntypedHashmap(void) {
     const Allocator a = StdAllocator();
 
-    UntypedHashmap map = UntypedHashmapNew(UntypedStringEqual, UntypedStringHash);
+    UntypedHashmap map = UntypedHashmapNew(I32Equal, I32Hash);
 
     Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){0}, sizeof(i32)) == NULL);
     Assert(UntypedHashmapGet(&map, sizeof(i32), &(i32){1}, sizeof(i32)) == NULL);
@@ -299,7 +326,7 @@ void TestUntypedHashmap(void) {
     Assert(v1 != NULL);
     Assert(*v1 == 20);
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(i32), &(i32){1}, sizeof(i32), _Alignof(i32), &(i32){17});
+    UntypedHashmapSet(&map, a, sizeof(i32), _Alignof(i32), &(i32){1}, sizeof(i32), _Alignof(i32), &(i32){17});
     i32* v2 = UntypedHashmapGet(&map, sizeof(i32), &(i32){1}, sizeof(i32));
     Assert(v2 != NULL);
     Assert(*v2 == 17);
