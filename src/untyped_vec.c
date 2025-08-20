@@ -18,7 +18,7 @@ void UntypedVecPush(UntypedVec* vec, Allocator allocator, i64 item_size, i64 ite
         const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
         UntypedVecReserve(vec, allocator, item_size, item_align, new_capacity);
     }
-    memmove((u8*)vec->buffer + vec->length * item_size, item, item_size);
+    memcpy((u8*)vec->buffer + vec->length * item_size, item, item_size);
     vec->length++;
 }
 
@@ -38,7 +38,7 @@ void UntypedVecInsert(UntypedVec* vec, Allocator allocator, i64 index, i64 item_
         UntypedVecReserve(vec, allocator, item_size, item_align, new_capacity);
     }
     memmove((u8*)vec->buffer + (index + 1) * item_size, (u8*)vec->buffer + index * item_size, (vec->length - index) * item_size);
-    memmove((u8*)vec->buffer + index * item_size, item, item_size);
+    memcpy((u8*)vec->buffer + index * item_size, item, item_size);
     vec->length++;
 }
 
@@ -67,6 +67,6 @@ void* UntypedVecGet(UntypedVec* vec, i64 index, i64 item_size) {
 void UntypedVecSet(UntypedVec* vec, i64 index, i64 item_size, const void* const item) {
     Assert(index >= 0 && index < vec->length);
 
-    memmove((u8*)vec->buffer + index * item_size, item, item_size);
+    memcpy((u8*)vec->buffer + index * item_size, item, item_size);
 }
 
