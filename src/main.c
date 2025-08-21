@@ -141,6 +141,15 @@ void TestHashmap(void) {
     Assert(Hashmap_String_i32_Get(&map, "Bobo") == NULL);
     Assert(Hashmap_String_i32_Get(&map, "Momo") == NULL);
 
+    Assert(!Hashmap_String_i32_TryRemove(&map, "Bobo", NULL));
+    Assert(!Hashmap_String_i32_TryRemove(&map, "Momo", NULL));
+
+    i32 out;
+    Assert(Hashmap_String_i32_TryRemove(&map, "Ryan", &out));
+    Assert(out == 21);
+
+    Assert(Hashmap_String_i32_Get(&map, "Ryan") == NULL);
+
     Hashmap_String_i32_Free(&map, a);
 
     puts("hashmap tests passed\n");
@@ -320,6 +329,15 @@ void TestUntypedHashmap(void) {
 
     Assert(UntypedHashmapGet(&map, sizeof(String), &codebase, sizeof(i32)) == NULL);
     Assert(UntypedHashmapGet(&map, sizeof(String), &ringo, sizeof(i32)) == NULL);
+
+    Assert(!UntypedHashmapTryRemove(&map, sizeof(String), &codebase, sizeof(i32), NULL));
+    Assert(!UntypedHashmapTryRemove(&map, sizeof(String), &ringo, sizeof(i32), NULL));
+
+    void* out = NULL;
+    Assert(UntypedHashmapTryRemove(&map, sizeof(String), &ryan, sizeof(i32), &out));
+    Assert(*(i32*)out == 21);
+
+    Assert(UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32)) == NULL);
 
     UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
 

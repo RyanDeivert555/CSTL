@@ -7,6 +7,7 @@
 typedef enum HashmapState {
     HASHMAP_STATE_EMPTY,
     HASHMAP_STATE_OCCUPIED,
+    HASHMAP_STATE_TOMBSTONE,
 } HashmapState;
 
 #define HASHMAP_DEFINE(K, V) \
@@ -23,6 +24,7 @@ typedef enum HashmapState {
     V* Hashmap_##K##_##V##_Get(Hashmap_##K##_##V* map, K key); \
     void Hashmap_##K##_##V##_Realloc(Hashmap_##K##_##V* map, Allocator allocator, i64 new_capacity); \
     void Hashmap_##K##_##V##_Set(Hashmap_##K##_##V* map, Allocator allocator, K key, V value); \
+    bool Hashmap_##K##_##V##_TryRemove(Hashmap_##K##_##V* map, K key, V* out_value); \
 
 #define HASHMAP_IMPL(K, V, CompareFunc, HashFunc) \
     Hashmap_##K##_##V Hashmap_##K##_##V##_New(void) { \
@@ -117,5 +119,29 @@ typedef enum HashmapState {
         map->keys[index] = key; \
         map->values[index] = value; \
         map->states[index] = HASHMAP_STATE_OCCUPIED; \
+    } \
+    \
+    bool Hashmap_##K##_##V##_TryRemove(Hashmap_##K##_##V* map, K key, V* out_value) { \
+        if (map->capacity == 0) { \
+            return false; \
+        } \
+        \
+        const i64 hash = HashFunc(key); \
+        i64 index = hash % map->capacity; \
+        \
+        while (map->states[index] != HASHMAP_STATE_EMPTY) { \
+            if (map->states[index] == HASHMAP_STATE_OCCUPIED && CompareFunc(key, map->keys[index])) { \
+                map->states[index] = HASHMAP_STATE_TOMBSTONE; \
+                if (out_value) { \
+                    *out_value = map->values[index]; \
+                    \
+                    return true; \
+                } \
+            } \
+            \
+            index = (index + 1) % map->capacity; \
+        } \
+        \
+        return false; \
     } \
 

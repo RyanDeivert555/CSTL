@@ -105,3 +105,38 @@ void* UntypedHashmapGet(UntypedHashmap* map, i64 key_size, const void* const key
     return NULL;
 }
 
+bool UntypedHashmapTryRemove(UntypedHashmap* map, i64 key_size, const void* const key, i64 value_size, void** out_value) {
+    if (map->capacity == 0) {
+        if (out_value) {
+            *out_value = NULL;
+
+            return false;
+        }
+    }
+
+    const i64 hash = map->hash(key);
+    i64 index = hash % map->capacity;
+
+    while (map->states[index] != UNTYPED_HASHMAP_STATE_EMPTY) {
+        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED && map->compare(key, (u8*)map->keys + index * key_size)) {
+            Assert(index < map->capacity);
+
+            map->states[index] = UNTYPED_HASHMAP_STATE_TOMBSTONE;
+
+            if (out_value) {
+                *out_value = (u8*)map->values + index * value_size;
+            }
+
+            return true;
+        }
+
+        index = (index + 1) % map->capacity;
+    }
+
+    if (out_value) {
+        *out_value = NULL;
+    }
+
+    return false;
+}
+
