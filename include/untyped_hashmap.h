@@ -6,8 +6,8 @@ typedef bool (*CompareFunc)(const void* lhs, const void* rhs);
 typedef i64 (*HashFunc)(const void* key);
 
 typedef enum UntypedHashmapState {
-    STATE_EMPTY,
-    STATE_OCCUPIED,
+    UNTYPED_HASHMAP_STATE_EMPTY,
+    UNTYPED_HASHMAP_STATE_OCCUPIED,
 } UntypedHashmapState;
 
 typedef struct UntypedHashmap {

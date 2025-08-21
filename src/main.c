@@ -40,7 +40,7 @@ VEC_IMPL(u8)
 LIST_DEFINE(f32)
 LIST_IMPL(f32)
 HASHMAP_DEFINE(String, i32)
-HASHMAP_IMPL(String, i32, StringHash, StringEqual)
+HASHMAP_IMPL(String, i32, StringEqual, StringHash)
 
 void TestVec(void);
 void TestList(void);
@@ -53,7 +53,7 @@ void TestUntypedHashmap(void);
 int main(void) {
     TestVec();
     TestList();
-    //TestHashmap();
+    TestHashmap();
     TestAllocator();
     TestFba();
     TestUntypedVec();
