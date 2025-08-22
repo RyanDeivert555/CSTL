@@ -25,6 +25,16 @@ typedef enum HashmapState {
     void Hashmap_##K##_##V##_Realloc(Hashmap_##K##_##V* map, Allocator allocator, i64 new_capacity); \
     void Hashmap_##K##_##V##_Set(Hashmap_##K##_##V* map, Allocator allocator, K key, V value); \
     bool Hashmap_##K##_##V##_TryRemove(Hashmap_##K##_##V* map, K key, V* out_value); \
+    \
+    typedef struct Hashmap_##K##_##V##_Iterator { \
+        const Hashmap_##K##_##V* inner; \
+        K key; \
+        V value; \
+        i64 index; \
+    } Hashmap_##K##_##V##_Iterator; \
+    \
+    Hashmap_##K##_##V##_Iterator Hashmap_##K##_##V##_IteratorNew(const Hashmap_##K##_##V* map); \
+    bool Hashmap_##K##_##V##_IteratorNext(Hashmap_##K##_##V##_Iterator* it); \
 
 #define HASHMAP_IMPL(K, V, CompareFunc, HashFunc) \
     Hashmap_##K##_##V Hashmap_##K##_##V##_New(void) { \
@@ -140,6 +150,31 @@ typedef enum HashmapState {
             } \
             \
             index = (index + 1) % map->capacity; \
+        } \
+        \
+        return false; \
+    } \
+    \
+    Hashmap_##K##_##V##_Iterator Hashmap_##K##_##V##_IteratorNew(const Hashmap_##K##_##V* map) { \
+        Hashmap_##K##_##V##_Iterator result = {0}; \
+        result.inner = map; \
+        \
+        return result; \
+    } \
+    \
+    bool Hashmap_##K##_##V##_IteratorNext(Hashmap_##K##_##V##_Iterator* it) { \
+        const Hashmap_##K##_##V* inner = it->inner; \
+        \
+        while (it->index < inner->capacity) { \
+            const i64 curr = it->index; \
+            it->index++; \
+            \
+            if (inner->states[curr] == HASHMAP_STATE_OCCUPIED) { \
+                it->key = inner->keys[curr]; \
+                it->value = inner->values[curr]; \
+                \
+                return true; \
+            } \
         } \
         \
         return false; \

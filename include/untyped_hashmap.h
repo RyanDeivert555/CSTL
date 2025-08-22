@@ -28,3 +28,13 @@ void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, i64 key_size, i
 void* UntypedHashmapGet(UntypedHashmap* map, i64 key_size, const void* const key, i64 value_size);
 bool UntypedHashmapTryRemove(UntypedHashmap* map, i64 key_size, const void* const key, i64 value_size, void** out_value);
 
+typedef struct UntypedHashmapIterator {
+    const UntypedHashmap* inner;
+    void* key;
+    void* value;
+    i64 index;
+} UntypedHashmapIterator;
+
+UntypedHashmapIterator UntypedHashmapIteratorNew(const UntypedHashmap* map);
+bool UntypedHashmapIteratorNext(UntypedHashmapIterator* it, i64 key_size, i64 value_size);
+

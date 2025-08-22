@@ -140,3 +140,28 @@ bool UntypedHashmapTryRemove(UntypedHashmap* map, i64 key_size, const void* cons
     return false;
 }
 
+UntypedHashmapIterator UntypedHashmapIteratorNew(const UntypedHashmap* map) {
+    UntypedHashmapIterator result = {0};
+    result.inner = map;
+
+    return result;
+}
+
+bool UntypedHashmapIteratorNext(UntypedHashmapIterator* it, i64 key_size, i64 value_size) {
+    const UntypedHashmap* inner = it->inner;
+
+    while (it->index < inner->capacity) {
+        const i64 curr = it->index;
+        it->index++;
+
+        if (inner->states[curr] == UNTYPED_HASHMAP_STATE_OCCUPIED) {
+            it->key = (u8*)inner->keys + curr * key_size;
+            it->value = (u8*)inner->values + curr * value_size;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
