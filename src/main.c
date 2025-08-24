@@ -6,6 +6,7 @@
 #include "fba.h"
 #include "untyped_vec.h"
 #include "untyped_hashmap.h"
+#include "intrusive_list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +50,7 @@ void TestAllocator(void);
 void TestFba(void);
 void TestUntypedVec(void);
 void TestUntypedHashmap(void);
+void TestIntrusiveList(void);
 
 int main(void) {
     TestVec();
@@ -58,6 +60,7 @@ int main(void) {
     TestFba();
     TestUntypedVec();
     TestUntypedHashmap();
+    TestIntrusiveList();
 
     puts("all tests passed");
 
@@ -342,5 +345,46 @@ void TestUntypedHashmap(void) {
     UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
 
     puts("untyped hashmap tests passed\n");
+}
+
+void TestIntrusiveList(void) {
+    typedef struct Data {
+        i32 num;
+        IntrusiveNode node;
+    } Data;
+
+    IntrusiveList list = IntrusiveListNew();
+    Data one = {1, {0}};
+    Data two = {2, {0}};
+    Data three = {3, {0}};
+    Data four = {4, {0}};
+    Data five = {5, {0}};
+    IntrusiveListPushFront(&list, &two.node);
+    IntrusiveNodeInsertAfter(&two.node, &five.node);
+    IntrusiveListPushFront(&list, &one.node);
+    IntrusiveNodeInsertAfter(&two.node, &three.node);
+    IntrusiveNodeInsertAfter(&three.node, &four.node);
+
+    {
+        IntrusiveNode* curr = list.head;
+        i64 count = 0;
+        while (curr) {
+            count++;
+            curr = curr->next;
+        }
+        Assert(count == 5);
+    }
+    {
+        IntrusiveNode* curr = list.head;
+        i32 index = 1;
+        while (curr) {
+            const Data* d = ParentOf(Data, node, curr);
+            Assert(d->num == index);
+            index++;
+            curr = curr->next;
+        }
+    }
+
+    puts("intrusive list tests passed\n");
 }
 

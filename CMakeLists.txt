@@ -10,6 +10,7 @@ set(
     src/fba.c
     src/untyped_vec.c
     src/untyped_hashmap.c
+    src/intrusive_list.c
 )
 
 set(
@@ -22,6 +23,7 @@ set(
     include/hashmap.h
     include/untyped_vec.h
     include/untyped_hashmap.h
+    include/intrusive_list.h
 )
 
 if(NOT CMAKE_BUILD_TYPE)
