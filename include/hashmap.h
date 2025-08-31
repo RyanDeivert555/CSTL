@@ -19,7 +19,6 @@ typedef enum HashmapState {
         i64 count; \
     } Hashmap_##K##_##V; \
     \
-    Hashmap_##K##_##V Hashmap_##K##_##V##_New(void); \
     void Hashmap_##K##_##V##_Free(Hashmap_##K##_##V* map, Allocator allocator); \
     V* Hashmap_##K##_##V##_Get(Hashmap_##K##_##V* map, K key); \
     void Hashmap_##K##_##V##_Realloc(Hashmap_##K##_##V* map, Allocator allocator, i64 new_capacity); \
@@ -37,12 +36,6 @@ typedef enum HashmapState {
     bool Hashmap_##K##_##V##_IteratorNext(Hashmap_##K##_##V##_Iterator* it); \
 
 #define HASHMAP_IMPL(K, V, CompareFunc, HashFunc) \
-    Hashmap_##K##_##V Hashmap_##K##_##V##_New(void) { \
-        Hashmap_##K##_##V result = {0}; \
-        \
-        return result; \
-    } \
-    \
     void Hashmap_##K##_##V##_Free(Hashmap_##K##_##V* map, Allocator allocator) { \
         AllocatorFree(K, allocator, map->keys, map->capacity); \
         AllocatorFree(V, allocator, map->values, map->capacity); \

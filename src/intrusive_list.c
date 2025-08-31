@@ -7,12 +7,6 @@ void IntrusiveNodeInsertAfter(IntrusiveNode* node, IntrusiveNode* new_node) {
     node->next = new_node;
 }
 
-IntrusiveList IntrusiveListNew(void) {
-    const IntrusiveList result = {0};
-
-    return result;
-}
-
 IntrusiveNode* IntrusiveListPopFront(IntrusiveList* list) {
     if (!list->head) {
         return NULL;

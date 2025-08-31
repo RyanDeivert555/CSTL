@@ -10,7 +10,6 @@
         i64 capacity; \
     } Vec_##T; \
     \
-    Vec_##T Vec_##T##_New(void); \
     void Vec_##T##_Free(Vec_##T* vec, Allocator allocator); \
     void Vec_##T##_Push(Vec_##T* vec, Allocator allocator, T elem); \
     T Vec_##T##_Pop(Vec_##T* vec); \
@@ -19,12 +18,6 @@
     void Vec_##T##_Reserve(Vec_##T* vec, Allocator allocator, i64 new_capacity); \
 
 #define VEC_IMPL(T) \
-    Vec_##T Vec_##T##_New(void) { \
-        const Vec_##T result = {0}; \
-        \
-        return result; \
-    } \
-    \
     void Vec_##T##_Free(Vec_##T* vec, Allocator allocator) { \
         AllocatorFree(T, allocator, vec->buffer, vec->capacity); \
     } \

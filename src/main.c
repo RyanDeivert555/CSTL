@@ -70,7 +70,7 @@ int main(void) {
 void TestVec(void) {
     const Allocator a = StdAllocator();
  
-    Vec_u8 vec = Vec_u8_New();
+    Vec_u8 vec = {0};
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
         Vec_u8_Push(&vec, a, hello[i]);
@@ -94,7 +94,7 @@ void TestVec(void) {
 void TestList(void) {
     const Allocator a = StdAllocator();
  
-    List_f32 list = List_f32_New();
+    List_f32 list = {0};
     for (float i = 0.0f; i < 10.0f; i++) {
         List_f32_PushBack(&list, a, i);
         List_f32_PushFront(&list, a, i);
@@ -117,7 +117,7 @@ void TestList(void) {
 void TestHashmap(void) {
     const Allocator a = StdAllocator();
 
-    Hashmap_String_i32 map = Hashmap_String_i32_New();
+    Hashmap_String_i32 map = {0};
 
     Assert(Hashmap_String_i32_Get(&map, "Ryan") == NULL);
     Assert(Hashmap_String_i32_Get(&map, "Aidan") == NULL);
@@ -250,7 +250,7 @@ void TestFba(void) {
 void TestUntypedVec(void) {
     const Allocator a = StdAllocator();
 
-    UntypedVec vec = UntypedVecNew();
+    UntypedVec vec = {0};
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
         UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &hello[i]);
@@ -279,7 +279,7 @@ void TestUntypedVec(void) {
     UntypedVecFree(&vec, a, sizeof(u8), _Alignof(u8));
 
     // test with integers now
-    vec = UntypedVecNew();
+    memset(&vec, 0, sizeof(UntypedVec));
     Assert(!vec.buffer && !vec.length && !vec.capacity);
 
     const i32 nums[] = {0, 1, 2, 4, 8, 16, -1};
@@ -353,7 +353,7 @@ void TestIntrusiveList(void) {
         IntrusiveNode node;
     } Data;
 
-    IntrusiveList list = IntrusiveListNew();
+    IntrusiveList list = {0};
     Data one = {1, {0}};
     Data two = {2, {0}};
     Data three = {3, {0}};

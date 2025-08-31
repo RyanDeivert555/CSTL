@@ -3,12 +3,6 @@
 #include "common.h"
 #include <string.h>
 
-UntypedVec UntypedVecNew(void) {
-    const UntypedVec result = {0};
-
-    return result;
-}
-
 void UntypedVecFree(UntypedVec* vec, Allocator allocator, i64 item_size, i64 item_align) {
     AllocatorRawFree(allocator, (u8*)vec->buffer, item_size, vec->capacity, item_align);
 }

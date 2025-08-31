@@ -15,7 +15,6 @@
         i64 length; \
     } List_##T; \
     \
-    List_##T List_##T##_New(void); \
     void List_##T##_Free(List_##T* list, Allocator allocator); \
     void List_##T##_PushFront(List_##T* list, Allocator allocator, T entry); \
     void List_##T##_PushBack(List_##T* list, Allocator allocator, T entry); \
@@ -27,12 +26,6 @@
         Node_##T* result = AllocatorAlloc(Node_##T, allocator, 1); \
         result->data = entry; \
         result->next = NULL; \
-        \
-        return result; \
-    } \
-    \
-    List_##T List_##T##_New(void) { \
-        List_##T result = {0}; \
         \
         return result; \
     } \
