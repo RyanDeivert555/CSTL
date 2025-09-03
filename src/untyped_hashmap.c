@@ -23,12 +23,12 @@ void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, i64 key_siz
     UntypedHashmapState* new_states = AllocatorAlloc(UntypedHashmapState, allocator, new_capacity);
 
     // Default to empty entries in case allocators do not zero memory
-    memset(new_states, 0, new_capacity * sizeof(UntypedHashmapState));
+    memset(new_states, UNTYPED_HASHMAP_STATE_EMPTY, new_capacity * sizeof(UntypedHashmapState));
 
     if (map->count != 0) {
         // Rehash keys and values into new buffers
         for (i64 i = 0; i < map->capacity; i++) {
-            if (map->states[i] == UNTYPED_HASHMAP_STATE_EMPTY) {
+            if (map->states[i] != UNTYPED_HASHMAP_STATE_OCCUPIED) {
                 continue;
             }
             const void* key = (u8*)map->keys + i * key_size;

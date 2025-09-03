@@ -153,6 +153,19 @@ void TestHashmap(void) {
 
     Assert(Hashmap_String_i32_Get(&map, "Ryan") == NULL);
 
+    Hashmap_String_i32_Set(&map, a, "Ryan", 21);
+    Hashmap_String_i32_Set(&map, a, "Momo", 39);
+    Hashmap_String_i32_Set(&map, a, "Bobo", 12);
+
+    Hashmap_String_i32_Iterator it = Hashmap_String_i32_IteratorNew(&map);
+
+    Assert(Hashmap_String_i32_IteratorNext(&it));
+    Assert(Hashmap_String_i32_IteratorNext(&it));
+    Assert(Hashmap_String_i32_IteratorNext(&it));
+    Assert(Hashmap_String_i32_IteratorNext(&it));
+    Assert(!Hashmap_String_i32_IteratorNext(&it));
+    Assert(!Hashmap_String_i32_IteratorNext(&it));
+
     Hashmap_String_i32_Free(&map, a);
 
     puts("hashmap tests passed\n");
@@ -341,6 +354,21 @@ void TestUntypedHashmap(void) {
     Assert(*(i32*)out == 21);
 
     Assert(UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32)) == NULL);
+
+
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &ryan, sizeof(i32), _Alignof(i32), &(i32){21});
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &codebase, sizeof(i32), _Alignof(i32), &(i32){39});
+    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &ringo, sizeof(i32), _Alignof(i32), &(i32){12});
+
+
+    UntypedHashmapIterator it = UntypedHashmapIteratorNew(&map);
+
+    Assert(UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
+    Assert(UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
+    Assert(UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
+    Assert(UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
+    Assert(!UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
+    Assert(!UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
 
     UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
 

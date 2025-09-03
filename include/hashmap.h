@@ -66,18 +66,18 @@ typedef enum HashmapState {
         V* new_values = AllocatorAlloc(V, allocator, new_capacity); \
         HashmapState* new_states = AllocatorAlloc(HashmapState, allocator, new_capacity); \
         \
-        memset(new_states, 0, new_capacity * sizeof(HashmapState)); \
+        memset(new_states, HASHMAP_STATE_EMPTY, new_capacity * sizeof(HashmapState)); \
         \
         if (map->count != 0) { \
             for (i64 i = 0; i < map->capacity; i++) { \
-                if (map->states[i] == HASHMAP_STATE_EMPTY) { \
+                if (map->states[i] != HASHMAP_STATE_OCCUPIED) { \
                     continue; \
                 } \
                 const K key = map->keys[i]; \
                 const V value = map->values[i]; \
                 \
                 const i64 hash = HashFunc(key); \
-                i64 index = hash % map->capacity; \
+                i64 index = hash % new_capacity; \
                 \
                 while (new_states[index] == HASHMAP_STATE_OCCUPIED) { \
                     index = (index + 1) % new_capacity; \
