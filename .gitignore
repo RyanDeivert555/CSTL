@@ -1,4 +1,4 @@
 /build
 /.cache
-win64-toolchain.cmake
+w64-toolchain.cmake
 
