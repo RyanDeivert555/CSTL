@@ -175,10 +175,10 @@ void TestAllocator(void) {
     const Allocator a = StdAllocator();
 
     {
-        i32* num = (i32*)AllocatorRawAlloc(a, sizeof(i32), 1, _Alignof(i32));
+        i32* num = (i32*)AllocatorRawAlloc(a, sizeof(i32), 1, alignof(i32));
         Assert(num != NULL);
         usize address = (usize)num;
-        Assert(address % _Alignof(i32) == 0);
+        Assert(address % alignof(i32) == 0);
 
         *num = 0;
 
@@ -186,19 +186,19 @@ void TestAllocator(void) {
 
         Assert(num != NULL);
         address = (usize)num;
-        Assert(address % _Alignof(i32) == 0);
+        Assert(address % alignof(i32) == 0);
 
         num[0] = 1;
         Assert(num[0] == 1);
 
-        AllocatorRawFree(a, (u8*)num, sizeof(i32), 1, _Alignof(i32));
+        AllocatorRawFree(a, (u8*)num, sizeof(i32), 1, alignof(i32));
     }
 
     {
         const usize len = 10;
         u64* nums = AllocatorAlloc(u64, a, len);
         const usize address = (usize)nums;
-        Assert(address % _Alignof(u64) == 0);
+        Assert(address % alignof(u64) == 0);
 
         for (u64 i = 0; i < len; i++) {
             nums[i] = i;
@@ -222,7 +222,7 @@ void TestFba(void) {
     {
         i32* memory = AllocatorAlloc(i32, a, 1);
         const usize address = (usize)memory;
-        Assert(address % _Alignof(i32) == 0);
+        Assert(address % alignof(i32) == 0);
 
         Assert(memory != NULL);
         *memory = 10;
@@ -266,14 +266,14 @@ void TestUntypedVec(void) {
     UntypedVec vec = {0};
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
-        UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &hello[i]);
+        UntypedVecPush(&vec, a, sizeof(u8), alignof(u8), &hello[i]);
     }
  
     for (i64 i = 0; i < vec.length; i++) {
         u8* item = (u8*)UntypedVecGet(&vec, i, sizeof(u8));
         *item += 1;
     }
-    UntypedVecPush(&vec, a, sizeof(u8), _Alignof(u8), &(u8){'\n'});
+    UntypedVecPush(&vec, a, sizeof(u8), alignof(u8), &(u8){'\n'});
  
     const char* expected = "hello\n";
     for (i64 i = 0; i < vec.length; i++) {
@@ -289,7 +289,7 @@ void TestUntypedVec(void) {
     const u8* first = UntypedVecGet(&vec, 0, sizeof(u8));
     Assert(*first == 'h');
  
-    UntypedVecFree(&vec, a, sizeof(u8), _Alignof(u8));
+    UntypedVecFree(&vec, a, sizeof(u8), alignof(u8));
 
     // test with integers now
     memset(&vec, 0, sizeof(UntypedVec));
@@ -297,7 +297,7 @@ void TestUntypedVec(void) {
 
     const i32 nums[] = {0, 1, 2, 4, 8, 16, -1};
     for (i64 i = 0; nums[i] != -1; i++) {
-        UntypedVecPush(&vec, a, sizeof(i32), _Alignof(i32), &nums[i]);
+        UntypedVecPush(&vec, a, sizeof(i32), alignof(i32), &nums[i]);
     }
 
     i64 index = 5;
@@ -307,7 +307,7 @@ void TestUntypedVec(void) {
         index--;
     }
 
-    UntypedVecFree(&vec, a, sizeof(i32), _Alignof(i32));
+    UntypedVecFree(&vec, a, sizeof(i32), alignof(i32));
  
     puts("untyped vec tests passed\n");
 }
@@ -325,12 +325,12 @@ void TestUntypedHashmap(void) {
     Assert(UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32)) == NULL);
     Assert(UntypedHashmapGet(&map, sizeof(String), &aidan, sizeof(i32)) == NULL);
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &ryan, sizeof(i32), _Alignof(i32), &(i32){20});
+    UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &ryan, sizeof(i32), alignof(i32), &(i32){20});
     i32* v1 = UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32));
     Assert(v1 != NULL);
     Assert(*v1 == 20);
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &aidan, sizeof(i32), _Alignof(i32), &(i32){17});
+    UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &aidan, sizeof(i32), alignof(i32), &(i32){17});
     i32* v2 = UntypedHashmapGet(&map, sizeof(String), &aidan, sizeof(i32));
     Assert(v2 != NULL);
     Assert(*v2 == 17);
@@ -338,7 +338,7 @@ void TestUntypedHashmap(void) {
     i32* v3 = UntypedHashmapGet(&map, sizeof(String), &codebase, sizeof(i32));
     Assert(v3 == NULL);
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &ryan, sizeof(i32), _Alignof(i32), &(i32){21});
+    UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &ryan, sizeof(i32), alignof(i32), &(i32){21});
     i32* v4 = UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32));
     Assert(v4 != NULL);
     Assert(*v4 == 21);
@@ -356,9 +356,9 @@ void TestUntypedHashmap(void) {
     Assert(UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32)) == NULL);
 
 
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &ryan, sizeof(i32), _Alignof(i32), &(i32){21});
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &codebase, sizeof(i32), _Alignof(i32), &(i32){39});
-    UntypedHashmapSet(&map, a, sizeof(String), _Alignof(String), &ringo, sizeof(i32), _Alignof(i32), &(i32){12});
+    UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &ryan, sizeof(i32), alignof(i32), &(i32){21});
+    UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &codebase, sizeof(i32), alignof(i32), &(i32){39});
+    UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &ringo, sizeof(i32), alignof(i32), &(i32){12});
 
 
     UntypedHashmapIterator it = UntypedHashmapIteratorNew(&map);
@@ -370,7 +370,7 @@ void TestUntypedHashmap(void) {
     Assert(!UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
     Assert(!UntypedHashmapIteratorNext(&it, sizeof(String), sizeof(i32)));
 
-    UntypedHashmapFree(&map, a, sizeof(String), _Alignof(String), sizeof(i32), _Alignof(i32));
+    UntypedHashmapFree(&map, a, sizeof(String), alignof(String), sizeof(i32), alignof(i32));
 
     puts("untyped hashmap tests passed\n");
 }
