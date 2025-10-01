@@ -135,6 +135,7 @@ typedef enum HashmapState {
         while (map->states[index] != HASHMAP_STATE_EMPTY) { \
             if (map->states[index] == HASHMAP_STATE_OCCUPIED && CompareFunc(key, map->keys[index])) { \
                 map->states[index] = HASHMAP_STATE_TOMBSTONE; \
+                map->count--; \
                 if (out_value) { \
                     *out_value = map->values[index]; \
                     \

@@ -1,6 +1,5 @@
 #include "common.h"
 #include "vec.h"
-#include "list.h"
 #include "hashmap.h"
 #include "allocator.h"
 #include "fba.h"
@@ -9,7 +8,28 @@
 #include "intrusive_list.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
+void TestVec(void);
+void TestHashmap(void);
+void TestAllocator(void);
+void TestFba(void);
+void TestUntypedVec(void);
+void TestUntypedHashmap(void);
+void TestIntrusiveList(void);
+
+int main(void) {
+    TestVec();
+    TestHashmap();
+    TestAllocator();
+    TestFba();
+    TestUntypedVec();
+    TestUntypedHashmap();
+    TestIntrusiveList();
+
+    puts("all tests passed");
+
+    return 0;
+}
 
 typedef const char* String;
 i64 StringHash(String key) {
@@ -36,36 +56,10 @@ bool UntypedStringEqual(const void* a, const void* b) {
     return StringEqual(*(String*)a, *(String*)b);
 }
 
-VEC_DEFINE(u8)
-VEC_IMPL(u8)
-LIST_DEFINE(f32)
-LIST_IMPL(f32)
-HASHMAP_DEFINE(String, i32)
-HASHMAP_IMPL(String, i32, StringEqual, StringHash)
-
-void TestVec(void);
-void TestList(void);
-void TestHashmap(void);
-void TestAllocator(void);
-void TestFba(void);
-void TestUntypedVec(void);
-void TestUntypedHashmap(void);
-void TestIntrusiveList(void);
-
-int main(void) {
-    TestVec();
-    TestList();
-    TestHashmap();
-    TestAllocator();
-    TestFba();
-    TestUntypedVec();
-    TestUntypedHashmap();
-    TestIntrusiveList();
-
-    puts("all tests passed");
-
-    return 0;
-}
+VEC_DEFINE(u8);
+VEC_IMPL(u8);
+HASHMAP_DEFINE(String, i32);
+HASHMAP_IMPL(String, i32, StringEqual, StringHash);
 
 void TestVec(void) {
     const Allocator a = StdAllocator();
@@ -91,29 +85,6 @@ void TestVec(void) {
     puts("vec tests passed\n");
 }
  
-void TestList(void) {
-    const Allocator a = StdAllocator();
- 
-    List_f32 list = {0};
-    for (float i = 0.0f; i < 10.0f; i++) {
-        List_f32_PushBack(&list, a, i);
-        List_f32_PushFront(&list, a, i);
-        Assert(List_f32_PopBack(&list, a) == i);
-    }
-
-    float expected = 9.0f;
-    Node_f32* current = list.head;
-    while (current) {
-        Assert(expected == current->data);
-        current = current->next;
-        expected -= 1.0f;
-    }
- 
-    List_f32_Free(&list, a);
- 
-    puts("list tests passed\n");
-}
-
 void TestHashmap(void) {
     const Allocator a = StdAllocator();
 
@@ -150,12 +121,14 @@ void TestHashmap(void) {
     i32 out;
     Assert(Hashmap_String_i32_TryRemove(&map, "Ryan", &out));
     Assert(out == 21);
+    Assert(map.count == 1);
 
     Assert(Hashmap_String_i32_Get(&map, "Ryan") == NULL);
 
     Hashmap_String_i32_Set(&map, a, "Ryan", 21);
     Hashmap_String_i32_Set(&map, a, "Momo", 39);
     Hashmap_String_i32_Set(&map, a, "Bobo", 12);
+    Assert(map.count == 4);
 
     Hashmap_String_i32_Iterator it = Hashmap_String_i32_IteratorNew(&map);
 
@@ -165,6 +138,18 @@ void TestHashmap(void) {
     Assert(Hashmap_String_i32_IteratorNext(&it));
     Assert(!Hashmap_String_i32_IteratorNext(&it));
     Assert(!Hashmap_String_i32_IteratorNext(&it));
+
+    Assert(Hashmap_String_i32_TryRemove(&map, "Ryan", &out));
+    Assert(out == 21);
+    Assert(Hashmap_String_i32_TryRemove(&map, "Aidan", &out));
+    Assert(out == 16);
+    Assert(Hashmap_String_i32_TryRemove(&map, "Momo", &out));
+    Assert(out == 39);
+    Assert(Hashmap_String_i32_TryRemove(&map, "Bobo", &out));
+    Assert(out == 12);
+    Assert(map.count == 0);
+    Assert(!Hashmap_String_i32_TryRemove(&map, "Bobo", NULL));
+    Assert(map.count == 0);
 
     Hashmap_String_i32_Free(&map, a);
 
@@ -193,7 +178,6 @@ void TestAllocator(void) {
 
         AllocatorRawFree(a, (u8*)num, sizeof(i32), 1, alignof(i32));
     }
-
     {
         const usize len = 10;
         u64* nums = AllocatorAlloc(u64, a, len);
@@ -209,14 +193,18 @@ void TestAllocator(void) {
 
         AllocatorFree(u64, a, nums, len);
     }
+    {
+        u64* ptr = AllocatorAlloc(u64, a, 0);
+        Assert(ptr != NULL);
+        AllocatorFree(u64, a, ptr, 0);
+    }
 
     puts("allocator test passed\n");
 }
 
 void TestFba(void) {
-    const i64 size = 1 << 16;
-    u8* buffer = malloc(size);
-    Fba fba = FbaNew(buffer, size);
+    u8 buffer[1 << 16];
+    Fba fba = FbaNew(buffer, 1 << 16);
     const Allocator a = FbaAsAllocator(&fba);
 
     {
@@ -232,7 +220,6 @@ void TestFba(void) {
         // Free last allocation
         Assert(instance->size == 0);
     }
-
     {
         const usize length = 10;
         i32* memory = AllocatorAlloc(i32, a, length);
@@ -255,7 +242,11 @@ void TestFba(void) {
         AllocatorFree(i32, a, first, 10);
         Assert(instance->size == 0);
     }
-    free(buffer);
+    {
+        u64* ptr = AllocatorAlloc(u64, a, 0);
+        Assert(ptr != NULL);
+        AllocatorFree(u64, a, ptr, 0);
+    }
 
     puts("fba test passed\n");
 }
@@ -275,7 +266,7 @@ void TestUntypedVec(void) {
     }
     UntypedVecPush(&vec, a, sizeof(u8), alignof(u8), &(u8){'\n'});
  
-    const char* expected = "hello\n";
+    const u8* expected = (const u8*)"hello\n";
     for (i64 i = 0; i < vec.length; i++) {
         const u8 c = *(u8*)UntypedVecGet(&vec, i, sizeof(u8));
         Assert(expected[i] == c);
@@ -355,11 +346,9 @@ void TestUntypedHashmap(void) {
 
     Assert(UntypedHashmapGet(&map, sizeof(String), &ryan, sizeof(i32)) == NULL);
 
-
     UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &ryan, sizeof(i32), alignof(i32), &(i32){21});
     UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &codebase, sizeof(i32), alignof(i32), &(i32){39});
     UntypedHashmapSet(&map, a, sizeof(String), alignof(String), &ringo, sizeof(i32), alignof(i32), &(i32){12});
-
 
     UntypedHashmapIterator it = UntypedHashmapIteratorNew(&map);
 

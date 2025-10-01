@@ -120,8 +120,8 @@ bool UntypedHashmapTryRemove(UntypedHashmap* map, i64 key_size, const void* cons
     while (map->states[index] != UNTYPED_HASHMAP_STATE_EMPTY) {
         if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED && map->compare(key, (u8*)map->keys + index * key_size)) {
             Assert(index < map->capacity);
-
             map->states[index] = UNTYPED_HASHMAP_STATE_TOMBSTONE;
+            map->count--;
 
             if (out_value) {
                 *out_value = (u8*)map->values + index * value_size;
