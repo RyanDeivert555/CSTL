@@ -13,7 +13,7 @@ Fba FbaNew(u8* buffer, i64 capacity) {
 }
 
 static u8* FbaAlloc(void* ctx, i64 size, i64 count, i64 align) {
-    Fba* instance = (Fba*)ctx;
+    Fba* instance = ctx;
 
     u8* current = instance->buffer + instance->size;
     const i64 padding = -(u64)current & (align - 1);
@@ -36,7 +36,7 @@ static bool FbaIsLastAlloc(Fba* self, u8* buffer, i64 size) {
 static void FbaFree(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)align;
 
-    Fba* instance = (Fba*)ctx;
+    Fba* instance = ctx;
 
     if (FbaIsLastAlloc(instance, ptr, size * count)) {
         instance->size -= size * count;

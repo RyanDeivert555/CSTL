@@ -204,7 +204,7 @@ void TestAllocator(void) {
 
 void TestFba(void) {
     u8 buffer[1 << 16];
-    Fba fba = FbaNew(buffer, 1 << 16);
+    Fba fba = FbaNew(buffer, sizeof(buffer));
     const Allocator a = FbaAsAllocator(&fba);
 
     {
