@@ -64,23 +64,23 @@ HASHMAP_IMPL(String, I32, StringEqual, StringHash);
 void TestVec(void) {
     const Allocator a = StdAllocator();
  
-    Vec_U8 vec = {0};
+    VecU8 vec = {0};
     const char* hello = "gdkkn";
     for (I64 i = 0; i < 5; i++) {
-        Vec_U8_Push(&vec, a, hello[i]);
+        VecU8Push(&vec, a, hello[i]);
     }
  
     for (I64 i = 0; i < vec.length; i++) {
         vec.buffer[i] += 1;
     }
-    Vec_U8_Push(&vec, a, '\n');
+    VecU8Push(&vec, a, '\n');
  
     const char* expected = "hello\n";
     for (I64 i = 0; i < vec.length; i++) {
         Assert(expected[i] == vec.buffer[i]);
     }
  
-    Vec_U8_Free(&vec, a);
+    VecU8Free(&vec, a);
  
     puts("vec tests passed\n");
 }
@@ -88,70 +88,70 @@ void TestVec(void) {
 void TestHashmap(void) {
     const Allocator a = StdAllocator();
 
-    Hashmap_String_I32 map = {0};
+    HashmapStringI32 map = {0};
 
-    Assert(Hashmap_String_I32_Get(&map, "Ryan") == NULL);
-    Assert(Hashmap_String_I32_Get(&map, "Aidan") == NULL);
+    Assert(HashmapStringI32Get(&map, "Ryan") == NULL);
+    Assert(HashmapStringI32Get(&map, "Aidan") == NULL);
 
-    Hashmap_String_I32_Set(&map, a, "Ryan", 19);
-    Hashmap_String_I32_Set(&map, a, "Aidan", 16);
+    HashmapStringI32Set(&map, a, "Ryan", 19);
+    HashmapStringI32Set(&map, a, "Aidan", 16);
 
-    I32* v1 = Hashmap_String_I32_Get(&map, "Ryan");
+    I32* v1 = HashmapStringI32Get(&map, "Ryan");
     Assert(v1 != NULL);
     Assert(*v1 == 19);
 
-    I32* v2 = Hashmap_String_I32_Get(&map, "Aidan");
+    I32* v2 = HashmapStringI32Get(&map, "Aidan");
     Assert(v2 != NULL);
     Assert(*v2 == 16);
 
-    I32* v3 = Hashmap_String_I32_Get(&map, "Bob");
+    I32* v3 = HashmapStringI32Get(&map, "Bob");
     Assert(v3 == NULL);
 
-    Hashmap_String_I32_Set(&map, a, "Ryan", 21);
-    I32* v4 = Hashmap_String_I32_Get(&map, "Ryan");
+    HashmapStringI32Set(&map, a, "Ryan", 21);
+    I32* v4 = HashmapStringI32Get(&map, "Ryan");
     Assert(v4 != NULL);
     Assert(*v4 == 21);
 
-    Assert(Hashmap_String_I32_Get(&map, "Bobo") == NULL);
-    Assert(Hashmap_String_I32_Get(&map, "Momo") == NULL);
+    Assert(HashmapStringI32Get(&map, "Bobo") == NULL);
+    Assert(HashmapStringI32Get(&map, "Momo") == NULL);
 
-    Assert(!Hashmap_String_I32_TryRemove(&map, "Bobo", NULL));
-    Assert(!Hashmap_String_I32_TryRemove(&map, "Momo", NULL));
+    Assert(!HashmapStringI32TryRemove(&map, "Bobo", NULL));
+    Assert(!HashmapStringI32TryRemove(&map, "Momo", NULL));
 
     I32 out;
-    Assert(Hashmap_String_I32_TryRemove(&map, "Ryan", &out));
+    Assert(HashmapStringI32TryRemove(&map, "Ryan", &out));
     Assert(out == 21);
     Assert(map.count == 1);
 
-    Assert(Hashmap_String_I32_Get(&map, "Ryan") == NULL);
+    Assert(HashmapStringI32Get(&map, "Ryan") == NULL);
 
-    Hashmap_String_I32_Set(&map, a, "Ryan", 21);
-    Hashmap_String_I32_Set(&map, a, "Momo", 39);
-    Hashmap_String_I32_Set(&map, a, "Bobo", 12);
+    HashmapStringI32Set(&map, a, "Ryan", 21);
+    HashmapStringI32Set(&map, a, "Momo", 39);
+    HashmapStringI32Set(&map, a, "Bobo", 12);
     Assert(map.count == 4);
 
-    Hashmap_String_I32_Iterator it = Hashmap_String_I32_IteratorNew(&map);
+    HashmapStringI32Iterator it = HashmapStringI32IteratorNew(&map);
 
-    Assert(Hashmap_String_I32_IteratorNext(&it));
-    Assert(Hashmap_String_I32_IteratorNext(&it));
-    Assert(Hashmap_String_I32_IteratorNext(&it));
-    Assert(Hashmap_String_I32_IteratorNext(&it));
-    Assert(!Hashmap_String_I32_IteratorNext(&it));
-    Assert(!Hashmap_String_I32_IteratorNext(&it));
+    Assert(HashmapStringI32IteratorNext(&it));
+    Assert(HashmapStringI32IteratorNext(&it));
+    Assert(HashmapStringI32IteratorNext(&it));
+    Assert(HashmapStringI32IteratorNext(&it));
+    Assert(!HashmapStringI32IteratorNext(&it));
+    Assert(!HashmapStringI32IteratorNext(&it));
 
-    Assert(Hashmap_String_I32_TryRemove(&map, "Ryan", &out));
+    Assert(HashmapStringI32TryRemove(&map, "Ryan", &out));
     Assert(out == 21);
-    Assert(Hashmap_String_I32_TryRemove(&map, "Aidan", &out));
+    Assert(HashmapStringI32TryRemove(&map, "Aidan", &out));
     Assert(out == 16);
-    Assert(Hashmap_String_I32_TryRemove(&map, "Momo", &out));
+    Assert(HashmapStringI32TryRemove(&map, "Momo", &out));
     Assert(out == 39);
-    Assert(Hashmap_String_I32_TryRemove(&map, "Bobo", &out));
+    Assert(HashmapStringI32TryRemove(&map, "Bobo", &out));
     Assert(out == 12);
     Assert(map.count == 0);
-    Assert(!Hashmap_String_I32_TryRemove(&map, "Bobo", NULL));
+    Assert(!HashmapStringI32TryRemove(&map, "Bobo", NULL));
     Assert(map.count == 0);
 
-    Hashmap_String_I32_Free(&map, a);
+    HashmapStringI32Free(&map, a);
 
     puts("hashmap tests passed\n");
 }
