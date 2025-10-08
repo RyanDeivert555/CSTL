@@ -203,8 +203,9 @@ void TestAllocator(void) {
 }
 
 void TestFba(void) {
-    U8 buffer[1 << 16];
-    Fba fba = FbaNew(buffer, sizeof(buffer));
+    const Usize size = 1 << 16;
+    U8* buffer = malloc(size);
+    Fba fba = FbaNew(buffer, size);
     const Allocator a = FbaAsAllocator(&fba);
 
     {
@@ -247,6 +248,8 @@ void TestFba(void) {
         Assert(ptr != NULL);
         AllocatorFree(U64, a, ptr, 0);
     }
+
+    free(buffer);
 
     puts("fba test passed\n");
 }
