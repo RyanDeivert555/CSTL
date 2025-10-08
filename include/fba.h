@@ -2,11 +2,11 @@
 #include "allocator.h"
 
 typedef struct Fba {
-    u8* buffer;
-    i64 size;
-    i64 capacity;
+    U8* buffer;
+    I64 size;
+    I64 capacity;
 } Fba;
 
-Fba FbaNew(u8* buffer, i64 capacity);
+Fba FbaNew(U8* buffer, I64 capacity);
 Allocator FbaAsAllocator(Fba* fba);
 

@@ -2,7 +2,7 @@
 #include "allocator.h"
 #include <stdbool.h>
 
-Fba FbaNew(u8* buffer, i64 capacity) {
+Fba FbaNew(U8* buffer, I64 capacity) {
     const Fba result = {
         .buffer = buffer,
         .capacity = capacity,
@@ -12,28 +12,28 @@ Fba FbaNew(u8* buffer, i64 capacity) {
     return result;
 }
 
-static u8* FbaAlloc(void* ctx, i64 size, i64 count, i64 align) {
+static U8* FbaAlloc(void* ctx, I64 size, I64 count, I64 align) {
     Fba* instance = ctx;
 
-    u8* current = instance->buffer + instance->size;
-    const i64 padding = -(u64)current & (align - 1);
-    const i64 offset = padding + (size * count);
+    U8* current = instance->buffer + instance->size;
+    const I64 padding = -(U64)current & (align - 1);
+    const I64 offset = padding + (size * count);
     
     if (instance->size + offset > instance->capacity) {
         return NULL;
     }
 
-    u8* data = current + padding;
+    U8* data = current + padding;
     instance->size += offset;
 
     return data;
 }
 
-static bool FbaIsLastAlloc(Fba* self, u8* buffer, i64 size) {
+static bool FbaIsLastAlloc(Fba* self, U8* buffer, I64 size) {
     return buffer + size == self->buffer + self->size;
 }
 
-static void FbaFree(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
+static void FbaFree(void* ctx, U8* ptr, I64 size, I64 count, I64 align) {
     (void)align;
 
     Fba* instance = ctx;

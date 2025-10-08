@@ -11,7 +11,7 @@ typedef struct IntrusiveList {
     IntrusiveNode* head;
 } IntrusiveList;
 
-#define ParentOf(T, field, child) ((T*)((u8*)(child) - offsetof(T, field)))
+#define ParentOf(T, field, child) ((T*)((U8*)(child) - offsetof(T, field)))
 
 IntrusiveNode* IntrusiveListPopFront(IntrusiveList* list);
 void IntrusiveListPushFront(IntrusiveList* list, IntrusiveNode* new_node);

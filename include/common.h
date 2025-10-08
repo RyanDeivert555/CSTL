@@ -3,18 +3,18 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t i8;
-typedef int16_t i16;
-typedef int32_t i32;
-typedef int64_t i64;
-typedef ptrdiff_t isize;
-typedef size_t usize;
-typedef float f32;
-typedef double f64;
+typedef uint8_t U8;
+typedef uint16_t U16;
+typedef uint32_t U32;
+typedef uint64_t U64;
+typedef int8_t I8;
+typedef int16_t I16;
+typedef int32_t I32;
+typedef int64_t I64;
+typedef ptrdiff_t Isize;
+typedef size_t Usize;
+typedef float F32;
+typedef double F64;
 
 #define Assert(c) while (!(c)) __builtin_unreachable()
 
