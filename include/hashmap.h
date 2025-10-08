@@ -100,7 +100,7 @@ typedef enum HashmapState {
         map->capacity = new_capacity; \
     } \
     \
-    void Hashmap##K##V##Set(Hashmap##K####V* map, Allocator allocator, K key, V value) { \
+    void Hashmap##K##V##Set(Hashmap##K##V* map, Allocator allocator, K key, V value) { \
         if (map->count * 10 >= map->capacity * 8) { \
             const I64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2; \
             Hashmap##K##V##Realloc(map, allocator, new_capacity); \
