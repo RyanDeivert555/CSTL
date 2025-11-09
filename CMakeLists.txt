@@ -24,7 +24,7 @@ target_sources(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PUBLIC include/)
 target_compile_options(${PROJECT_NAME} PRIVATE 
-    -Wall -Wextra -Wpedantic -Werror
+    -Wall -Wextra -Wpedantic -Werror -std=c23
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 target_link_options(${PROJECT_NAME} PRIVATE
