@@ -20,4 +20,3 @@ void IntrusiveListPushFront(IntrusiveList* list, IntrusiveNode* new_node) {
     new_node->next = list->head;
     list->head = new_node;
 }
-

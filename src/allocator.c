@@ -45,4 +45,3 @@ Allocator StdAllocator(void) {
 
     return result;
 }
-

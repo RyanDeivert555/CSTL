@@ -1,11 +1,11 @@
-#include "common.h"
-#include "vec.h"
-#include "hashmap.h"
 #include "allocator.h"
+#include "common.h"
 #include "fba.h"
-#include "untyped_vec.h"
-#include "untyped_hashmap.h"
+#include "hashmap.h"
 #include "intrusive_list.h"
+#include "untyped_hashmap.h"
+#include "untyped_vec.h"
+#include "vec.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -63,28 +63,28 @@ HASHMAP_IMPL(String, I32, StringEqual, StringHash);
 
 void TestVec(void) {
     const Allocator a = StdAllocator();
- 
+
     VecU8 vec = {0};
     const char* hello = "gdkkn";
     for (I64 i = 0; i < 5; i++) {
         VecU8Push(&vec, a, hello[i]);
     }
- 
+
     for (I64 i = 0; i < vec.length; i++) {
         vec.buffer[i] += 1;
     }
     VecU8Push(&vec, a, '\n');
- 
+
     const char* expected = "hello\n";
     for (I64 i = 0; i < vec.length; i++) {
         Assert(expected[i] == vec.buffer[i]);
     }
- 
+
     VecU8Free(&vec, a);
- 
+
     puts("vec tests passed\n");
 }
- 
+
 void TestHashmap(void) {
     const Allocator a = StdAllocator();
 
@@ -223,7 +223,7 @@ void TestFba(void) {
     {
         const Usize length = 10;
         I32* memory = AllocatorAlloc(I32, a, length);
-    
+
         Assert(memory != NULL);
         AllocatorFree(I32, a, memory, length);
         const Fba* instance = a.ctx;
@@ -259,13 +259,13 @@ void TestUntypedVec(void) {
     for (I64 i = 0; i < 5; i++) {
         UntypedVecPush(&vec, a, sizeof(U8), alignof(U8), &hello[i]);
     }
- 
+
     for (I64 i = 0; i < vec.length; i++) {
         U8* item = (U8*)UntypedVecGet(&vec, i, sizeof(U8));
         *item += 1;
     }
     UntypedVecPush(&vec, a, sizeof(U8), alignof(U8), &(U8){'\n'});
- 
+
     const U8* expected = (const U8*)"hello\n";
     for (I64 i = 0; i < vec.length; i++) {
         const U8 c = *(U8*)UntypedVecGet(&vec, i, sizeof(U8));
@@ -279,7 +279,7 @@ void TestUntypedVec(void) {
 
     const U8* first = UntypedVecGet(&vec, 0, sizeof(U8));
     Assert(*first == 'h');
- 
+
     UntypedVecFree(&vec, a, sizeof(U8), alignof(U8));
 
     // test with integers now
@@ -299,7 +299,7 @@ void TestUntypedVec(void) {
     }
 
     UntypedVecFree(&vec, a, sizeof(I32), alignof(I32));
- 
+
     puts("untyped vec tests passed\n");
 }
 
@@ -404,4 +404,3 @@ void TestIntrusiveList(void) {
 
     puts("intrusive list tests passed\n");
 }
-

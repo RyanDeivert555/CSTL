@@ -25,13 +25,15 @@ void* UntypedVecPop(UntypedVec* vec, I64 item_size) {
     return result;
 }
 
-void UntypedVecInsert(UntypedVec* vec, Allocator allocator, I64 index, I64 item_size, I64 item_align, const void* const item) {
+void UntypedVecInsert(UntypedVec* vec, Allocator allocator, I64 index, I64 item_size, I64 item_align,
+                      const void* const item) {
     Assert(index >= 0 && index <= vec->length);
     if (vec->length == vec->capacity) {
         const I64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
         UntypedVecReserve(vec, allocator, item_size, item_align, new_capacity);
     }
-    memmove((U8*)vec->buffer + (index + 1) * item_size, (U8*)vec->buffer + index * item_size, (vec->length - index) * item_size);
+    memmove((U8*)vec->buffer + (index + 1) * item_size, (U8*)vec->buffer + index * item_size,
+            (vec->length - index) * item_size);
     memcpy((U8*)vec->buffer + index * item_size, item, item_size);
     vec->length++;
 }
@@ -39,7 +41,8 @@ void UntypedVecInsert(UntypedVec* vec, Allocator allocator, I64 index, I64 item_
 void UntypedVecRemove(UntypedVec* vec, I64 index, I64 item_size) {
     Assert(index >= 0 && index < vec->length);
     vec->length--;
-    memmove((U8*)vec->buffer + index * item_size, (U8*)vec->buffer + (index + 1) * item_size, (vec->length - index) * item_size);
+    memmove((U8*)vec->buffer + index * item_size, (U8*)vec->buffer + (index + 1) * item_size,
+            (vec->length - index) * item_size);
 }
 
 void UntypedVecReserve(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align, I64 new_capacity) {
@@ -63,4 +66,3 @@ void UntypedVecSet(UntypedVec* vec, I64 index, I64 item_size, const void* const 
 
     memcpy((U8*)vec->buffer + index * item_size, item, item_size);
 }
-

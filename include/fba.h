@@ -9,4 +9,3 @@ typedef struct Fba {
 
 Fba FbaNew(U8* buffer, I64 capacity);
 Allocator FbaAsAllocator(Fba* fba);
-

@@ -1,7 +1,7 @@
 #pragma once
-#include <stdint.h>
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 typedef uint8_t U8;
 typedef uint16_t U16;
@@ -16,5 +16,6 @@ typedef size_t Usize;
 typedef float F32;
 typedef double F64;
 
-#define Assert(c) while (!(c)) __builtin_unreachable()
-
+#define Assert(c)                                                                                                      \
+    while (!(c))                                                                                                       \
+    __builtin_unreachable()

@@ -15,4 +15,3 @@ typedef struct IntrusiveList {
 
 IntrusiveNode* IntrusiveListPopFront(IntrusiveList* list);
 void IntrusiveListPushFront(IntrusiveList* list, IntrusiveNode* new_node);
-

@@ -11,13 +11,15 @@ UntypedHashmap UntypedHashmapNew(CompareFunc compare, HashFunc hash) {
     return result;
 }
 
-void UntypedHashmapFree(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, I64 value_size, I64 value_align) {
+void UntypedHashmapFree(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, I64 value_size,
+                        I64 value_align) {
     AllocatorRawFree(allocator, (U8*)map->keys, key_size, map->capacity, key_align);
     AllocatorRawFree(allocator, (U8*)map->values, value_size, map->capacity, value_align);
     AllocatorFree(UntypedHashmapState, allocator, map->states, map->capacity);
 }
 
-void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, I64 value_size, I64 value_align, I64 new_capacity) {
+void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, I64 value_size,
+                           I64 value_align, I64 new_capacity) {
     void* new_keys = AllocatorRawAlloc(allocator, key_size, new_capacity, key_align);
     void* new_values = AllocatorRawAlloc(allocator, value_size, new_capacity, value_align);
     UntypedHashmapState* new_states = AllocatorAlloc(UntypedHashmapState, allocator, new_capacity);
@@ -58,7 +60,8 @@ void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, I64 key_siz
     map->capacity = new_capacity;
 }
 
-void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, const void* const key, I64 value_size, I64 value_align, const void* const value) {
+void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, const void* const key,
+                       I64 value_size, I64 value_align, const void* const value) {
     // 80% load factor
     if (map->count * 10 >= map->capacity * 8) {
         // Larger starting capacity, prevent collisions
@@ -69,7 +72,8 @@ void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, I64 key_size, I
     I64 index = hash % map->capacity;
 
     while (map->states[index] != UNTYPED_HASHMAP_STATE_EMPTY) {
-        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED && map->compare(key, (U8*)map->keys + index * key_size)) {
+        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED
+            && map->compare(key, (U8*)map->keys + index * key_size)) {
             // Overwrite found value
             memcpy((U8*)map->values + index * value_size, value, value_size);
             return;
@@ -93,7 +97,8 @@ void* UntypedHashmapGet(UntypedHashmap* map, I64 key_size, const void* const key
     I64 index = hash % map->capacity;
 
     while (map->states[index] != UNTYPED_HASHMAP_STATE_EMPTY) {
-        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED && map->compare(key, (U8*)map->keys + index * key_size)) {
+        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED
+            && map->compare(key, (U8*)map->keys + index * key_size)) {
             Assert(index < map->capacity);
 
             return (U8*)map->values + index * value_size;
@@ -105,7 +110,8 @@ void* UntypedHashmapGet(UntypedHashmap* map, I64 key_size, const void* const key
     return NULL;
 }
 
-bool UntypedHashmapTryRemove(UntypedHashmap* map, I64 key_size, const void* const key, I64 value_size, void** out_value) {
+bool UntypedHashmapTryRemove(UntypedHashmap* map, I64 key_size, const void* const key, I64 value_size,
+                             void** out_value) {
     if (map->capacity == 0) {
         if (out_value) {
             *out_value = NULL;
@@ -118,7 +124,8 @@ bool UntypedHashmapTryRemove(UntypedHashmap* map, I64 key_size, const void* cons
     I64 index = hash % map->capacity;
 
     while (map->states[index] != UNTYPED_HASHMAP_STATE_EMPTY) {
-        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED && map->compare(key, (U8*)map->keys + index * key_size)) {
+        if (map->states[index] == UNTYPED_HASHMAP_STATE_OCCUPIED
+            && map->compare(key, (U8*)map->keys + index * key_size)) {
             Assert(index < map->capacity);
             map->states[index] = UNTYPED_HASHMAP_STATE_TOMBSTONE;
             map->count--;
@@ -164,4 +171,3 @@ bool UntypedHashmapIteratorNext(UntypedHashmapIterator* it, I64 key_size, I64 va
 
     return false;
 }
-
