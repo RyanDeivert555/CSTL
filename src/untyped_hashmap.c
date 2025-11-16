@@ -1,6 +1,6 @@
-#include "untyped_hashmap.h"
-#include "allocator.h"
-#include "common.h"
+#include "CSTL/untyped_hashmap.h"
+#include "CSTL/allocator.h"
+#include "CSTL/common.h"
 #include <string.h>
 
 UntypedHashmap UntypedHashmapNew(CompareFunc compare, HashFunc hash) {
