@@ -4,54 +4,54 @@
 #include <stdbool.h>   // IWYU pragma: keep
 #include <string.h>    // IWYU pragma: keep
 
-typedef enum HashmapState {
-    HASHMAP_STATE_EMPTY,
-    HASHMAP_STATE_OCCUPIED,
-    HASHMAP_STATE_TOMBSTONE,
-} HashmapState;
+typedef enum hashmap_state {
+    hashmap_state_empty,
+    hashmap_state_occupied,
+    hashmap_state_tombstone,
+} hashmap_state;
 
 #define HASHMAP_DEFINE(K, V)                                                                                           \
-    typedef struct Hashmap##K##V {                                                                                     \
+    typedef struct hashmap_##K##_##V {                                                                                 \
         K* keys;                                                                                                       \
         V* values;                                                                                                     \
-        HashmapState* states;                                                                                          \
-        I64 capacity;                                                                                                  \
-        I64 count;                                                                                                     \
-    } Hashmap##K##V;                                                                                                   \
+        hashmap_state* states;                                                                                         \
+        i64 capacity;                                                                                                  \
+        i64 count;                                                                                                     \
+    } hashmap_##K##_##V;                                                                                               \
                                                                                                                        \
-    void Hashmap##K##V##Free(Hashmap##K##V* map, Allocator allocator);                                                 \
-    V* Hashmap##K##V##Get(Hashmap##K##V* map, K key);                                                                  \
-    void Hashmap##K##V##Realloc(Hashmap##K##V* map, Allocator allocator, I64 new_capacity);                            \
-    void Hashmap##K##V##Set(Hashmap##K##V* map, Allocator allocator, K key, V value);                                  \
-    bool Hashmap##K##V##TryRemove(Hashmap##K##V* map, K key, V* out_value);                                            \
+    void hashmap_##K##_##V##_free(hashmap_##K##_##V* map, allocator allocator);                                        \
+    V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key);                                                         \
+    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator, i64 new_capacity);                   \
+    void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, allocator allocator, K key, V value);                         \
+    bool hashmap_##K##_##V##_try_remove(hashmap_##K##_##V* map, K key, V* out_value);                                  \
                                                                                                                        \
-    typedef struct Hashmap##K##V##Iterator {                                                                           \
-        const Hashmap##K##V* inner;                                                                                    \
+    typedef struct hashmap_##K##_##V##_iterator {                                                                      \
+        const hashmap_##K##_##V* inner;                                                                                \
         K key;                                                                                                         \
         V value;                                                                                                       \
-        I64 index;                                                                                                     \
-    } Hashmap##K##V##Iterator;                                                                                         \
+        i64 index;                                                                                                     \
+    } hashmap_##K##_##V##_iterator;                                                                                    \
                                                                                                                        \
-    Hashmap##K##V##Iterator Hashmap##K##V##IteratorNew(const Hashmap##K##V* map);                                      \
-    bool Hashmap##K##V##IteratorNext(Hashmap##K##V##Iterator* it);
+    hashmap_##K##_##V##_iterator hashmap_##K##_##V##_iterator_new(const hashmap_##K##_##V* map);                       \
+    bool hashmap_##K##_##V##_iterator_next(hashmap_##K##_##V##_iterator* it);
 
-#define HASHMAP_IMPL(K, V, CompareFunc, HashFunc)                                                                      \
-    void Hashmap##K##V##Free(Hashmap##K##V* map, Allocator allocator) {                                                \
-        AllocatorFree(K, allocator, map->keys, map->capacity);                                                         \
-        AllocatorFree(V, allocator, map->values, map->capacity);                                                       \
-        AllocatorFree(HashmapState, allocator, map->states, map->capacity);                                            \
+#define HASHMAP_IMPL(K, V, compare_func, hash_func)                                                                    \
+    void hashmap_##K##_##V##_free(hashmap_##K##_##V* map, allocator allocator) {                                       \
+        allocator_free(K, allocator, map->keys, map->capacity);                                                        \
+        allocator_free(V, allocator, map->values, map->capacity);                                                      \
+        allocator_free(hashmap_state, allocator, map->states, map->capacity);                                          \
     }                                                                                                                  \
                                                                                                                        \
-    V* Hashmap##K##V##Get(Hashmap##K##V* map, K key) {                                                                 \
+    V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) {                                                        \
         if (map->capacity == 0) {                                                                                      \
             return NULL;                                                                                               \
         }                                                                                                              \
                                                                                                                        \
-        const I64 hash = HashFunc(key);                                                                                \
-        I64 index = hash % map->capacity;                                                                              \
+        const i64 hash = hash_func(key);                                                                               \
+        i64 index = hash % map->capacity;                                                                              \
                                                                                                                        \
-        while (map->states[index] != HASHMAP_STATE_EMPTY) {                                                            \
-            if (map->states[index] == HASHMAP_STATE_OCCUPIED && CompareFunc(key, map->keys[index])) {                  \
+        while (map->states[index] != hashmap_state_empty) {                                                            \
+            if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
                 return &map->values[index];                                                                            \
             }                                                                                                          \
                                                                                                                        \
@@ -61,38 +61,38 @@ typedef enum HashmapState {
         return NULL;                                                                                                   \
     }                                                                                                                  \
                                                                                                                        \
-    void Hashmap##K##V##Realloc(Hashmap##K##V* map, Allocator allocator, I64 new_capacity) {                           \
-        K* new_keys = AllocatorAlloc(K, allocator, new_capacity);                                                      \
-        V* new_values = AllocatorAlloc(V, allocator, new_capacity);                                                    \
-        HashmapState* new_states = AllocatorAlloc(HashmapState, allocator, new_capacity);                              \
+    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, allocator allocator, i64 new_capacity) {                  \
+        K* new_keys = allocator_alloc(K, allocator, new_capacity);                                                     \
+        V* new_values = allocator_alloc(V, allocator, new_capacity);                                                   \
+        hashmap_state* new_states = allocator_alloc(hashmap_state, allocator, new_capacity);                           \
                                                                                                                        \
-        memset(new_states, HASHMAP_STATE_EMPTY, new_capacity * sizeof(HashmapState));                                  \
+        memset(new_states, hashmap_state_empty, new_capacity * sizeof(hashmap_state));                                 \
                                                                                                                        \
         if (map->count != 0) {                                                                                         \
-            for (I64 i = 0; i < map->capacity; i++) {                                                                  \
-                if (map->states[i] != HASHMAP_STATE_OCCUPIED) {                                                        \
+            for (i64 i = 0; i < map->capacity; i++) {                                                                  \
+                if (map->states[i] != hashmap_state_occupied) {                                                        \
                     continue;                                                                                          \
                 }                                                                                                      \
                 const K key = map->keys[i];                                                                            \
                 const V value = map->values[i];                                                                        \
                                                                                                                        \
-                const I64 hash = HashFunc(key);                                                                        \
-                I64 index = hash % new_capacity;                                                                       \
+                const i64 hash = hash_func(key);                                                                       \
+                i64 index = hash % new_capacity;                                                                       \
                                                                                                                        \
-                while (new_states[index] == HASHMAP_STATE_OCCUPIED) {                                                  \
+                while (new_states[index] == hashmap_state_occupied) {                                                  \
                     index = (index + 1) % new_capacity;                                                                \
                 }                                                                                                      \
                                                                                                                        \
-                Assert(index < new_capacity);                                                                          \
+                cstl_assert(index < new_capacity);                                                                     \
                 new_keys[index] = key;                                                                                 \
                 new_values[index] = value;                                                                             \
-                new_states[index] = HASHMAP_STATE_OCCUPIED;                                                            \
+                new_states[index] = hashmap_state_occupied;                                                            \
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
-        AllocatorFree(K, allocator, map->keys, map->capacity);                                                         \
-        AllocatorFree(V, allocator, map->values, map->capacity);                                                       \
-        AllocatorFree(HashmapState, allocator, map->states, map->capacity);                                            \
+        allocator_free(K, allocator, map->keys, map->capacity);                                                        \
+        allocator_free(V, allocator, map->values, map->capacity);                                                      \
+        allocator_free(hashmap_state, allocator, map->states, map->capacity);                                          \
                                                                                                                        \
         map->keys = new_keys;                                                                                          \
         map->values = new_values;                                                                                      \
@@ -100,17 +100,17 @@ typedef enum HashmapState {
         map->capacity = new_capacity;                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    void Hashmap##K##V##Set(Hashmap##K##V* map, Allocator allocator, K key, V value) {                                 \
+    void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, allocator allocator, K key, V value) {                        \
         if (map->count * 10 >= map->capacity * 8) {                                                                    \
-            const I64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;                                     \
-            Hashmap##K##V##Realloc(map, allocator, new_capacity);                                                      \
+            const i64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;                                     \
+            hashmap_##K##_##V##_realloc(map, allocator, new_capacity);                                                 \
         }                                                                                                              \
                                                                                                                        \
-        const I64 hash = HashFunc(key);                                                                                \
-        I64 index = hash % map->capacity;                                                                              \
+        const i64 hash = hash_func(key);                                                                               \
+        i64 index = hash % map->capacity;                                                                              \
                                                                                                                        \
-        while (map->states[index] != HASHMAP_STATE_EMPTY) {                                                            \
-            if (map->states[index] == HASHMAP_STATE_OCCUPIED && CompareFunc(key, map->keys[index])) {                  \
+        while (map->states[index] != hashmap_state_empty) {                                                            \
+            if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
                 map->values[index] = value;                                                                            \
                 return;                                                                                                \
             }                                                                                                          \
@@ -121,20 +121,20 @@ typedef enum HashmapState {
         map->count++;                                                                                                  \
         map->keys[index] = key;                                                                                        \
         map->values[index] = value;                                                                                    \
-        map->states[index] = HASHMAP_STATE_OCCUPIED;                                                                   \
+        map->states[index] = hashmap_state_occupied;                                                                   \
     }                                                                                                                  \
                                                                                                                        \
-    bool Hashmap##K##V##TryRemove(Hashmap##K##V* map, K key, V* out_value) {                                           \
+    bool hashmap_##K##_##V##_try_remove(hashmap_##K##_##V* map, K key, V* out_value) {                                 \
         if (map->capacity == 0) {                                                                                      \
             return false;                                                                                              \
         }                                                                                                              \
                                                                                                                        \
-        const I64 hash = HashFunc(key);                                                                                \
-        I64 index = hash % map->capacity;                                                                              \
+        const i64 hash = hash_func(key);                                                                               \
+        i64 index = hash % map->capacity;                                                                              \
                                                                                                                        \
-        while (map->states[index] != HASHMAP_STATE_EMPTY) {                                                            \
-            if (map->states[index] == HASHMAP_STATE_OCCUPIED && CompareFunc(key, map->keys[index])) {                  \
-                map->states[index] = HASHMAP_STATE_TOMBSTONE;                                                          \
+        while (map->states[index] != hashmap_state_empty) {                                                            \
+            if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
+                map->states[index] = hashmap_state_tombstone;                                                          \
                 map->count--;                                                                                          \
                 if (out_value) {                                                                                       \
                     *out_value = map->values[index];                                                                   \
@@ -149,21 +149,21 @@ typedef enum HashmapState {
         return false;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    Hashmap##K##V##Iterator Hashmap##K##V##IteratorNew(const Hashmap##K##V* map) {                                     \
-        Hashmap##K##V##Iterator result = {0};                                                                          \
+    hashmap_##K##_##V##_iterator hashmap_##K##_##V##_iterator_new(const hashmap_##K##_##V* map) {                      \
+        hashmap_##K##_##V##_iterator result = {0};                                                                     \
         result.inner = map;                                                                                            \
                                                                                                                        \
         return result;                                                                                                 \
     }                                                                                                                  \
                                                                                                                        \
-    bool Hashmap##K##V##IteratorNext(Hashmap##K##V##Iterator* it) {                                                    \
-        const Hashmap##K##V* inner = it->inner;                                                                        \
+    bool hashmap_##K##_##V##_iterator_next(hashmap_##K##_##V##_iterator* it) {                                         \
+        const hashmap_##K##_##V* inner = it->inner;                                                                    \
                                                                                                                        \
         while (it->index < inner->capacity) {                                                                          \
-            const I64 curr = it->index;                                                                                \
+            const i64 curr = it->index;                                                                                \
             it->index++;                                                                                               \
                                                                                                                        \
-            if (inner->states[curr] == HASHMAP_STATE_OCCUPIED) {                                                       \
+            if (inner->states[curr] == hashmap_state_occupied) {                                                       \
                 it->key = inner->keys[curr];                                                                           \
                 it->value = inner->values[curr];                                                                       \
                                                                                                                        \

@@ -2,20 +2,21 @@
 #include "common.h"
 #include <stdalign.h>
 
-typedef struct AllocatorVTable {
-    U8* (*alloc)(void* ctx, I64 size, I64 count, I64 align);
-    void (*free)(void* ctx, U8* ptr, I64 size, I64 count, I64 align);
-} AllocatorVTable;
+typedef struct allocator_v_table {
+    u8* (*alloc)(void* ctx, i64 size, i64 count, i64 align);
+    void (*free)(void* ctx, u8* ptr, i64 size, i64 count, i64 align);
+} allocator_v_table;
 
-typedef struct Allocator {
+typedef struct allocator {
     void* ctx;
-    const AllocatorVTable* vtable;
-} Allocator;
+    const allocator_v_table* vtable;
+} allocator;
 
-U8* AllocatorRawAlloc(Allocator allocator, I64 size, I64 count, I64 align);
-void AllocatorRawFree(Allocator allocator, U8* ptr, I64 size, I64 count, I64 align);
+u8* allocator_raw_alloc(allocator allocator, i64 size, i64 count, i64 align);
+void allocator_raw_free(allocator allocator, u8* ptr, i64 size, i64 count, i64 align);
 
-#define AllocatorAlloc(T, allocator, count) (T*)AllocatorRawAlloc(allocator, sizeof(T), (count), alignof(T))
-#define AllocatorFree(T, allocator, ptr, count) AllocatorRawFree(allocator, (U8*)(ptr), sizeof(T), (count), alignof(T))
+#define allocator_alloc(T, allocator, count) (T*)allocator_raw_alloc(allocator, sizeof(T), (count), alignof(T))
+#define allocator_free(T, allocator, ptr, count)                                                                       \
+    allocator_raw_free(allocator, (u8*)(ptr), sizeof(T), (count), alignof(T))
 
-Allocator StdAllocator(void);
+allocator std_allocator(void);

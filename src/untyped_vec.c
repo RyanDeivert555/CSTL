@@ -3,66 +3,66 @@
 #include "CSTL/common.h"
 #include <string.h>
 
-void UntypedVecFree(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align) {
-    AllocatorRawFree(allocator, (U8*)vec->buffer, item_size, vec->capacity, item_align);
+void untyped_vecFree(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align) {
+    allocator_raw_free(allocator, (u8*)vec->buffer, item_size, vec->capacity, item_align);
 }
 
-void UntypedVecPush(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align, const void* const item) {
+void untyped_vec_push(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align, const void* const item) {
     if (vec->length == vec->capacity) {
-        const I64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
-        UntypedVecReserve(vec, allocator, item_size, item_align, new_capacity);
+        const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
+        untyped_vec_reserve(vec, allocator, item_size, item_align, new_capacity);
     }
-    memcpy((U8*)vec->buffer + vec->length * item_size, item, item_size);
+    memcpy((u8*)vec->buffer + vec->length * item_size, item, item_size);
     vec->length++;
 }
 
-void* UntypedVecPop(UntypedVec* vec, I64 item_size) {
-    Assert(vec->length > 0);
-    const I64 last_index = vec->length - 1;
-    void* result = (U8*)vec->buffer + last_index * item_size;
+void* untyped_vec_pop(untyped_vec* vec, i64 item_size) {
+    cstl_assert(vec->length > 0);
+    const i64 last_index = vec->length - 1;
+    void* result = (u8*)vec->buffer + last_index * item_size;
     vec->length--;
 
     return result;
 }
 
-void UntypedVecInsert(UntypedVec* vec, Allocator allocator, I64 index, I64 item_size, I64 item_align,
-                      const void* const item) {
-    Assert(index >= 0 && index <= vec->length);
+void untyped_vec_insert(untyped_vec* vec, allocator allocator, i64 index, i64 item_size, i64 item_align,
+                        const void* const item) {
+    cstl_assert(index >= 0 && index <= vec->length);
     if (vec->length == vec->capacity) {
-        const I64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
-        UntypedVecReserve(vec, allocator, item_size, item_align, new_capacity);
+        const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
+        untyped_vec_reserve(vec, allocator, item_size, item_align, new_capacity);
     }
-    memmove((U8*)vec->buffer + (index + 1) * item_size, (U8*)vec->buffer + index * item_size,
+    memmove((u8*)vec->buffer + (index + 1) * item_size, (u8*)vec->buffer + index * item_size,
             (vec->length - index) * item_size);
-    memcpy((U8*)vec->buffer + index * item_size, item, item_size);
+    memcpy((u8*)vec->buffer + index * item_size, item, item_size);
     vec->length++;
 }
 
-void UntypedVecRemove(UntypedVec* vec, I64 index, I64 item_size) {
-    Assert(index >= 0 && index < vec->length);
+void untyped_vec_remove(untyped_vec* vec, i64 index, i64 item_size) {
+    cstl_assert(index >= 0 && index < vec->length);
     vec->length--;
-    memmove((U8*)vec->buffer + index * item_size, (U8*)vec->buffer + (index + 1) * item_size,
+    memmove((u8*)vec->buffer + index * item_size, (u8*)vec->buffer + (index + 1) * item_size,
             (vec->length - index) * item_size);
 }
 
-void UntypedVecReserve(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align, I64 new_capacity) {
-    void* new_buffer = AllocatorRawAlloc(allocator, item_size, new_capacity, item_align);
+void untyped_vec_reserve(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align, i64 new_capacity) {
+    void* new_buffer = allocator_raw_alloc(allocator, item_size, new_capacity, item_align);
     if (vec->length != 0) {
         memcpy(new_buffer, vec->buffer, item_size * vec->length);
     }
-    AllocatorRawFree(allocator, (U8*)vec->buffer, item_size, vec->capacity, item_size);
+    allocator_raw_free(allocator, (u8*)vec->buffer, item_size, vec->capacity, item_size);
     vec->buffer = new_buffer;
     vec->capacity = new_capacity;
 }
 
-void* UntypedVecGet(UntypedVec* vec, I64 index, I64 item_size) {
-    Assert(index >= 0 && index < vec->length);
+void* untyped_vec_get(untyped_vec* vec, i64 index, i64 item_size) {
+    cstl_assert(index >= 0 && index < vec->length);
 
-    return (U8*)vec->buffer + index * item_size;
+    return (u8*)vec->buffer + index * item_size;
 }
 
-void UntypedVecSet(UntypedVec* vec, I64 index, I64 item_size, const void* const item) {
-    Assert(index >= 0 && index < vec->length);
+void untyped_vec_set(untyped_vec* vec, i64 index, i64 item_size, const void* const item) {
+    cstl_assert(index >= 0 && index < vec->length);
 
-    memcpy((U8*)vec->buffer + index * item_size, item, item_size);
+    memcpy((u8*)vec->buffer + index * item_size, item, item_size);
 }

@@ -1,22 +1,22 @@
 #include "CSTL/intrusive_list.h"
 
-void IntrusiveNodeInsertAfter(IntrusiveNode* node, IntrusiveNode* new_node) {
+void intrusive_nodeInsertAfter(intrusive_node* node, intrusive_node* new_node) {
     new_node->next = node->next;
     node->next = new_node;
 }
 
-IntrusiveNode* IntrusiveListPopFront(IntrusiveList* list) {
+intrusive_node* intrusive_list_pop_front(intrusive_list* list) {
     if (!list->head) {
         return NULL;
     }
 
-    IntrusiveNode* first = list->head;
+    intrusive_node* first = list->head;
     list->head = first->next;
 
     return first;
 }
 
-void IntrusiveListPushFront(IntrusiveList* list, IntrusiveNode* new_node) {
+void intrusive_list_push_front(intrusive_list* list, intrusive_node* new_node) {
     new_node->next = list->head;
     list->head = new_node;
 }

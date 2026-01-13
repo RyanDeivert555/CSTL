@@ -1,17 +1,17 @@
 #pragma once
 #include "common.h" // IWYU pragma: keep
 
-typedef struct IntrusiveNode {
-    struct IntrusiveNode* next;
-} IntrusiveNode;
+typedef struct intrusive_node {
+    struct intrusive_node* next;
+} intrusive_node;
 
-void IntrusiveNodeInsertAfter(IntrusiveNode* node, IntrusiveNode* new_node);
+void intrusive_node_insert_after(intrusive_node* node, intrusive_node* new_node);
 
-typedef struct IntrusiveList {
-    IntrusiveNode* head;
-} IntrusiveList;
+typedef struct intrusive_list {
+    intrusive_node* head;
+} intrusive_list;
 
-#define ParentOf(T, field, child) ((T*)((U8*)(child) - offsetof(T, field)))
+#define parent_of(T, field, child) ((T*)((u8*)(child) - offsetof(T, field)))
 
-IntrusiveNode* IntrusiveListPopFront(IntrusiveList* list);
-void IntrusiveListPushFront(IntrusiveList* list, IntrusiveNode* new_node);
+intrusive_node* intrusive_list_pop_front(intrusive_list* list);
+void intrusive_list_push_front(intrusive_list* list, intrusive_node* new_node);

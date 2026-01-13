@@ -2,18 +2,18 @@
 #include "allocator.h"
 #include "common.h"
 
-typedef struct UntypedVec {
+typedef struct untyped_vec {
     void* buffer;
-    I64 length;
-    I64 capacity;
-} UntypedVec;
+    i64 length;
+    i64 capacity;
+} untyped_vec;
 
-void UntypedVecFree(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align);
-void UntypedVecPush(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align, const void* const item);
-void* UntypedVecPop(UntypedVec* vec, I64 item_size);
-void UntypedVecInsert(UntypedVec* vec, Allocator allocator, I64 index, I64 item_size, I64 item_align,
-                      const void* const item);
-void UntypedVecRemove(UntypedVec* vec, I64 index, I64 item_size);
-void UntypedVecReserve(UntypedVec* vec, Allocator allocator, I64 item_size, I64 item_align, I64 new_capacity);
-void* UntypedVecGet(UntypedVec* vec, I64 index, I64 item_size);
-void UntypedVecSet(UntypedVec* vec, I64 index, I64 item_size, const void* const item);
+void untyped_vec_free(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align);
+void untyped_vec_push(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align, const void* const item);
+void* untyped_vec_pop(untyped_vec* vec, i64 item_size);
+void untyped_vec_insert(untyped_vec* vec, allocator allocator, i64 index, i64 item_size, i64 item_align,
+                        const void* const item);
+void untyped_vec_remove(untyped_vec* vec, i64 index, i64 item_size);
+void untyped_vec_reserve(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align, i64 new_capacity);
+void* untyped_vec_get(untyped_vec* vec, i64 index, i64 item_size);
+void untyped_vec_set(untyped_vec* vec, i64 index, i64 item_size, const void* const item);

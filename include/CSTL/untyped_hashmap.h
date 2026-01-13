@@ -2,42 +2,42 @@
 #include "allocator.h"
 #include "common.h"
 
-typedef bool (*CompareFunc)(const void* lhs, const void* rhs);
-typedef I64 (*HashFunc)(const void* key);
+typedef bool (*compare_func)(const void* lhs, const void* rhs);
+typedef i64 (*hash_func)(const void* key);
 
-typedef enum UntypedHashmapState {
-    UNTYPED_HASHMAP_STATE_EMPTY,
-    UNTYPED_HASHMAP_STATE_OCCUPIED,
-    UNTYPED_HASHMAP_STATE_TOMBSTONE,
-} UntypedHashmapState;
+typedef enum untyped_hashmap_state {
+    untyped_hashmap_state_empty,
+    untyped_hashmap_state_occupied,
+    untyped_hashmap_state_tombstone,
+} untyped_hashmap_state;
 
-typedef struct UntypedHashmap {
-    CompareFunc compare;
-    HashFunc hash;
+typedef struct untyped_hashmap {
+    compare_func compare;
+    hash_func hash;
     void* keys;
     void* values;
-    UntypedHashmapState* states;
-    I64 capacity;
-    I64 count;
-} UntypedHashmap;
+    untyped_hashmap_state* states;
+    i64 capacity;
+    i64 count;
+} untyped_hashmap;
 
-UntypedHashmap UntypedHashmapNew(CompareFunc compare, HashFunc hash);
-void UntypedHashmapFree(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, I64 value_size,
-                        I64 value_align);
-void UntypedHashmapRealloc(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, I64 value_size,
-                           I64 value_align, I64 new_size);
-void UntypedHashmapSet(UntypedHashmap* map, Allocator allocator, I64 key_size, I64 key_align, const void* const key,
-                       I64 value_size, I64 value_align, const void* const value);
-void* UntypedHashmapGet(UntypedHashmap* map, I64 key_size, const void* const key, I64 value_size);
-bool UntypedHashmapTryRemove(UntypedHashmap* map, I64 key_size, const void* const key, I64 value_size,
-                             void** out_value);
+untyped_hashmap untyped_hashmap_new(compare_func compare, hash_func hash);
+void untyped_hashmap_free(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, i64 value_size,
+                          i64 value_align);
+void untyped_hashmap_realloc(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, i64 value_size,
+                             i64 value_align, i64 new_size);
+void untyped_hashmap_set(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, const void* const key,
+                         i64 value_size, i64 value_align, const void* const value);
+void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* const key, i64 value_size);
+bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* const key, i64 value_size,
+                                void** out_value);
 
-typedef struct UntypedHashmapIterator {
-    const UntypedHashmap* inner;
+typedef struct untyped_hashmap_iterator {
+    const untyped_hashmap* inner;
     void* key;
     void* value;
-    I64 index;
-} UntypedHashmapIterator;
+    i64 index;
+} untyped_hashmap_iterator;
 
-UntypedHashmapIterator UntypedHashmapIteratorNew(const UntypedHashmap* map);
-bool UntypedHashmapIteratorNext(UntypedHashmapIterator* it, I64 key_size, I64 value_size);
+untyped_hashmap_iterator untyped_hashmap_iterator_new(const untyped_hashmap* map);
+bool untyped_hashmap_iterator_next(untyped_hashmap_iterator* it, i64 key_size, i64 value_size);

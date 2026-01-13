@@ -1,25 +1,25 @@
 #include "CSTL/allocator.h"
 #include <stdlib.h>
 
-U8* AllocatorRawAlloc(Allocator allocator, I64 size, I64 count, I64 align) {
+u8* allocator_raw_alloc(allocator allocator, i64 size, i64 count, i64 align) {
     return allocator.vtable->alloc(allocator.ctx, size, count, align);
 }
 
-void AllocatorRawFree(Allocator allocator, U8* ptr, I64 size, I64 count, I64 align) {
+void allocator_raw_free(allocator allocator, u8* ptr, i64 size, i64 count, i64 align) {
     allocator.vtable->free(allocator.ctx, ptr, size, count, align);
 }
 
-static U8* StdAlloc(void* ctx, I64 size, I64 count, I64 align) {
+static u8* std_alloc(void* ctx, i64 size, i64 count, i64 align) {
     (void)ctx;
 
 #if defined(_WIN32)
-    return (U8*)_aligned_malloc(size * count, align);
+    return (u8*)_aligned_malloc(size * count, align);
 #else
-    return (U8*)aligned_alloc(align, size * count);
+    return (u8*)aligned_alloc(align, size * count);
 #endif
 }
 
-static void StdFree(void* ctx, U8* ptr, I64 size, I64 count, I64 align) {
+static void std_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)ctx;
     (void)size;
     (void)count;
@@ -32,13 +32,13 @@ static void StdFree(void* ctx, U8* ptr, I64 size, I64 count, I64 align) {
 #endif
 }
 
-static const AllocatorVTable std_allocator_vtable = {
-    .alloc = StdAlloc,
-    .free = StdFree,
+static const allocator_v_table std_allocator_vtable = {
+    .alloc = std_alloc,
+    .free = std_free,
 };
 
-Allocator StdAllocator(void) {
-    const Allocator result = {
+allocator std_allocator(void) {
+    const allocator result = {
         .ctx = NULL,
         .vtable = &std_allocator_vtable,
     };
