@@ -18,8 +18,8 @@ void untyped_hashmap_free(untyped_hashmap* map, allocator allocator, i64 key_siz
     allocator_free(untyped_hashmap_state, allocator, map->states, map->capacity);
 }
 
-void untyped_hashmapRealloc(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, i64 value_size,
-                            i64 value_align, i64 new_capacity) {
+void untyped_hashmap_realloc(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, i64 value_size,
+                             i64 value_align, i64 new_capacity) {
     void* new_keys = allocator_raw_alloc(allocator, key_size, new_capacity, key_align);
     void* new_values = allocator_raw_alloc(allocator, value_size, new_capacity, value_align);
     untyped_hashmap_state* new_states = allocator_alloc(untyped_hashmap_state, allocator, new_capacity);

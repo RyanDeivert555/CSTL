@@ -1,6 +1,6 @@
 #include "CSTL/intrusive_list.h"
 
-void intrusive_nodeInsertAfter(intrusive_node* node, intrusive_node* new_node) {
+void intrusive_node_insert_after(intrusive_node* node, intrusive_node* new_node) {
     new_node->next = node->next;
     node->next = new_node;
 }

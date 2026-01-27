@@ -3,7 +3,7 @@
 #include "CSTL/common.h"
 #include <string.h>
 
-void untyped_vecFree(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align) {
+void untyped_vec_free(untyped_vec* vec, allocator allocator, i64 item_size, i64 item_align) {
     allocator_raw_free(allocator, (u8*)vec->buffer, item_size, vec->capacity, item_align);
 }
 
