@@ -62,39 +62,35 @@ HASHMAP_DEFINE(string, i32);
 HASHMAP_IMPL(string, i32, string_equal, string_hash);
 
 void test_vec(void) {
-    const allocator a = std_allocator();
-
     vec_u8 vec = {0};
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
-        vec_u8_push(&vec, a, hello[i]);
+        vec_u8_push(&vec, hello[i]);
     }
 
     for (i64 i = 0; i < vec.length; i++) {
         vec.buffer[i] += 1;
     }
-    vec_u8_push(&vec, a, '\n');
+    vec_u8_push(&vec, '\n');
 
     const char* expected = "hello\n";
     for (i64 i = 0; i < vec.length; i++) {
         cstl_assert(expected[i] == vec.buffer[i]);
     }
 
-    vec_u8_free(&vec, a);
+    vec_u8_free(&vec);
 
     puts("vec tests passed\n");
 }
 
 void test_hashmap(void) {
-    const allocator a = std_allocator();
-
     hashmap_string_i32 map = {0};
 
     cstl_assert(hashmap_string_i32_get(&map, "Ryan") == NULL);
     cstl_assert(hashmap_string_i32_get(&map, "Aidan") == NULL);
 
-    hashmap_string_i32_set(&map, a, "Ryan", 19);
-    hashmap_string_i32_set(&map, a, "Aidan", 16);
+    hashmap_string_i32_set(&map, "Ryan", 19);
+    hashmap_string_i32_set(&map, "Aidan", 16);
 
     i32* v1 = hashmap_string_i32_get(&map, "Ryan");
     cstl_assert(v1 != NULL);
@@ -107,7 +103,7 @@ void test_hashmap(void) {
     i32* v3 = hashmap_string_i32_get(&map, "Bob");
     cstl_assert(v3 == NULL);
 
-    hashmap_string_i32_set(&map, a, "Ryan", 21);
+    hashmap_string_i32_set(&map, "Ryan", 21);
     i32* v4 = hashmap_string_i32_get(&map, "Ryan");
     cstl_assert(v4 != NULL);
     cstl_assert(*v4 == 21);
@@ -125,9 +121,9 @@ void test_hashmap(void) {
 
     cstl_assert(hashmap_string_i32_get(&map, "Ryan") == NULL);
 
-    hashmap_string_i32_set(&map, a, "Ryan", 21);
-    hashmap_string_i32_set(&map, a, "Momo", 39);
-    hashmap_string_i32_set(&map, a, "Bobo", 12);
+    hashmap_string_i32_set(&map, "Ryan", 21);
+    hashmap_string_i32_set(&map, "Momo", 39);
+    hashmap_string_i32_set(&map, "Bobo", 12);
     cstl_assert(map.count == 4);
 
     hashmap_string_i32_iterator it = hashmap_string_i32_iterator_new(&map);
@@ -151,16 +147,14 @@ void test_hashmap(void) {
     cstl_assert(!hashmap_string_i32_try_remove(&map, "Bobo", NULL));
     cstl_assert(map.count == 0);
 
-    hashmap_string_i32_free(&map, a);
+    hashmap_string_i32_free(&map);
 
     puts("hashmap tests passed\n");
 }
 
 void test_allocator(void) {
-    const allocator a = std_allocator();
-
     {
-        i32* num = (i32*)allocator_raw_alloc(a, sizeof(i32), 1, alignof(i32));
+        i32* num = (i32*)cstl_raw_alloc(sizeof(i32), 1, alignof(i32));
         cstl_assert(num != NULL);
         usize address = (usize)num;
         cstl_assert(address % alignof(i32) == 0);
@@ -176,11 +170,11 @@ void test_allocator(void) {
         num[0] = 1;
         cstl_assert(num[0] == 1);
 
-        allocator_raw_free(a, (u8*)num, sizeof(i32), 1, alignof(i32));
+        cstl_raw_free((u8*)num, sizeof(i32), 1, alignof(i32));
     }
     {
         const usize len = 10;
-        u64* nums = allocator_alloc(u64, a, len);
+        u64* nums = cstl_alloc(u64, len);
         const usize address = (usize)nums;
         cstl_assert(address % alignof(u64) == 0);
 
@@ -191,12 +185,12 @@ void test_allocator(void) {
             cstl_assert(nums[i] == i);
         }
 
-        allocator_free(u64, a, nums, len);
+        cstl_free(u64, nums, len);
     }
     {
-        u64* ptr = allocator_alloc(u64, a, 0);
+        u64* ptr = cstl_alloc(u64, 0);
         cstl_assert(ptr != NULL);
-        allocator_free(u64, a, ptr, 0);
+        cstl_free(u64, ptr, 0);
     }
 
     puts("allocator test passed\n");
@@ -205,66 +199,64 @@ void test_allocator(void) {
 void test_fba(void) {
     u8 buffer[1 << 16];
     fba f = fba_new(buffer, sizeof(buffer));
-    const allocator a = fba_as_allocator(&f);
+    set_global_allocator(&f, fba_alloc, fba_free);
 
     {
-        i32* memory = allocator_alloc(i32, a, 1);
+        i32* memory = cstl_alloc(i32, 1);
         const usize address = (usize)memory;
         cstl_assert(address % alignof(i32) == 0);
 
         cstl_assert(memory != NULL);
         *memory = 10;
 
-        allocator_free(i32, a, memory, 1);
-        const fba* instance = a.ctx;
+        cstl_free(i32, memory, 1);
         // free last allocation
-        cstl_assert(instance->size == 0);
+        cstl_assert(f.size == 0);
     }
     {
         const usize length = 10;
-        i32* memory = allocator_alloc(i32, a, length);
+        i32* memory = cstl_alloc(i32, length);
 
         cstl_assert(memory != NULL);
-        allocator_free(i32, a, memory, length);
-        const fba* instance = a.ctx;
-        cstl_assert(instance->size == 0);
+        cstl_free(i32, memory, length);
+        cstl_assert(f.size == 0);
     }
     {
-        const i32* first = allocator_alloc(i32, a, 10);
-        const i32* second = allocator_alloc(i32, a, 10);
-        allocator_free(i32, a, first, 10);
+        const i32* first = cstl_alloc(i32, 10);
+        const i32* second = cstl_alloc(i32, 10);
+        cstl_free(i32, first, 10);
 
-        const fba* instance = a.ctx;
         // not last allocation, no freeing
-        cstl_assert(instance->size == 20 * sizeof(i32));
-        allocator_free(i32, a, second, 10);
-        cstl_assert(instance->size == 10 * sizeof(i32));
-        allocator_free(i32, a, first, 10);
-        cstl_assert(instance->size == 0);
+        cstl_assert(f.size == 20 * sizeof(i32));
+        cstl_free(i32, second, 10);
+        cstl_assert(f.size == 10 * sizeof(i32));
+        cstl_free(i32, first, 10);
+        cstl_assert(f.size == 0);
     }
     {
-        u64* ptr = allocator_alloc(u64, a, 0);
+        u64* ptr = cstl_alloc(u64, 0);
         cstl_assert(ptr != NULL);
-        allocator_free(u64, a, ptr, 0);
+        cstl_free(u64, ptr, 0);
     }
 
     puts("fba test passed\n");
 }
 
 void test_untyped_vec(void) {
-    const allocator a = std_allocator();
+    // Reset from last test
+    set_global_allocator(NULL, std_alloc, std_free);
 
     untyped_vec vec = {0};
     const char* hello = "gdkkn";
     for (i64 i = 0; i < 5; i++) {
-        untyped_vec_push(&vec, a, sizeof(u8), alignof(u8), &hello[i]);
+        untyped_vec_push(&vec, sizeof(u8), alignof(u8), &hello[i]);
     }
 
     for (i64 i = 0; i < vec.length; i++) {
         u8* item = (u8*)untyped_vec_get(&vec, i, sizeof(u8));
         *item += 1;
     }
-    untyped_vec_push(&vec, a, sizeof(u8), alignof(u8), &(u8){'\n'});
+    untyped_vec_push(&vec, sizeof(u8), alignof(u8), &(u8){'\n'});
 
     const u8* expected = (const u8*)"hello\n";
     for (i64 i = 0; i < vec.length; i++) {
@@ -280,7 +272,7 @@ void test_untyped_vec(void) {
     const u8* first = untyped_vec_get(&vec, 0, sizeof(u8));
     cstl_assert(*first == 'h');
 
-    untyped_vec_free(&vec, a, sizeof(u8), alignof(u8));
+    untyped_vec_free(&vec, sizeof(u8), alignof(u8));
 
     // test with integers now
     memset(&vec, 0, sizeof(untyped_vec));
@@ -288,7 +280,7 @@ void test_untyped_vec(void) {
 
     const i32 nums[] = {0, 1, 2, 4, 8, 16, -1};
     for (i64 i = 0; nums[i] != -1; i++) {
-        untyped_vec_push(&vec, a, sizeof(i32), alignof(i32), &nums[i]);
+        untyped_vec_push(&vec, sizeof(i32), alignof(i32), &nums[i]);
     }
 
     i64 index = 5;
@@ -298,14 +290,12 @@ void test_untyped_vec(void) {
         index--;
     }
 
-    untyped_vec_free(&vec, a, sizeof(i32), alignof(i32));
+    untyped_vec_free(&vec, sizeof(i32), alignof(i32));
 
     puts("untyped vec tests passed\n");
 }
 
 void test_untyped_hashmap(void) {
-    const allocator a = std_allocator();
-
     string ryan = "Ryan";
     string aidan = "Aidan";
     string codebase = "Codebase";
@@ -316,12 +306,12 @@ void test_untyped_hashmap(void) {
     cstl_assert(untyped_hashmap_get(&map, sizeof(string), &ryan, sizeof(i32)) == NULL);
     cstl_assert(untyped_hashmap_get(&map, sizeof(string), &aidan, sizeof(i32)) == NULL);
 
-    untyped_hashmap_set(&map, a, sizeof(string), alignof(string), &ryan, sizeof(i32), alignof(i32), &(i32){20});
+    untyped_hashmap_set(&map, sizeof(string), alignof(string), &ryan, sizeof(i32), alignof(i32), &(i32){20});
     i32* v1 = untyped_hashmap_get(&map, sizeof(string), &ryan, sizeof(i32));
     cstl_assert(v1 != NULL);
     cstl_assert(*v1 == 20);
 
-    untyped_hashmap_set(&map, a, sizeof(string), alignof(string), &aidan, sizeof(i32), alignof(i32), &(i32){17});
+    untyped_hashmap_set(&map, sizeof(string), alignof(string), &aidan, sizeof(i32), alignof(i32), &(i32){17});
     i32* v2 = untyped_hashmap_get(&map, sizeof(string), &aidan, sizeof(i32));
     cstl_assert(v2 != NULL);
     cstl_assert(*v2 == 17);
@@ -329,7 +319,7 @@ void test_untyped_hashmap(void) {
     i32* v3 = untyped_hashmap_get(&map, sizeof(string), &codebase, sizeof(i32));
     cstl_assert(v3 == NULL);
 
-    untyped_hashmap_set(&map, a, sizeof(string), alignof(string), &ryan, sizeof(i32), alignof(i32), &(i32){21});
+    untyped_hashmap_set(&map, sizeof(string), alignof(string), &ryan, sizeof(i32), alignof(i32), &(i32){21});
     i32* v4 = untyped_hashmap_get(&map, sizeof(string), &ryan, sizeof(i32));
     cstl_assert(v4 != NULL);
     cstl_assert(*v4 == 21);
@@ -346,9 +336,9 @@ void test_untyped_hashmap(void) {
 
     cstl_assert(untyped_hashmap_get(&map, sizeof(string), &ryan, sizeof(i32)) == NULL);
 
-    untyped_hashmap_set(&map, a, sizeof(string), alignof(string), &ryan, sizeof(i32), alignof(i32), &(i32){21});
-    untyped_hashmap_set(&map, a, sizeof(string), alignof(string), &codebase, sizeof(i32), alignof(i32), &(i32){39});
-    untyped_hashmap_set(&map, a, sizeof(string), alignof(string), &ringo, sizeof(i32), alignof(i32), &(i32){12});
+    untyped_hashmap_set(&map, sizeof(string), alignof(string), &ryan, sizeof(i32), alignof(i32), &(i32){21});
+    untyped_hashmap_set(&map, sizeof(string), alignof(string), &codebase, sizeof(i32), alignof(i32), &(i32){39});
+    untyped_hashmap_set(&map, sizeof(string), alignof(string), &ringo, sizeof(i32), alignof(i32), &(i32){12});
 
     untyped_hashmap_iterator it = untyped_hashmap_iterator_new(&map);
 
@@ -359,7 +349,7 @@ void test_untyped_hashmap(void) {
     cstl_assert(!untyped_hashmap_iterator_next(&it, sizeof(string), sizeof(i32)));
     cstl_assert(!untyped_hashmap_iterator_next(&it, sizeof(string), sizeof(i32)));
 
-    untyped_hashmap_free(&map, a, sizeof(string), alignof(string), sizeof(i32), alignof(i32));
+    untyped_hashmap_free(&map, sizeof(string), alignof(string), sizeof(i32), alignof(i32));
 
     puts("untyped hashmap tests passed\n");
 }

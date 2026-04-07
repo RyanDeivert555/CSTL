@@ -10,7 +10,7 @@ intrusive_node* intrusive_list_pop_front(intrusive_list* list) {
         return NULL;
     }
 
-    intrusive_node* first = list->head;
+    intrusive_node* const first = list->head;
     list->head = first->next;
 
     return first;

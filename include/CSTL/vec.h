@@ -10,22 +10,22 @@
         i64 capacity;                                                                                                  \
     } vec_##T;                                                                                                         \
                                                                                                                        \
-    void vec_##T##_free(vec_##T* vec, allocator allocator);                                                            \
-    void vec_##T##_push(vec_##T* vec, allocator allocator, T elem);                                                    \
+    void vec_##T##_free(vec_##T* vec);                                                                                 \
+    void vec_##T##_push(vec_##T* vec, T elem);                                                                         \
     T vec_##T##_pop(vec_##T* vec);                                                                                     \
-    void vec_##T##_insert(vec_##T* vec, allocator allocator, T elem, i64 index);                                       \
+    void vec_##T##_insert(vec_##T* vec, T elem, i64 index);                                                            \
     T vec_##T##_remove(vec_##T* vec, i64 index);                                                                       \
-    void vec_##T##_reserve(vec_##T* vec, allocator allocator, i64 new_capacity);
+    void vec_##T##_reserve(vec_##T* vec, i64 new_capacity);
 
 #define VEC_IMPL(T)                                                                                                    \
-    void vec_##T##_free(vec_##T* vec, allocator allocator) {                                                           \
-        allocator_free(T, allocator, vec->buffer, vec->capacity);                                                      \
+    void vec_##T##_free(vec_##T* vec) {                                                                                \
+        cstl_free(T, vec->buffer, vec->capacity);                                                                      \
     }                                                                                                                  \
                                                                                                                        \
-    void vec_##T##_push(vec_##T* vec, allocator allocator, T elem) {                                                   \
+    void vec_##T##_push(vec_##T* vec, T elem) {                                                                        \
         if (vec->length == vec->capacity) {                                                                            \
             const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;                                     \
-            vec_##T##_reserve(vec, allocator, new_capacity);                                                           \
+            vec_##T##_reserve(vec, new_capacity);                                                                      \
         }                                                                                                              \
         vec->buffer[vec->length] = elem;                                                                               \
         vec->length++;                                                                                                 \
@@ -40,11 +40,11 @@
         return value;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    void vec_##T##_insert(vec_##T* vec, allocator allocator, T elem, i64 index) {                                      \
+    void vec_##T##_insert(vec_##T* vec, T elem, i64 index) {                                                           \
         cstl_assert(index >= 0 && index <= vec->length);                                                               \
         if (vec->length == vec->capacity) {                                                                            \
             const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;                                     \
-            vec_##T##_reserve(vec, allocator, new_capacity);                                                           \
+            vec_##T##_reserve(vec, new_capacity);                                                                      \
         }                                                                                                              \
         memmove(&vec->buffer[index + 1], &vec->buffer[index], (vec->length - index) * sizeof(T));                      \
         vec->buffer[index] = elem;                                                                                     \
@@ -60,13 +60,13 @@
         return res;                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
-    void vec_##T##_reserve(vec_##T* vec, allocator allocator, i64 new_capacity) {                                      \
+    void vec_##T##_reserve(vec_##T* vec, i64 new_capacity) {                                                           \
         cstl_assert(new_capacity >= 0);                                                                                \
-        T* new_buffer = allocator_alloc(T, allocator, new_capacity);                                                   \
+        T* const new_buffer = cstl_alloc(T, new_capacity);                                                             \
         if (vec->length != 0) {                                                                                        \
             memcpy(new_buffer, vec->buffer, vec->length * sizeof(T));                                                  \
         }                                                                                                              \
-        allocator_free(T, allocator, vec->buffer, vec->capacity);                                                      \
+        cstl_free(T, vec->buffer, vec->capacity);                                                                      \
         vec->buffer = new_buffer;                                                                                      \
         vec->capacity = new_capacity;                                                                                  \
     }

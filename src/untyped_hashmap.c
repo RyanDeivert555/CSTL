@@ -11,18 +11,17 @@ untyped_hashmap untyped_hashmap_new(compare_func compare, hash_func hash) {
     return result;
 }
 
-void untyped_hashmap_free(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, i64 value_size,
-                          i64 value_align) {
-    allocator_raw_free(allocator, (u8*)map->keys, key_size, map->capacity, key_align);
-    allocator_raw_free(allocator, (u8*)map->values, value_size, map->capacity, value_align);
-    allocator_free(untyped_hashmap_state, allocator, map->states, map->capacity);
+void untyped_hashmap_free(untyped_hashmap* map, i64 key_size, i64 key_align, i64 value_size, i64 value_align) {
+    cstl_raw_free((u8*)map->keys, key_size, map->capacity, key_align);
+    cstl_raw_free((u8*)map->values, value_size, map->capacity, value_align);
+    cstl_free(untyped_hashmap_state, map->states, map->capacity);
 }
 
-void untyped_hashmap_realloc(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, i64 value_size,
-                             i64 value_align, i64 new_capacity) {
-    void* new_keys = allocator_raw_alloc(allocator, key_size, new_capacity, key_align);
-    void* new_values = allocator_raw_alloc(allocator, value_size, new_capacity, value_align);
-    untyped_hashmap_state* new_states = allocator_alloc(untyped_hashmap_state, allocator, new_capacity);
+void untyped_hashmap_realloc(untyped_hashmap* map, i64 key_size, i64 key_align, i64 value_size, i64 value_align,
+                             i64 new_capacity) {
+    void* const new_keys = cstl_raw_alloc(key_size, new_capacity, key_align);
+    void* const new_values = cstl_raw_alloc(value_size, new_capacity, value_align);
+    untyped_hashmap_state* const new_states = cstl_alloc(untyped_hashmap_state, new_capacity);
 
     // Default to empty entries in case allocators do not zero memory
     memset(new_states, untyped_hashmap_state_empty, new_capacity * sizeof(untyped_hashmap_state));
@@ -50,9 +49,9 @@ void untyped_hashmap_realloc(untyped_hashmap* map, allocator allocator, i64 key_
         }
     }
 
-    allocator_raw_free(allocator, (u8*)map->keys, key_size, map->capacity, key_align);
-    allocator_raw_free(allocator, (u8*)map->values, value_size, map->capacity, value_align);
-    allocator_free(untyped_hashmap_state, allocator, map->states, map->capacity);
+    cstl_raw_free((u8*)map->keys, key_size, map->capacity, key_align);
+    cstl_raw_free((u8*)map->values, value_size, map->capacity, value_align);
+    cstl_free(untyped_hashmap_state, map->states, map->capacity);
 
     map->keys = new_keys;
     map->values = new_values;
@@ -60,13 +59,13 @@ void untyped_hashmap_realloc(untyped_hashmap* map, allocator allocator, i64 key_
     map->capacity = new_capacity;
 }
 
-void untyped_hashmap_set(untyped_hashmap* map, allocator allocator, i64 key_size, i64 key_align, const void* const key,
-                         i64 value_size, i64 value_align, const void* const value) {
+void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, const void* const key, i64 value_size,
+                         i64 value_align, const void* const value) {
     // 80% load factor
     if (map->count * 10 >= map->capacity * 8) {
         // Larger starting capacity, prevent collisions
         const i64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;
-        untyped_hashmap_realloc(map, allocator, key_size, key_align, value_size, value_align, new_capacity);
+        untyped_hashmap_realloc(map, key_size, key_align, value_size, value_align, new_capacity);
     }
     const i64 hash = map->hash(key);
     i64 index = hash % map->capacity;

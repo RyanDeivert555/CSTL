@@ -1,15 +1,25 @@
 #include "CSTL/allocator.h"
 #include <stdlib.h>
 
-u8* allocator_raw_alloc(allocator allocator, i64 size, i64 count, i64 align) {
-    return allocator.vtable->alloc(allocator.ctx, size, count, align);
+static void* global_allocator_ctx = NULL;
+static alloc_func global_alloc = std_alloc;
+static free_func global_free = std_free;
+
+void set_global_allocator(void* ctx, alloc_func alloc, free_func free) {
+    global_allocator_ctx = ctx;
+    global_alloc = alloc;
+    global_free = free;
 }
 
-void allocator_raw_free(allocator allocator, u8* ptr, i64 size, i64 count, i64 align) {
-    allocator.vtable->free(allocator.ctx, ptr, size, count, align);
+u8* cstl_raw_alloc(i64 size, i64 count, i64 align) {
+    return global_alloc(global_allocator_ctx, size, count, align);
 }
 
-static u8* std_alloc(void* ctx, i64 size, i64 count, i64 align) {
+void cstl_raw_free(u8* ptr, i64 size, i64 count, i64 align) {
+    global_free(global_allocator_ctx, ptr, size, count, align);
+}
+
+u8* std_alloc(void* ctx, i64 size, i64 count, i64 align) {
     (void)ctx;
 
 #if defined(_WIN32)
@@ -19,7 +29,7 @@ static u8* std_alloc(void* ctx, i64 size, i64 count, i64 align) {
 #endif
 }
 
-static void std_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
+void std_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)ctx;
     (void)size;
     (void)count;
@@ -28,20 +38,6 @@ static void std_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
 #if defined(_WIN32)
     _aligned_free(ptr);
 #else
-    free(ptr);
+    free_aligned_sized(ptr, align, size * count);
 #endif
-}
-
-static const allocator_v_table std_allocator_vtable = {
-    .alloc = std_alloc,
-    .free = std_free,
-};
-
-allocator std_allocator(void) {
-    const allocator result = {
-        .ctx = NULL,
-        .vtable = &std_allocator_vtable,
-    };
-
-    return result;
 }
