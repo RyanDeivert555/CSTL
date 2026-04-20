@@ -7,7 +7,7 @@ void untyped_vec_free(untyped_vec* vec, i64 item_size, i64 item_align) {
     cstl_raw_free((u8*)vec->buffer, item_size, vec->capacity, item_align);
 }
 
-void untyped_vec_push(untyped_vec* vec, i64 item_size, i64 item_align, const void* const item) {
+void untyped_vec_push(untyped_vec* vec, i64 item_size, i64 item_align, const void* item) {
     if (vec->length == vec->capacity) {
         const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
         untyped_vec_reserve(vec, item_size, item_align, new_capacity);
@@ -25,7 +25,7 @@ void* untyped_vec_pop(untyped_vec* vec, i64 item_size) {
     return result;
 }
 
-void untyped_vec_insert(untyped_vec* vec, i64 index, i64 item_size, i64 item_align, const void* const item) {
+void untyped_vec_insert(untyped_vec* vec, i64 index, i64 item_size, i64 item_align, const void* item) {
     cstl_assert(index >= 0 && index <= vec->length);
     if (vec->length == vec->capacity) {
         const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;
@@ -60,7 +60,7 @@ void* untyped_vec_get(untyped_vec* vec, i64 index, i64 item_size) {
     return (u8*)vec->buffer + index * item_size;
 }
 
-void untyped_vec_set(untyped_vec* vec, i64 index, i64 item_size, const void* const item) {
+void untyped_vec_set(untyped_vec* vec, i64 index, i64 item_size, const void* item) {
     cstl_assert(index >= 0 && index < vec->length);
 
     memcpy((u8*)vec->buffer + index * item_size, item, item_size);

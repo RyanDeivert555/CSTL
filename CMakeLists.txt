@@ -13,6 +13,12 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 add_library(${PROJECT_NAME})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    C_STANDARD 23
+    C_STANDARD_REQUIRED YES
+    C_EXTENSIONS NO
+)
+
 target_sources(${PROJECT_NAME}
     PRIVATE
     src/allocator.c
@@ -24,7 +30,7 @@ target_sources(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PUBLIC include/)
 target_compile_options(${PROJECT_NAME} PRIVATE 
-    -Wall -Wextra -Wpedantic -Werror -std=c23
+    -Wall -Wextra -Wpedantic -Werror
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 target_link_options(${PROJECT_NAME} PRIVATE
@@ -45,4 +51,3 @@ if(CSTL_RUN_TESTS)
     enable_testing()
     add_test(cstl_tests cstl_tests)
 endif()
-

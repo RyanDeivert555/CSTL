@@ -1,5 +1,4 @@
 #pragma once
-#include "allocator.h"
 #include "common.h"
 
 typedef bool (*compare_func)(const void* lhs, const void* rhs);
@@ -25,11 +24,10 @@ untyped_hashmap untyped_hashmap_new(compare_func compare, hash_func hash);
 void untyped_hashmap_free(untyped_hashmap* map, i64 key_size, i64 key_align, i64 value_size, i64 value_align);
 void untyped_hashmap_realloc(untyped_hashmap* map, i64 key_size, i64 key_align, i64 value_size, i64 value_align,
                              i64 new_size);
-void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, const void* const key, i64 value_size,
-                         i64 value_align, const void* const value);
-void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* const key, i64 value_size);
-bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* const key, i64 value_size,
-                                void** out_value);
+void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, const void* key, i64 value_size,
+                         i64 value_align, const void* value);
+void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size);
+bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size, void** out_value);
 
 typedef struct untyped_hashmap_iterator {
     const untyped_hashmap* inner;

@@ -59,8 +59,8 @@ void untyped_hashmap_realloc(untyped_hashmap* map, i64 key_size, i64 key_align, 
     map->capacity = new_capacity;
 }
 
-void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, const void* const key, i64 value_size,
-                         i64 value_align, const void* const value) {
+void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, const void* key, i64 value_size,
+                         i64 value_align, const void* value) {
     // 80% load factor
     if (map->count * 10 >= map->capacity * 8) {
         // Larger starting capacity, prevent collisions
@@ -87,7 +87,7 @@ void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, cons
     map->states[index] = untyped_hashmap_state_occupied;
 }
 
-void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* const key, i64 value_size) {
+void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size) {
     if (map->capacity == 0) {
         return NULL;
     }
@@ -109,8 +109,7 @@ void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* const 
     return NULL;
 }
 
-bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* const key, i64 value_size,
-                                void** out_value) {
+bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size, void** out_value) {
     if (map->capacity == 0) {
         if (out_value) {
             *out_value = NULL;
