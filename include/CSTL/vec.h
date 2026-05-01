@@ -62,6 +62,9 @@
                                                                                                                        \
     void vec_##T##_reserve(vec_##T* vec, i64 new_capacity) {                                                           \
         cstl_assert(new_capacity >= 0);                                                                                \
+        if (new_capacity < vec->length) {                                                                              \
+            vec->length = new_capacity;                                                                                \
+        }                                                                                                              \
         T* const new_buffer = cstl_alloc(T, new_capacity);                                                             \
         if (vec->length != 0) {                                                                                        \
             memcpy(new_buffer, vec->buffer, vec->length * sizeof(T));                                                  \

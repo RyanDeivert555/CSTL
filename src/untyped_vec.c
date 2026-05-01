@@ -45,11 +45,15 @@ void untyped_vec_remove(untyped_vec* vec, i64 index, i64 item_size) {
 }
 
 void untyped_vec_reserve(untyped_vec* vec, i64 item_size, i64 item_align, i64 new_capacity) {
+    cstl_assert(new_capacity >= 0);
     void* const new_buffer = cstl_raw_alloc(item_size, new_capacity, item_align);
+    if (new_capacity < vec->length) {
+        vec->length = new_capacity;
+    }
     if (vec->length != 0) {
         memcpy(new_buffer, vec->buffer, item_size * vec->length);
     }
-    cstl_raw_free((u8*)vec->buffer, item_size, vec->capacity, item_size);
+    cstl_raw_free((u8*)vec->buffer, item_size, vec->capacity, item_align);
     vec->buffer = new_buffer;
     vec->capacity = new_capacity;
 }

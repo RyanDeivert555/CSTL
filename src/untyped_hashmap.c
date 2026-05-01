@@ -57,18 +57,20 @@ void untyped_hashmap_realloc(untyped_hashmap* map, i64 key_size, i64 key_align, 
     map->values = new_values;
     map->states = new_states;
     map->capacity = new_capacity;
+    map->tombstone_count = 0;
 }
 
 void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, const void* key, i64 value_size,
                          i64 value_align, const void* value) {
     // 80% load factor
-    if (map->count * 10 >= map->capacity * 8) {
+    if (map->count + map->tombstone_count >= (map->capacity / 10) * 8) {
         // Larger starting capacity, prevent collisions
         const i64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;
         untyped_hashmap_realloc(map, key_size, key_align, value_size, value_align, new_capacity);
     }
     const i64 hash = map->hash(key);
     i64 index = hash % map->capacity;
+    i64 tombstone = -1;
 
     while (map->states[index] != untyped_hashmap_state_empty) {
         if (map->states[index] == untyped_hashmap_state_occupied
@@ -76,15 +78,24 @@ void untyped_hashmap_set(untyped_hashmap* map, i64 key_size, i64 key_align, cons
             // Overwrite found value
             memcpy((u8*)map->values + index * value_size, value, value_size);
             return;
+        } else if (map->states[index] == untyped_hashmap_state_tombstone) {
+            if (tombstone == -1) {
+                tombstone = index;
+            }
         }
 
         index = (index + 1) % map->capacity;
     }
 
+    const i64 target = tombstone != -1 ? tombstone : index;
+    if (target == tombstone) {
+        map->tombstone_count--;
+    }
+
     map->count++;
-    memcpy((u8*)map->keys + index * key_size, key, key_size);
-    memcpy((u8*)map->values + index * value_size, value, value_size);
-    map->states[index] = untyped_hashmap_state_occupied;
+    memcpy((u8*)map->keys + target * key_size, key, key_size);
+    memcpy((u8*)map->values + target * value_size, value, value_size);
+    map->states[target] = untyped_hashmap_state_occupied;
 }
 
 void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size) {
@@ -109,13 +120,9 @@ void* untyped_hashmap_get(untyped_hashmap* map, i64 key_size, const void* key, i
     return NULL;
 }
 
-bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size, void** out_value) {
+bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* key, i64 value_size, void* out_value) {
     if (map->capacity == 0) {
-        if (out_value) {
-            *out_value = NULL;
-
-            return false;
-        }
+        return false;
     }
 
     const i64 hash = map->hash(key);
@@ -127,19 +134,16 @@ bool untyped_hashmap_try_remove(untyped_hashmap* map, i64 key_size, const void* 
             cstl_assert(index < map->capacity);
             map->states[index] = untyped_hashmap_state_tombstone;
             map->count--;
+            map->tombstone_count++;
 
             if (out_value) {
-                *out_value = (u8*)map->values + index * value_size;
+                memcpy(out_value, (u8*)map->values + index * value_size, value_size);
             }
 
             return true;
         }
 
         index = (index + 1) % map->capacity;
-    }
-
-    if (out_value) {
-        *out_value = NULL;
     }
 
     return false;

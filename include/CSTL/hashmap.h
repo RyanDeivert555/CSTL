@@ -1,7 +1,6 @@
 #pragma once
 #include "allocator.h" // IWYU pragma: keep
 #include "common.h"    // IWYU pragma: keep
-#include <stdbool.h>   // IWYU pragma: keep
 #include <string.h>    // IWYU pragma: keep
 
 typedef enum hashmap_state {
@@ -17,6 +16,7 @@ typedef enum hashmap_state {
         hashmap_state* states;                                                                                         \
         i64 capacity;                                                                                                  \
         i64 count;                                                                                                     \
+        i64 tombstone_count;                                                                                           \
     } hashmap_##K##_##V;                                                                                               \
                                                                                                                        \
     void hashmap_##K##_##V##_free(hashmap_##K##_##V* map);                                                             \
@@ -98,30 +98,40 @@ typedef enum hashmap_state {
         map->values = new_values;                                                                                      \
         map->states = new_states;                                                                                      \
         map->capacity = new_capacity;                                                                                  \
+        map->tombstone_count = 0;                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
     void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, K key, V value) {                                             \
-        if (map->count * 10 >= map->capacity * 8) {                                                                    \
+        if (map->count + map->tombstone_count >= (map->capacity / 10) * 8) {                                           \
             const i64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;                                     \
             hashmap_##K##_##V##_realloc(map, new_capacity);                                                            \
         }                                                                                                              \
                                                                                                                        \
         const i64 hash = hash_func(key);                                                                               \
         i64 index = hash % map->capacity;                                                                              \
+        i64 tombstone = -1;                                                                                            \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
                 map->values[index] = value;                                                                            \
                 return;                                                                                                \
+            } else if (map->states[index] == hashmap_state_tombstone) {                                                \
+                if (tombstone == -1) {                                                                                 \
+                    tombstone = index;                                                                                 \
+                }                                                                                                      \
             }                                                                                                          \
                                                                                                                        \
             index = (index + 1) % map->capacity;                                                                       \
         }                                                                                                              \
                                                                                                                        \
+        const i64 target = tombstone != -1 ? tombstone : index;                                                        \
+        if (target == tombstone) {                                                                                     \
+            map->tombstone_count--;                                                                                    \
+        }                                                                                                              \
         map->count++;                                                                                                  \
-        map->keys[index] = key;                                                                                        \
-        map->values[index] = value;                                                                                    \
-        map->states[index] = hashmap_state_occupied;                                                                   \
+        map->keys[target] = key;                                                                                       \
+        map->values[target] = value;                                                                                   \
+        map->states[target] = hashmap_state_occupied;                                                                  \
     }                                                                                                                  \
                                                                                                                        \
     bool hashmap_##K##_##V##_try_remove(hashmap_##K##_##V* map, K key, V* out_value) {                                 \
@@ -135,6 +145,7 @@ typedef enum hashmap_state {
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
                 map->states[index] = hashmap_state_tombstone;                                                          \
+                map->tombstone_count++;                                                                                \
                 map->count--;                                                                                          \
                 if (out_value) {                                                                                       \
                     *out_value = map->values[index];                                                                   \

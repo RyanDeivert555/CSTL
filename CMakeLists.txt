@@ -8,7 +8,6 @@ project(
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(CSTL_RUN_TESTS "Run tests" ON)
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
 add_library(${PROJECT_NAME})
@@ -25,7 +24,9 @@ target_sources(${PROJECT_NAME}
     src/fba.c
     src/untyped_vec.c
     src/untyped_hashmap.c
-    src/intrusive_list.c
+    src/untyped_queue.c
+    src/random.c
+    src/xorshift.c
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include/)
@@ -37,17 +38,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 
-if(CSTL_RUN_TESTS)
-    add_executable(cstl_tests src/main.c)
-    target_compile_options(cstl_tests PRIVATE 
-        $<$<CONFIG:Debug>:-fsanitize=address,undefined> 
-    )
-    target_link_options(cstl_tests PRIVATE
-        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
-    )
-    target_link_libraries(cstl_tests PRIVATE 
-        ${PROJECT_NAME} 
-    )
-    enable_testing()
-    add_test(cstl_tests cstl_tests)
-endif()
+enable_testing()
+
+add_subdirectory(tests)
