@@ -32,6 +32,7 @@ static bool fba_is_last_alloc(fba* self, u8* buffer, i64 size) {
 }
 
 void fba_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
+    // TODO: surely you need the alignment?
     (void)align;
 
     fba* const instance = ctx;

@@ -6,9 +6,11 @@ set(CSTL_TESTS
     vec
     hashmap
     queue
+    set
     untyped_vec
     untyped_hashmap
     untyped_queue
+    untyped_set
 )
 
 foreach(TEST_NAME IN LISTS CSTL_TESTS)

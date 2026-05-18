@@ -4,7 +4,7 @@
 typedef bool (*compare_func)(const void* lhs, const void* rhs);
 typedef i64 (*hash_func)(const void* key);
 
-typedef enum untyped_hashmap_state {
+typedef enum untyped_hashmap_state : u8 {
     untyped_hashmap_state_empty,
     untyped_hashmap_state_occupied,
     untyped_hashmap_state_tombstone,

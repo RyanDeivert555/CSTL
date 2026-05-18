@@ -33,10 +33,9 @@ static u64 splitmix64(u64* state) {
 xorshift xorshift_new(u64 seed) {
     xorshift result = {0};
 
-    result.state[0] = splitmix64(&seed);
-    result.state[1] = splitmix64(&seed);
-    result.state[2] = splitmix64(&seed);
-    result.state[3] = splitmix64(&seed);
+    for (i64 i = 0; i < 4; i++) {
+        result.state[i] = splitmix64(&seed);
+    }
 
     return result;
 }

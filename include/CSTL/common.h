@@ -18,6 +18,7 @@ typedef size_t usize;
 typedef float f32;
 typedef double f64;
 
+// TODO: use constexpr instead?
 #define U8_MAX UINT8_MAX
 #define U16_MAX UINT16_MAX
 #define U32_MAX UINT32_MAX
@@ -42,4 +43,13 @@ typedef double f64;
 
 #define cstl_assert(c)                                                                                                 \
     while (!(c))                                                                                                       \
-    __builtin_unreachable()
+    unreachable()
+
+// cstl_force_inline
+#if defined(__GNUC__) || defined(__clang__)
+#define cstl_force_inline inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#define cstl_force_inline __forceinline
+#else
+#define cstl_force_inline inline
+#endif

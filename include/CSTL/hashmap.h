@@ -3,7 +3,7 @@
 #include "common.h"    // IWYU pragma: keep
 #include <string.h>    // IWYU pragma: keep
 
-typedef enum hashmap_state {
+typedef enum hashmap_state : u8 {
     hashmap_state_empty,
     hashmap_state_occupied,
     hashmap_state_tombstone,
@@ -168,7 +168,7 @@ typedef enum hashmap_state {
     }                                                                                                                  \
                                                                                                                        \
     bool hashmap_##K##_##V##_iterator_next(hashmap_##K##_##V##_iterator* it) {                                         \
-        const hashmap_##K##_##V* inner = it->inner;                                                                    \
+        const hashmap_##K##_##V* const inner = it->inner;                                                              \
                                                                                                                        \
         while (it->index < inner->capacity) {                                                                          \
             const i64 curr = it->index;                                                                                \

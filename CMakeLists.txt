@@ -25,6 +25,7 @@ target_sources(${PROJECT_NAME}
     src/untyped_vec.c
     src/untyped_hashmap.c
     src/untyped_queue.c
+    src/untyped_set.c
     src/random.c
     src/xorshift.c
 )

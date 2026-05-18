@@ -157,7 +157,7 @@ untyped_hashmap_iterator untyped_hashmap_iterator_new(const untyped_hashmap* map
 }
 
 bool untyped_hashmap_iterator_next(untyped_hashmap_iterator* it, i64 key_size, i64 value_size) {
-    const untyped_hashmap* inner = it->inner;
+    const untyped_hashmap* const inner = it->inner;
 
     while (it->index < inner->capacity) {
         const i64 curr = it->index;
