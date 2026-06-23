@@ -63,4 +63,9 @@ void test_set(void) {
     cstl_assert(!set_string_iterator_next(&it));
 
     set_string_free(&s);
+    cstl_assert(s.values == NULL);
+    cstl_assert(s.states == NULL);
+    cstl_assert(s.capacity == 0);
+    cstl_assert(s.count == 0);
+    cstl_assert(s.tombstone_count == 0);
 }

@@ -1,4 +1,5 @@
 #include "CSTL/untyped_hashmap.h"
+#include "CSTL/common.h"
 #include <string.h>
 
 void test_untyped_hashmap(void);
@@ -89,4 +90,11 @@ void test_untyped_hashmap(void) {
     cstl_assert(!untyped_hashmap_iterator_next(&it, sizeof(string), sizeof(i32)));
 
     untyped_hashmap_free(&map, sizeof(string), alignof(string), sizeof(i32), alignof(i32));
+    cstl_assert(map.keys == NULL);
+    cstl_assert(map.values == NULL);
+    cstl_assert(map.count == 0);
+    cstl_assert(map.capacity == 0);
+    cstl_assert(map.tombstone_count == 0);
+    cstl_assert(map.hash);
+    cstl_assert(map.compare);
 }

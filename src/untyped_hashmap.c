@@ -15,6 +15,13 @@ void untyped_hashmap_free(untyped_hashmap* map, i64 key_size, i64 key_align, i64
     cstl_raw_free((u8*)map->keys, key_size, map->capacity, key_align);
     cstl_raw_free((u8*)map->values, value_size, map->capacity, value_align);
     cstl_free(untyped_hashmap_state, map->states, map->capacity);
+    // don't want to zero the function pointers, manually zero other fields
+    map->keys = NULL;
+    map->values = NULL;
+    map->states = NULL;
+    map->count = 0;
+    map->capacity = 0;
+    map->tombstone_count = 0;
 }
 
 void untyped_hashmap_realloc(untyped_hashmap* map, i64 key_size, i64 key_align, i64 value_size, i64 value_align,

@@ -3,6 +3,8 @@
 #include "common.h"    // IWYU pragma: keep
 #include <string.h>    // IWYU pragma: keep
 
+#define cstl_vec(T) vec_##T
+
 #define VEC_DEFINE(T)                                                                                                  \
     typedef struct vec_##T {                                                                                           \
         T* buffer;                                                                                                     \
@@ -20,6 +22,7 @@
 #define VEC_IMPL(T)                                                                                                    \
     void vec_##T##_free(vec_##T* vec) {                                                                                \
         cstl_free(T, vec->buffer, vec->capacity);                                                                      \
+        memset(vec, 0, sizeof(vec_##T));                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void vec_##T##_push(vec_##T* vec, T elem) {                                                                        \

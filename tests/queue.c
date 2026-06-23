@@ -51,4 +51,9 @@ void test_queue(void) {
     cstl_assert(!queue_i32_try_pop(&q, NULL));
 
     queue_i32_free(&q);
+    cstl_assert(q.buffer == NULL);
+    cstl_assert(q.length == 0);
+    cstl_assert(q.capacity == 0);
+    cstl_assert(q.front == 0);
+    cstl_assert(q.back == 0);
 }

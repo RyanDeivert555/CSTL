@@ -1,4 +1,5 @@
 #include "CSTL/untyped_queue.h"
+#include "CSTL/common.h"
 
 void test_untyped_queue(void);
 
@@ -50,4 +51,9 @@ void test_untyped_queue(void) {
     cstl_assert(!untyped_queue_try_pop(&q, sizeof(i32), NULL));
 
     untyped_queue_free(&q, sizeof(i32), alignof(i32));
+    cstl_assert(q.buffer == NULL);
+    cstl_assert(q.length == 0);
+    cstl_assert(q.capacity == 0);
+    cstl_assert(q.front == 0);
+    cstl_assert(q.back == 0);
 }

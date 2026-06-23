@@ -13,6 +13,7 @@ untyped_set untyped_set_new(compare_func compare, hash_func hash) {
 void untyped_set_free(untyped_set* set, i64 item_size, i64 item_align) {
     cstl_raw_free(set->values, item_size, set->capacity, item_align);
     cstl_free(untyped_set_state, set->states, set->capacity);
+    memset(set, 0, sizeof(untyped_set));
 }
 
 void untyped_set_realloc(untyped_set* set, i64 item_size, i64 item_align, i64 new_capacity) {

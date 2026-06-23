@@ -41,9 +41,18 @@ typedef double f64;
 #define F64_MIN DBL_MIN
 #define F64_MAX DBL_MAX
 
+#if defined(__GNUC__) || defined(__clang__)
 #define cstl_assert(c)                                                                                                 \
     while (!(c))                                                                                                       \
-    unreachable()
+    __builtin_unreachable()
+#elif defined(_MSC_VER)
+#define cstl_assert(c)                                                                                                 \
+    while (!(c))                                                                                                       \
+    __assume(0)
+#else
+#include <assert.h>
+#define cstl_assert(c) assert(c)
+#endif
 
 // cstl_force_inline
 #if defined(__GNUC__) || defined(__clang__)

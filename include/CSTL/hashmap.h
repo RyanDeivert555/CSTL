@@ -3,6 +3,8 @@
 #include "common.h"    // IWYU pragma: keep
 #include <string.h>    // IWYU pragma: keep
 
+#define cstl_hashmap(K, V) hashmap_##K##_##V
+
 typedef enum hashmap_state : u8 {
     hashmap_state_empty,
     hashmap_state_occupied,
@@ -40,6 +42,7 @@ typedef enum hashmap_state : u8 {
         cstl_free(K, map->keys, map->capacity);                                                                        \
         cstl_free(V, map->values, map->capacity);                                                                      \
         cstl_free(hashmap_state, map->states, map->capacity);                                                          \
+        memset(map, 0, sizeof(hashmap_##K##_##V));                                                                     \
     }                                                                                                                  \
                                                                                                                        \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) {                                                        \

@@ -5,6 +5,7 @@
 
 void untyped_queue_free(untyped_queue* q, i64 item_size, i64 item_align) {
     cstl_raw_free(q->buffer, item_size, q->capacity, item_align);
+    memset(q, 0, sizeof(untyped_queue));
 }
 
 void untyped_queue_push(untyped_queue* q, i64 item_size, i64 item_align, void* elem) {

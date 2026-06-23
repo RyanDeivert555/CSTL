@@ -5,7 +5,7 @@ static u64 rol64(u64 x, i32 k) {
     return (x << k) | (x >> (64 - k));
 }
 
-static u64 xorshift_next(xorshift* instance) {
+static u64 xorshift_next(xorshift_state* instance) {
     const u64 result = rol64(instance->state[0] + instance->state[3], 23) + instance->state[0];
     const u64 t = instance->state[1] << 17;
 
@@ -30,8 +30,8 @@ static u64 splitmix64(u64* state) {
     return curr ^ (curr >> 31);
 }
 
-xorshift xorshift_new(u64 seed) {
-    xorshift result = {0};
+xorshift_state xorshift_new(u64 seed) {
+    xorshift_state result = {0};
 
     for (i64 i = 0; i < 4; i++) {
         result.state[i] = splitmix64(&seed);
@@ -41,7 +41,7 @@ xorshift xorshift_new(u64 seed) {
 }
 
 void xorshift_random_bytes(void* ctx, void* buffer, i64 size) {
-    xorshift* const instance = ctx;
+    xorshift_state* const instance = ctx;
 
     i64 i = 0;
     while (i + (i64)sizeof(u64) <= size) {
@@ -56,4 +56,11 @@ void xorshift_random_bytes(void* ctx, void* buffer, i64 size) {
         const u64 next = xorshift_next(instance);
         memcpy((u8*)buffer + i, &next, size - i);
     }
+}
+
+random_state xorshift_as_random(xorshift_state* xorshift) {
+    return (random_state){
+        .ctx = xorshift,
+        .rand = xorshift_random_bytes,
+    };
 }

@@ -93,4 +93,9 @@ void test_hashmap(void) {
     cstl_assert(map.count == 0);
 
     hashmap_string_i32_free(&map);
+    cstl_assert(map.keys == NULL);
+    cstl_assert(map.values == NULL);
+    cstl_assert(map.count == 0);
+    cstl_assert(map.capacity == 0);
+    cstl_assert(map.tombstone_count == 0);
 }

@@ -5,6 +5,7 @@
 
 void untyped_vec_free(untyped_vec* vec, i64 item_size, i64 item_align) {
     cstl_raw_free((u8*)vec->buffer, item_size, vec->capacity, item_align);
+    memset(vec, 0, sizeof(untyped_vec));
 }
 
 void untyped_vec_push(untyped_vec* vec, i64 item_size, i64 item_align, const void* item) {

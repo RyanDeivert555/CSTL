@@ -1,4 +1,5 @@
 #include "CSTL/untyped_vec.h"
+#include "CSTL/common.h"
 #include <string.h>
 
 void test_untyped_vec(void);
@@ -54,4 +55,7 @@ void test_untyped_vec(void) {
     }
 
     untyped_vec_free(&vec, sizeof(i32), alignof(i32));
+    cstl_assert(vec.buffer == NULL);
+    cstl_assert(vec.length == 0);
+    cstl_assert(vec.capacity == 0);
 }

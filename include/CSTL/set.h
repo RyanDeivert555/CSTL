@@ -3,6 +3,8 @@
 #include "common.h"    // IWYU pragma: keep
 #include <string.h>    // IWYU pragma: keep
 
+#define cstl_set(T) set_##T
+
 typedef enum set_state : u8 {
     set_state_empty,
     set_state_occupied,
@@ -37,6 +39,7 @@ typedef enum set_state : u8 {
     void set_##T##_free(set_##T* set) {                                                                                \
         cstl_free(T, set->values, set->capacity);                                                                      \
         cstl_free(set_state, set->states, set->capacity);                                                              \
+        memset(set, 0, sizeof(set_##T));                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_realloc(set_##T* set, i64 new_capacity) {                                                           \

@@ -1,6 +1,9 @@
 #pragma once
 #include "allocator.h" // IWYU pragma: keep
 #include "common.h"    // IWYU pragma: keep
+#include <string.h>    // IWYU pragma: keep
+
+#define cstl_queue(T) queue_##T
 
 #define QUEUE_DEFINE(T)                                                                                                \
     typedef struct queue_##T {                                                                                         \
@@ -20,6 +23,7 @@
 #define QUEUE_IMPL(T)                                                                                                  \
     void queue_##T##_free(queue_##T* q) {                                                                              \
         cstl_free(T, q->buffer, q->capacity);                                                                          \
+        memset(q, 0, sizeof(queue_##T));                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void queue_##T##_push(queue_##T* q, T elem) {                                                                      \

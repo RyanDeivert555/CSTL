@@ -22,11 +22,11 @@ foreach(TEST_NAME IN LISTS CSTL_TESTS)
     )
     target_compile_options(test_${TEST_NAME} PRIVATE 
         -Wall -Wextra -Wpedantic -Werror
-        -fsanitize=address,undefined
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
     )
     target_link_libraries(test_${TEST_NAME} PRIVATE cstl)
     add_test(NAME test_${TEST_NAME} COMMAND test_${TEST_NAME})
     target_link_options(test_${TEST_NAME} PRIVATE
-        -fsanitize=address,undefined
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
     )
 endforeach()
