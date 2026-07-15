@@ -1,4 +1,5 @@
 #include "CSTL/hashmap.h"
+#include "CSTL/allocator.h"
 
 typedef const char* string;
 u64 string_hash(string key) {
@@ -29,7 +30,7 @@ int main(void) {
 }
 
 void test_hashmap(void) {
-    hashmap_string_i32 map = {0};
+    hashmap_string_i32 map = hashmap_string_i32_create(std_allocator());
 
     cstl_assert(hashmap_string_i32_get(&map, "Ryan") == NULL);
     cstl_assert(hashmap_string_i32_get(&map, "Aidan") == NULL);

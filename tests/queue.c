@@ -12,7 +12,7 @@ int main(void) {
 }
 
 void test_queue(void) {
-    queue_i32 q = {0};
+    queue_i32 q = queue_i32_create(std_allocator());
 
     for (i32 i = 0; i < 10; i++) {
         queue_i32_push(&q, i);

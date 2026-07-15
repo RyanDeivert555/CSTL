@@ -10,8 +10,10 @@
         T* buffer;                                                                                                     \
         i64 length;                                                                                                    \
         i64 capacity;                                                                                                  \
+        allocator allocator;                                                                                           \
     } vec_##T;                                                                                                         \
                                                                                                                        \
+    vec_##T vec_##T##_create(allocator a);                                                                             \
     void vec_##T##_free(vec_##T* vec);                                                                                 \
     void vec_##T##_push(vec_##T* vec, T elem);                                                                         \
     T vec_##T##_pop(vec_##T* vec);                                                                                     \
@@ -20,8 +22,15 @@
     void vec_##T##_reserve(vec_##T* vec, i64 new_capacity);
 
 #define VEC_IMPL(T)                                                                                                    \
+    vec_##T vec_##T##_create(allocator a) {                                                                            \
+        vec_##T result = {0};                                                                                          \
+        result.allocator = a;                                                                                          \
+                                                                                                                       \
+        return result;                                                                                                 \
+    }                                                                                                                  \
+                                                                                                                       \
     void vec_##T##_free(vec_##T* vec) {                                                                                \
-        cstl_free(T, vec->buffer, vec->capacity);                                                                      \
+        cstl_free(T, vec->allocator, vec->buffer, vec->capacity);                                                      \
         memset(vec, 0, sizeof(vec_##T));                                                                               \
     }                                                                                                                  \
                                                                                                                        \
@@ -68,11 +77,11 @@
         if (new_capacity < vec->length) {                                                                              \
             vec->length = new_capacity;                                                                                \
         }                                                                                                              \
-        T* const new_buffer = cstl_alloc(T, new_capacity);                                                             \
+        T* const new_buffer = cstl_alloc(T, vec->allocator, new_capacity);                                             \
         if (vec->length != 0) {                                                                                        \
             memcpy(new_buffer, vec->buffer, vec->length * sizeof(T));                                                  \
         }                                                                                                              \
-        cstl_free(T, vec->buffer, vec->capacity);                                                                      \
+        cstl_free(T, vec->allocator, vec->buffer, vec->capacity);                                                      \
         vec->buffer = new_buffer;                                                                                      \
         vec->capacity = new_capacity;                                                                                  \
     }

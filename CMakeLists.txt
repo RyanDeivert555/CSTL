@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 project(
     cstl 
-    VERSION 0.0.1
     DESCRIPTION "A library with generic implementations of common data stuctures"
     LANGUAGES C
 )
@@ -22,10 +21,6 @@ target_sources(${PROJECT_NAME}
     PRIVATE
     src/allocator.c
     src/fba.c
-    src/untyped_vec.c
-    src/untyped_hashmap.c
-    src/untyped_queue.c
-    src/untyped_set.c
     src/random.c
     src/xorshift.c
 )

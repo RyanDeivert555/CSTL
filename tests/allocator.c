@@ -9,8 +9,9 @@ int main(void) {
 }
 
 void test_allocator(void) {
+    allocator a = std_allocator();
     {
-        i32* const num = (i32*)cstl_raw_alloc(sizeof(i32), 1, alignof(i32));
+        i32* const num = (i32*)cstl_raw_alloc(a, sizeof(i32), 1, alignof(i32));
         cstl_assert(num != NULL);
         usize address = (usize)num;
         cstl_assert(address % alignof(i32) == 0);
@@ -26,11 +27,11 @@ void test_allocator(void) {
         num[0] = 1;
         cstl_assert(num[0] == 1);
 
-        cstl_raw_free((u8*)num, sizeof(i32), 1, alignof(i32));
+        cstl_raw_free(a, (u8*)num, sizeof(i32), 1, alignof(i32));
     }
     {
         const usize len = 10;
-        u64* const nums = cstl_alloc(u64, len);
+        u64* const nums = cstl_alloc(u64, a, len);
         const usize address = (usize)nums;
         cstl_assert(address % alignof(u64) == 0);
 
@@ -41,11 +42,11 @@ void test_allocator(void) {
             cstl_assert(nums[i] == i);
         }
 
-        cstl_free(u64, nums, len);
+        cstl_free(u64, a, nums, len);
     }
     {
-        u64* const ptr = cstl_alloc(u64, 0);
+        u64* const ptr = cstl_alloc(u64, a, 0);
         cstl_assert(ptr == NULL);
-        cstl_free(u64, ptr, 0);
+        cstl_free(u64, a, ptr, 0);
     }
 }

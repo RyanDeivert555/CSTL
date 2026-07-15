@@ -1,4 +1,5 @@
 #include "CSTL/set.h"
+#include "CSTL/allocator.h"
 #include "CSTL/common.h"
 
 typedef const char* string;
@@ -30,7 +31,7 @@ int main(void) {
 }
 
 void test_set(void) {
-    set_string s = {0};
+    set_string s = set_string_create(std_allocator());
 
     cstl_assert(!set_string_contains(s, "ryan"));
     cstl_assert(!set_string_contains(s, "aidan"));

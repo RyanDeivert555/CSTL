@@ -18,8 +18,10 @@ typedef enum set_state : u8 {
         i64 capacity;                                                                                                  \
         i64 count;                                                                                                     \
         i64 tombstone_count;                                                                                           \
+        allocator allocator;                                                                                           \
     } set_##T;                                                                                                         \
                                                                                                                        \
+    set_##T set_##T##_create(allocator a);                                                                             \
     void set_##T##_free(set_##T* set);                                                                                 \
     void set_##T##_realloc(set_##T* set, i64 new_capacity);                                                            \
     void set_##T##_insert(set_##T* set, T elem);                                                                       \
@@ -36,15 +38,22 @@ typedef enum set_state : u8 {
     bool set_##T##_iterator_next(set_##T##_iterator* it);
 
 #define SET_IMPL(T, compare_func, hash_func)                                                                           \
+    set_##T set_##T##_create(allocator a) {                                                                            \
+        set_##T instance = {0};                                                                                        \
+        instance.allocator = a;                                                                                        \
+                                                                                                                       \
+        return instance;                                                                                               \
+    }                                                                                                                  \
+                                                                                                                       \
     void set_##T##_free(set_##T* set) {                                                                                \
-        cstl_free(T, set->values, set->capacity);                                                                      \
-        cstl_free(set_state, set->states, set->capacity);                                                              \
+        cstl_free(T, set->allocator, set->values, set->capacity);                                                      \
+        cstl_free(set_state, set->allocator, set->states, set->capacity);                                              \
         memset(set, 0, sizeof(set_##T));                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_realloc(set_##T* set, i64 new_capacity) {                                                           \
-        T* const new_values = cstl_alloc(T, new_capacity);                                                             \
-        set_state* const new_states = cstl_alloc(set_state, new_capacity);                                             \
+        T* const new_values = cstl_alloc(T, set->allocator, new_capacity);                                             \
+        set_state* const new_states = cstl_alloc(set_state, set->allocator, new_capacity);                             \
                                                                                                                        \
         memset(new_states, set_state_empty, new_capacity * sizeof(set_state));                                         \
                                                                                                                        \
@@ -67,8 +76,8 @@ typedef enum set_state : u8 {
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
-        cstl_free(T, set->values, set->capacity);                                                                      \
-        cstl_free(set_state, set->states, set->capacity);                                                              \
+        cstl_free(T, set->allocator, set->values, set->capacity);                                                      \
+        cstl_free(set_state, set->allocator, set->states, set->capacity);                                              \
                                                                                                                        \
         set->values = new_values;                                                                                      \
         set->states = new_states;                                                                                      \

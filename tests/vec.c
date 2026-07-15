@@ -1,4 +1,5 @@
 #include "CSTL/vec.h"
+#include "CSTL/allocator.h"
 #include "CSTL/common.h"
 
 VEC_DEFINE(i32)
@@ -13,7 +14,7 @@ int main(void) {
 }
 
 void test_vec(void) {
-    vec_i32 v = {0};
+    vec_i32 v = vec_i32_create(std_allocator());
 
     vec_i32_reserve(&v, 10);
     cstl_assert(v.capacity >= 10);
