@@ -45,8 +45,7 @@ void test_allocator(void) {
     }
     {
         u64* const ptr = cstl_alloc(u64, 0);
-        // TODO: this is implementation defined for malloc?
-        cstl_assert(ptr != NULL);
+        cstl_assert(ptr == NULL);
         cstl_free(u64, ptr, 0);
     }
 }

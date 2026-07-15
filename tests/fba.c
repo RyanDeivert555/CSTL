@@ -50,7 +50,7 @@ void test_fba(void) {
     }
     {
         u64* const ptr = cstl_alloc(u64, 0);
-        cstl_assert(ptr != NULL);
+        cstl_assert(ptr == NULL);
         cstl_free(u64, ptr, 0);
     }
 

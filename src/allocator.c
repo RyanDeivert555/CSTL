@@ -21,25 +21,23 @@ void cstl_raw_free(u8* ptr, i64 size, i64 count, i64 align) {
 
 u8* std_alloc(void* ctx, i64 size, i64 count, i64 align) {
     (void)ctx;
+    (void)align;
 
-#if defined(_WIN32)
-    return (u8*)_aligned_malloc(size * count, align);
-#else
-    // TODO: assert size is multiple of alignment?
-    return (u8*)aligned_alloc(align, size * count);
-#endif
+    if (count <= 0 || size <= 0) {
+        return NULL;
+    }
+    if (count > I64_MAX / size) {
+        return NULL;
+    }
+
+    return (u8*)malloc(count * size);
 }
 
 void std_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
     (void)ctx;
-
-#if defined(_WIN32)
     (void)size;
     (void)count;
     (void)align;
 
-    _aligned_free(ptr);
-#else
-    free_aligned_sized(ptr, align, size * count);
-#endif
+    free(ptr);
 }

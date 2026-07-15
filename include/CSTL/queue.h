@@ -67,6 +67,9 @@
                                                                                                                        \
     void queue_##T##_reserve(queue_##T* q, i64 new_capacity) {                                                         \
         cstl_assert(new_capacity >= 0);                                                                                \
+        if (new_capacity < q->length) {                                                                                \
+            q->length = new_capacity;                                                                                  \
+        }                                                                                                              \
         T* const new_buffer = cstl_alloc(T, new_capacity);                                                             \
         for (i64 i = 0; i < q->length; i++) {                                                                          \
             new_buffer[i] = q->buffer[(q->front + i) % q->capacity];                                                   \

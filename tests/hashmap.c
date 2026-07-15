@@ -1,8 +1,8 @@
 #include "CSTL/hashmap.h"
 
 typedef const char* string;
-i64 string_hash(string key) {
-    i64 result = 5381;
+u64 string_hash(string key) {
+    u64 result = 5381;
 
     while (*key) {
         result = ((result << 5) + result) + *key;

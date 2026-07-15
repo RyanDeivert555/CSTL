@@ -11,6 +11,13 @@ fba fba_new(u8* buffer, i64 capacity) {
 }
 
 u8* fba_alloc(void* ctx, i64 size, i64 count, i64 align) {
+    if (count <= 0 || size <= 0) {
+        return NULL;
+    }
+    if (count > I64_MAX / size) {
+        return NULL;
+    }
+
     fba* const instance = ctx;
 
     u8* const current = instance->buffer + instance->size;

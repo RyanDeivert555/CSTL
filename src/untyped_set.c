@@ -29,14 +29,13 @@ void untyped_set_realloc(untyped_set* set, i64 item_size, i64 item_align, i64 ne
             }
             const void* value = (u8*)set->values + i * item_size;
 
-            const i64 hash = set->hash(value);
-            i64 index = hash % new_capacity;
+            const u64 hash = set->hash(value);
+            u64 index = hash % new_capacity;
 
             while (new_states[index] == untyped_set_state_occupied) {
                 index = (index + 1) % new_capacity;
             }
 
-            cstl_assert(index < new_capacity);
             memcpy((u8*)new_values + index * item_size, value, item_size);
             new_states[index] = untyped_set_state_occupied;
         }
@@ -52,13 +51,13 @@ void untyped_set_realloc(untyped_set* set, i64 item_size, i64 item_align, i64 ne
 }
 
 void untyped_set_insert(untyped_set* set, i64 item_size, i64 item_align, void* elem) {
-    if (set->count + set->tombstone_count >= (set->capacity / 10) * 8) {
+    if (set->count + set->tombstone_count >= (set->capacity * 8) / 10) {
         const i64 new_capacity = (set->capacity == 0) ? 8 : set->capacity * 2;
         untyped_set_realloc(set, item_size, new_capacity, item_align);
     }
 
-    const i64 hash = set->hash(elem);
-    i64 index = hash % set->capacity;
+    const u64 hash = set->hash(elem);
+    u64 index = hash % set->capacity;
     i64 tombstone = -1;
 
     while (set->states[index] != untyped_set_state_empty) {
@@ -74,7 +73,7 @@ void untyped_set_insert(untyped_set* set, i64 item_size, i64 item_align, void* e
         index = (index + 1) % set->capacity;
     }
 
-    const i64 target = tombstone != -1 ? tombstone : index;
+    const i64 target = tombstone != -1 ? tombstone : (i64)index;
     if (target == tombstone) {
         set->tombstone_count--;
     }
@@ -88,8 +87,8 @@ bool untyped_set_contains(untyped_set set, i64 item_size, void* elem) {
         return false;
     }
 
-    const i64 hash = set.hash(elem);
-    i64 index = hash % set.capacity;
+    const u64 hash = set.hash(elem);
+    u64 index = hash % set.capacity;
 
     while (set.states[index] != untyped_set_state_empty) {
         if (set.states[index] == untyped_set_state_occupied && set.compare(elem, (u8*)set.values + index * item_size)) {
@@ -107,8 +106,8 @@ void* untyped_set_remove(untyped_set* set, i64 item_size, void* elem) {
         return NULL;
     }
 
-    const i64 hash = set->hash(elem);
-    i64 index = hash % set->capacity;
+    const u64 hash = set->hash(elem);
+    u64 index = hash % set->capacity;
 
     while (set->states[index] != untyped_set_state_empty) {
         if (set->states[index] == untyped_set_state_occupied

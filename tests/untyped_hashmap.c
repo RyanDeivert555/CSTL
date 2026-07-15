@@ -11,8 +11,8 @@ int main(void) {
 }
 
 typedef const char* string;
-i64 string_hash(string key) {
-    i64 result = 5381;
+u64 string_hash(string key) {
+    u64 result = 5381;
 
     while (*key) {
         result = ((result << 5) + result) + *key;
@@ -27,7 +27,7 @@ bool string_equal(string a, string b) {
     return strcmp(a, b) == 0;
 }
 
-i64 untyped_string_hash(const void* key) {
+u64 untyped_string_hash(const void* key) {
     return string_hash(*(string*)key);
 }
 

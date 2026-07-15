@@ -55,14 +55,13 @@ typedef enum set_state : u8 {
                 }                                                                                                      \
                 const T value = set->values[i];                                                                        \
                                                                                                                        \
-                const i64 hash = hash_func(value);                                                                     \
-                i64 index = hash % new_capacity;                                                                       \
+                const u64 hash = hash_func(value);                                                                     \
+                u64 index = hash % new_capacity;                                                                       \
                                                                                                                        \
                 while (new_states[index] == set_state_occupied) {                                                      \
                     index = (index + 1) % new_capacity;                                                                \
                 }                                                                                                      \
                                                                                                                        \
-                cstl_assert(index < new_capacity);                                                                     \
                 new_values[index] = value;                                                                             \
                 new_states[index] = set_state_occupied;                                                                \
             }                                                                                                          \
@@ -78,13 +77,13 @@ typedef enum set_state : u8 {
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_insert(set_##T* set, T elem) {                                                                      \
-        if (set->count + set->tombstone_count >= (set->capacity / 10) * 8) {                                           \
+        if (set->count + set->tombstone_count >= (set->capacity * 8) / 10) {                                           \
             const i64 new_capacity = (set->capacity == 0) ? 8 : set->capacity * 2;                                     \
             set_##T##_realloc(set, new_capacity);                                                                      \
         }                                                                                                              \
                                                                                                                        \
-        const i64 hash = hash_func(elem);                                                                              \
-        i64 index = hash % set->capacity;                                                                              \
+        const u64 hash = hash_func(elem);                                                                              \
+        u64 index = hash % set->capacity;                                                                              \
         i64 tombstone = -1;                                                                                            \
                                                                                                                        \
         while (set->states[index] != set_state_empty) {                                                                \
@@ -99,7 +98,7 @@ typedef enum set_state : u8 {
             index = (index + 1) % set->capacity;                                                                       \
         }                                                                                                              \
                                                                                                                        \
-        const i64 target = tombstone != -1 ? tombstone : index;                                                        \
+        const i64 target = tombstone != -1 ? tombstone : (i64)index;                                                   \
         if (target == tombstone) {                                                                                     \
             set->tombstone_count--;                                                                                    \
         }                                                                                                              \
@@ -113,8 +112,8 @@ typedef enum set_state : u8 {
             return false;                                                                                              \
         }                                                                                                              \
                                                                                                                        \
-        const i64 hash = hash_func(elem);                                                                              \
-        i64 index = hash % set.capacity;                                                                               \
+        const u64 hash = hash_func(elem);                                                                              \
+        u64 index = hash % set.capacity;                                                                               \
                                                                                                                        \
         while (set.states[index] != set_state_empty) {                                                                 \
             if (set.states[index] == set_state_occupied && compare_func(elem, set.values[index])) {                    \
@@ -132,8 +131,8 @@ typedef enum set_state : u8 {
             return NULL;                                                                                               \
         }                                                                                                              \
                                                                                                                        \
-        const i64 hash = hash_func(elem);                                                                              \
-        i64 index = hash % set->capacity;                                                                              \
+        const u64 hash = hash_func(elem);                                                                              \
+        u64 index = hash % set->capacity;                                                                              \
                                                                                                                        \
         while (set->states[index] != set_state_empty) {                                                                \
             if (set->states[index] == set_state_occupied && compare_func(elem, set->values[index])) {                  \
