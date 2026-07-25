@@ -9,5 +9,4 @@ typedef struct random_state {
 } random_state;
 
 void set_random_bytes(random_state* rand, void* buffer, i64 size);
-void std_random_bytes(void* ctx, void* buffer, i64 size);
-random_state std_random_state(u64 seed);
+random_state std_random_state(u32 seed);

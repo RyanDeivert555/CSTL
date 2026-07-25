@@ -69,4 +69,5 @@ void test_set(void) {
     cstl_assert(s.capacity == 0);
     cstl_assert(s.count == 0);
     cstl_assert(s.tombstone_count == 0);
+    cstl_assert(s.alloc.vtable != NULL);
 }

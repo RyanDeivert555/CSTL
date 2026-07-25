@@ -13,6 +13,7 @@ No, I believe that C89 is too restrictive for the little portability that it off
 
 ## Why did you use "insert strategy a" to do generics in C? Why didn't you use "insert strategy b"?
 I deemed this strategy the best. No strategy will be perfect, so you will find holes with any strategy
+Type erased structures used to be added, but they were removed because the cost of maintenance was not worth it
 
-## Will you add support for <insert build system>?
+## Will you add support for "insert build system"?
 Maybe. I might at least add support for makefiles. As always, PRs welcome

@@ -19,7 +19,7 @@ typedef enum hashmap_state : u8 {
         i64 capacity;                                                                                                  \
         i64 count;                                                                                                     \
         i64 tombstone_count;                                                                                           \
-        allocator allocator;                                                                                           \
+        allocator alloc;                                                                                               \
     } hashmap_##K##_##V;                                                                                               \
                                                                                                                        \
     hashmap_##K##_##V hashmap_##K##_##V##_create(allocator a);                                                         \
@@ -42,16 +42,21 @@ typedef enum hashmap_state : u8 {
 #define HASHMAP_IMPL(K, V, compare_func, hash_func)                                                                    \
     hashmap_##K##_##V hashmap_##K##_##V##_create(allocator a) {                                                        \
         hashmap_##K##_##V instance = {0};                                                                              \
-        instance.allocator = a;                                                                                        \
+        instance.alloc = a;                                                                                            \
                                                                                                                        \
         return instance;                                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void hashmap_##K##_##V##_free(hashmap_##K##_##V* map) {                                                            \
-        cstl_free(K, map->allocator, map->keys, map->capacity);                                                        \
-        cstl_free(V, map->allocator, map->values, map->capacity);                                                      \
-        cstl_free(hashmap_state, map->allocator, map->states, map->capacity);                                          \
-        memset(map, 0, sizeof(hashmap_##K##_##V));                                                                     \
+        cstl_free(K, map->alloc, map->keys, map->capacity);                                                            \
+        cstl_free(V, map->alloc, map->values, map->capacity);                                                          \
+        cstl_free(hashmap_state, map->alloc, map->states, map->capacity);                                              \
+        map->keys = NULL;                                                                                              \
+        map->values = NULL;                                                                                            \
+        map->states = NULL;                                                                                            \
+        map->capacity = 0;                                                                                             \
+        map->count = 0;                                                                                                \
+        map->tombstone_count = 0;                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key) {                                                        \
@@ -74,9 +79,10 @@ typedef enum hashmap_state : u8 {
     }                                                                                                                  \
                                                                                                                        \
     void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, i64 new_capacity) {                                       \
-        K* const new_keys = cstl_alloc(K, map->allocator, new_capacity);                                               \
-        V* const new_values = cstl_alloc(V, map->allocator, new_capacity);                                             \
-        hashmap_state* const new_states = cstl_alloc(hashmap_state, map->allocator, new_capacity);                     \
+        cstl_assert(new_capacity > map->count);                                                                        \
+        K* const new_keys = cstl_alloc(K, map->alloc, new_capacity);                                                   \
+        V* const new_values = cstl_alloc(V, map->alloc, new_capacity);                                                 \
+        hashmap_state* const new_states = cstl_alloc(hashmap_state, map->alloc, new_capacity);                         \
                                                                                                                        \
         memset(new_states, hashmap_state_empty, new_capacity * sizeof(hashmap_state));                                 \
                                                                                                                        \
@@ -101,9 +107,9 @@ typedef enum hashmap_state : u8 {
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
-        cstl_free(K, map->allocator, map->keys, map->capacity);                                                        \
-        cstl_free(V, map->allocator, map->values, map->capacity);                                                      \
-        cstl_free(hashmap_state, map->allocator, map->states, map->capacity);                                          \
+        cstl_free(K, map->alloc, map->keys, map->capacity);                                                            \
+        cstl_free(V, map->alloc, map->values, map->capacity);                                                          \
+        cstl_free(hashmap_state, map->alloc, map->states, map->capacity);                                              \
                                                                                                                        \
         map->keys = new_keys;                                                                                          \
         map->values = new_values;                                                                                      \
@@ -113,23 +119,32 @@ typedef enum hashmap_state : u8 {
     }                                                                                                                  \
                                                                                                                        \
     void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, K key, V value) {                                             \
-        if (map->count + map->tombstone_count >= (map->capacity * 8) / 10) {                                           \
-            const i64 new_capacity = (map->capacity == 0) ? 8 : map->capacity * 2;                                     \
+        const u64 hash = hash_func(key);                                                                               \
+                                                                                                                       \
+        if (map->capacity > 0) {                                                                                       \
+            u64 index = hash % map->capacity;                                                                          \
+                                                                                                                       \
+            while (map->states[index] != hashmap_state_empty) {                                                        \
+                if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {             \
+                    map->values[index] = value;                                                                        \
+                    return;                                                                                            \
+                }                                                                                                      \
+                                                                                                                       \
+                index = (index + 1) % map->capacity;                                                                   \
+            }                                                                                                          \
+        }                                                                                                              \
+                                                                                                                       \
+        if (map->count + map->tombstone_count >= (map->capacity * CSTL_INITIAL_CAPACITY) / 10) {                       \
+            const i64 new_capacity = (map->capacity == 0) ? CSTL_INITIAL_CAPACITY : map->capacity * 2;                 \
             hashmap_##K##_##V##_realloc(map, new_capacity);                                                            \
         }                                                                                                              \
                                                                                                                        \
-        const u64 hash = hash_func(key);                                                                               \
         u64 index = hash % map->capacity;                                                                              \
         i64 tombstone = -1;                                                                                            \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
-            if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
-                map->values[index] = value;                                                                            \
-                return;                                                                                                \
-            } else if (map->states[index] == hashmap_state_tombstone) {                                                \
-                if (tombstone == -1) {                                                                                 \
-                    tombstone = index;                                                                                 \
-                }                                                                                                      \
+            if (map->states[index] == hashmap_state_tombstone && tombstone == -1) {                                    \
+                tombstone = index;                                                                                     \
             }                                                                                                          \
                                                                                                                        \
             index = (index + 1) % map->capacity;                                                                       \

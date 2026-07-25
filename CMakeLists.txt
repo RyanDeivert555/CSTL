@@ -34,6 +34,13 @@ target_link_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 
+# tests
 enable_testing()
-
 add_subdirectory(tests)
+
+# benchmarking
+option(CSTL_BUILD_BENCHMARKS "Build performance benchmarks" OFF)
+if(CSTL_BUILD_BENCHMARKS)
+    enable_language(CXX)
+    add_subdirectory(benchmarks)
+endif()

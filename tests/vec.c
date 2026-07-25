@@ -1,6 +1,5 @@
 #include "CSTL/vec.h"
 #include "CSTL/allocator.h"
-#include "CSTL/common.h"
 
 VEC_DEFINE(i32)
 VEC_IMPL(i32)
@@ -65,4 +64,5 @@ void test_vec(void) {
     cstl_assert(v.buffer == NULL);
     cstl_assert(v.length == 0);
     cstl_assert(v.capacity == 0);
+    cstl_assert(v.alloc.vtable != NULL);
 }

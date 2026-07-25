@@ -99,4 +99,5 @@ void test_hashmap(void) {
     cstl_assert(map.count == 0);
     cstl_assert(map.capacity == 0);
     cstl_assert(map.tombstone_count == 0);
+    cstl_assert(map.alloc.vtable != NULL);
 }

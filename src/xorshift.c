@@ -40,7 +40,7 @@ xorshift_state xorshift_new(u64 seed) {
     return result;
 }
 
-void xorshift_random_bytes(void* ctx, void* buffer, i64 size) {
+static void xorshift_random_bytes(void* ctx, void* buffer, i64 size) {
     xorshift_state* const instance = ctx;
 
     i64 i = 0;

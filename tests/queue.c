@@ -56,4 +56,5 @@ void test_queue(void) {
     cstl_assert(q.capacity == 0);
     cstl_assert(q.front == 0);
     cstl_assert(q.back == 0);
+    cstl_assert(q.alloc.vtable != NULL);
 }

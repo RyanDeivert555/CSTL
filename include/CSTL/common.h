@@ -18,7 +18,10 @@ typedef size_t usize;
 typedef float f32;
 typedef double f64;
 
-// TODO: use constexpr instead?
+typedef isize cstl_size;
+
+#define CSTL_INITIAL_CAPACITY 8
+
 #define U8_MAX UINT8_MAX
 #define U16_MAX UINT16_MAX
 #define U32_MAX UINT32_MAX
@@ -54,11 +57,4 @@ typedef double f64;
 #define cstl_assert(c) assert(c)
 #endif
 
-// cstl_force_inline
-#if defined(__GNUC__) || defined(__clang__)
-#define cstl_force_inline inline __attribute__((always_inline))
-#elif defined(_MSC_VER)
-#define cstl_force_inline __forceinline
-#else
-#define cstl_force_inline inline
-#endif
+#define cstl_unused(x) ((void)(x))

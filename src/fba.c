@@ -12,13 +12,6 @@ fba fba_new(u8* buffer, i64 capacity) {
 }
 
 static u8* fba_alloc(void* ctx, i64 size, i64 count, i64 align) {
-    if (count <= 0 || size <= 0) {
-        return NULL;
-    }
-    if (count > I64_MAX / size) {
-        return NULL;
-    }
-
     fba* const instance = ctx;
 
     u8* const current = instance->buffer + instance->size;
@@ -40,13 +33,12 @@ static bool fba_is_last_alloc(fba* self, u8* buffer, i64 size) {
 }
 
 static void fba_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
-    // TODO: surely you need the alignment?
-    (void)align;
+    cstl_unused(align);
 
     fba* const instance = ctx;
 
     if (fba_is_last_alloc(instance, ptr, size * count)) {
-        instance->size -= size * count;
+        instance->size = ptr - instance->buffer;
     }
 }
 

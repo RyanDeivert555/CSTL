@@ -18,7 +18,7 @@ typedef enum set_state : u8 {
         i64 capacity;                                                                                                  \
         i64 count;                                                                                                     \
         i64 tombstone_count;                                                                                           \
-        allocator allocator;                                                                                           \
+        allocator alloc;                                                                                               \
     } set_##T;                                                                                                         \
                                                                                                                        \
     set_##T set_##T##_create(allocator a);                                                                             \
@@ -40,20 +40,25 @@ typedef enum set_state : u8 {
 #define SET_IMPL(T, compare_func, hash_func)                                                                           \
     set_##T set_##T##_create(allocator a) {                                                                            \
         set_##T instance = {0};                                                                                        \
-        instance.allocator = a;                                                                                        \
+        instance.alloc = a;                                                                                            \
                                                                                                                        \
         return instance;                                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_free(set_##T* set) {                                                                                \
-        cstl_free(T, set->allocator, set->values, set->capacity);                                                      \
-        cstl_free(set_state, set->allocator, set->states, set->capacity);                                              \
-        memset(set, 0, sizeof(set_##T));                                                                               \
+        cstl_free(T, set->alloc, set->values, set->capacity);                                                          \
+        cstl_free(set_state, set->alloc, set->states, set->capacity);                                                  \
+        set->values = NULL;                                                                                            \
+        set->states = NULL;                                                                                            \
+        set->capacity = 0;                                                                                             \
+        set->count = 0;                                                                                                \
+        set->tombstone_count = 0;                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_realloc(set_##T* set, i64 new_capacity) {                                                           \
-        T* const new_values = cstl_alloc(T, set->allocator, new_capacity);                                             \
-        set_state* const new_states = cstl_alloc(set_state, set->allocator, new_capacity);                             \
+        cstl_assert(new_capacity > set->count);                                                                        \
+        T* const new_values = cstl_alloc(T, set->alloc, new_capacity);                                                 \
+        set_state* const new_states = cstl_alloc(set_state, set->alloc, new_capacity);                                 \
                                                                                                                        \
         memset(new_states, set_state_empty, new_capacity * sizeof(set_state));                                         \
                                                                                                                        \
@@ -76,8 +81,8 @@ typedef enum set_state : u8 {
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
-        cstl_free(T, set->allocator, set->values, set->capacity);                                                      \
-        cstl_free(set_state, set->allocator, set->states, set->capacity);                                              \
+        cstl_free(T, set->alloc, set->values, set->capacity);                                                          \
+        cstl_free(set_state, set->alloc, set->states, set->capacity);                                                  \
                                                                                                                        \
         set->values = new_values;                                                                                      \
         set->states = new_states;                                                                                      \
@@ -86,22 +91,31 @@ typedef enum set_state : u8 {
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_insert(set_##T* set, T elem) {                                                                      \
-        if (set->count + set->tombstone_count >= (set->capacity * 8) / 10) {                                           \
-            const i64 new_capacity = (set->capacity == 0) ? 8 : set->capacity * 2;                                     \
+        const u64 hash = hash_func(elem);                                                                              \
+                                                                                                                       \
+        if (set->capacity > 0) {                                                                                       \
+            u64 index = hash % set->capacity;                                                                          \
+                                                                                                                       \
+            while (set->states[index] != set_state_empty) {                                                            \
+                if (set->states[index] == set_state_occupied && compare_func(elem, set->values[index])) {              \
+                    return;                                                                                            \
+                }                                                                                                      \
+                                                                                                                       \
+                index = (index + 1) % set->capacity;                                                                   \
+            }                                                                                                          \
+        }                                                                                                              \
+                                                                                                                       \
+        if (set->count + set->tombstone_count >= (set->capacity * CSTL_INITIAL_CAPACITY) / 10) {                       \
+            const i64 new_capacity = (set->capacity == 0) ? CSTL_INITIAL_CAPACITY : set->capacity * 2;                 \
             set_##T##_realloc(set, new_capacity);                                                                      \
         }                                                                                                              \
                                                                                                                        \
-        const u64 hash = hash_func(elem);                                                                              \
         u64 index = hash % set->capacity;                                                                              \
         i64 tombstone = -1;                                                                                            \
                                                                                                                        \
         while (set->states[index] != set_state_empty) {                                                                \
-            if (set->states[index] == set_state_occupied && compare_func(elem, set->values[index])) {                  \
-                return;                                                                                                \
-            } else if (set->states[index] == set_state_tombstone) {                                                    \
-                if (tombstone == -1) {                                                                                 \
-                    tombstone = index;                                                                                 \
-                }                                                                                                      \
+            if (set->states[index] == set_state_tombstone && tombstone == -1) {                                        \
+                tombstone = index;                                                                                     \
             }                                                                                                          \
                                                                                                                        \
             index = (index + 1) % set->capacity;                                                                       \

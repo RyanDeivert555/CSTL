@@ -12,7 +12,7 @@
         i64 capacity;                                                                                                  \
         i64 front;                                                                                                     \
         i64 back;                                                                                                      \
-        allocator allocator;                                                                                           \
+        allocator alloc;                                                                                               \
     } queue_##T;                                                                                                       \
                                                                                                                        \
     queue_##T queue_##T##_create(allocator a);                                                                         \
@@ -25,19 +25,23 @@
 #define QUEUE_IMPL(T)                                                                                                  \
     queue_##T queue_##T##_create(allocator a) {                                                                        \
         queue_##T instance = {0};                                                                                      \
-        instance.allocator = a;                                                                                        \
+        instance.alloc = a;                                                                                            \
                                                                                                                        \
         return instance;                                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     void queue_##T##_free(queue_##T* q) {                                                                              \
-        cstl_free(T, q->allocator, q->buffer, q->capacity);                                                            \
-        memset(q, 0, sizeof(queue_##T));                                                                               \
+        cstl_free(T, q->alloc, q->buffer, q->capacity);                                                                \
+        q->buffer = NULL;                                                                                              \
+        q->length = 0;                                                                                                 \
+        q->capacity = 0;                                                                                               \
+        q->front = 0;                                                                                                  \
+        q->back = 0;                                                                                                   \
     }                                                                                                                  \
                                                                                                                        \
     void queue_##T##_push(queue_##T* q, T elem) {                                                                      \
         if (q->length == q->capacity) {                                                                                \
-            const i64 new_capacity = q->capacity == 0 ? 1 : q->capacity * 2;                                           \
+            const i64 new_capacity = q->capacity == 0 ? CSTL_INITIAL_CAPACITY : q->capacity * 2;                       \
             queue_##T##_reserve(q, new_capacity);                                                                      \
         }                                                                                                              \
                                                                                                                        \
@@ -75,15 +79,17 @@
     }                                                                                                                  \
                                                                                                                        \
     void queue_##T##_reserve(queue_##T* q, i64 new_capacity) {                                                         \
-        cstl_assert(new_capacity >= 0);                                                                                \
-        if (new_capacity < q->length) {                                                                                \
-            q->length = new_capacity;                                                                                  \
+        cstl_assert(new_capacity >= q->length);                                                                        \
+        if (new_capacity <= q->capacity) {                                                                             \
+            return;                                                                                                    \
         }                                                                                                              \
-        T* const new_buffer = cstl_alloc(T, q->allocator, new_capacity);                                               \
+                                                                                                                       \
+        T* const new_buffer = cstl_alloc(T, q->alloc, new_capacity);                                                   \
         for (i64 i = 0; i < q->length; i++) {                                                                          \
             new_buffer[i] = q->buffer[(q->front + i) % q->capacity];                                                   \
         }                                                                                                              \
-        cstl_free(T, q->allocator, q->buffer, q->capacity);                                                            \
+                                                                                                                       \
+        cstl_free(T, q->alloc, q->buffer, q->capacity);                                                                \
         q->buffer = new_buffer;                                                                                        \
         q->capacity = new_capacity;                                                                                    \
         q->front = 0;                                                                                                  \
