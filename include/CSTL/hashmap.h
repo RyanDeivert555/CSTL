@@ -80,10 +80,14 @@ typedef enum hashmap_state : u8 {
                                                                                                                        \
     void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, i64 new_capacity) {                                       \
         cstl_assert(new_capacity > map->count);                                                                        \
+        new_capacity = cstl_next_pow2(new_capacity);                                                                   \
+        if (new_capacity <= map->capacity) {                                                                           \
+            return;                                                                                                    \
+        }                                                                                                              \
+                                                                                                                       \
         K* const new_keys = cstl_alloc(K, map->alloc, new_capacity);                                                   \
         V* const new_values = cstl_alloc(V, map->alloc, new_capacity);                                                 \
         hashmap_state* const new_states = cstl_alloc(hashmap_state, map->alloc, new_capacity);                         \
-                                                                                                                       \
         memset(new_states, hashmap_state_empty, new_capacity * sizeof(hashmap_state));                                 \
                                                                                                                        \
         if (map->count != 0) {                                                                                         \
@@ -95,10 +99,10 @@ typedef enum hashmap_state : u8 {
                 const V value = map->values[i];                                                                        \
                                                                                                                        \
                 const u64 hash = hash_func(key);                                                                       \
-                u64 index = hash % new_capacity;                                                                       \
+                u64 index = hash & (u64)(new_capacity - 1);                                                            \
                                                                                                                        \
                 while (new_states[index] == hashmap_state_occupied) {                                                  \
-                    index = (index + 1) % new_capacity;                                                                \
+                    index = (index + 1) & (u64)(new_capacity - 1);                                                     \
                 }                                                                                                      \
                                                                                                                        \
                 new_keys[index] = key;                                                                                 \
@@ -122,7 +126,7 @@ typedef enum hashmap_state : u8 {
         const u64 hash = hash_func(key);                                                                               \
                                                                                                                        \
         if (map->capacity > 0) {                                                                                       \
-            u64 index = hash % map->capacity;                                                                          \
+            u64 index = hash & (u64)(map->capacity - 1);                                                               \
                                                                                                                        \
             while (map->states[index] != hashmap_state_empty) {                                                        \
                 if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {             \
@@ -130,16 +134,16 @@ typedef enum hashmap_state : u8 {
                     return;                                                                                            \
                 }                                                                                                      \
                                                                                                                        \
-                index = (index + 1) % map->capacity;                                                                   \
+                index = (index + 1) & (u64)(map->capacity - 1);                                                        \
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
-        if (map->count + map->tombstone_count >= (map->capacity * CSTL_INITIAL_CAPACITY) / 10) {                       \
+        if (map->count + map->tombstone_count >= (map->capacity * CSTL_LOAD_FACTOR) / 10) {                            \
             const i64 new_capacity = (map->capacity == 0) ? CSTL_INITIAL_CAPACITY : map->capacity * 2;                 \
             hashmap_##K##_##V##_realloc(map, new_capacity);                                                            \
         }                                                                                                              \
                                                                                                                        \
-        u64 index = hash % map->capacity;                                                                              \
+        u64 index = hash & (u64)(map->capacity - 1);                                                                   \
         i64 tombstone = -1;                                                                                            \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
@@ -147,7 +151,7 @@ typedef enum hashmap_state : u8 {
                 tombstone = index;                                                                                     \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) % map->capacity;                                                                       \
+            index = (index + 1) & (u64)(map->capacity - 1);                                                            \
         }                                                                                                              \
                                                                                                                        \
         const i64 target = tombstone != -1 ? tombstone : (i64)index;                                                   \
@@ -166,7 +170,7 @@ typedef enum hashmap_state : u8 {
         }                                                                                                              \
                                                                                                                        \
         const u64 hash = hash_func(key);                                                                               \
-        u64 index = hash % map->capacity;                                                                              \
+        u64 index = hash & (u64)(map->capacity - 1);                                                                   \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
@@ -180,7 +184,7 @@ typedef enum hashmap_state : u8 {
                 return true;                                                                                           \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) % map->capacity;                                                                       \
+            index = (index + 1) & (u64)(map->capacity - 1);                                                            \
         }                                                                                                              \
                                                                                                                        \
         return false;                                                                                                  \

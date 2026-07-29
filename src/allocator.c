@@ -1,15 +1,31 @@
 #include "CSTL/allocator.h"
 #include <stdlib.h>
 
-static bool is_pow2(i64 x) {
+bool cstl_is_pow2(i64 x) {
     return x > 0 && (x & (x - 1)) == 0;
 }
 
+i64 cstl_next_pow2(i64 n) {
+    if (n <= 1) {
+        return 1;
+    }
+
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n |= n >> 32;
+
+    return n + 1;
+}
+
 u8* cstl_raw_alloc(allocator a, i64 size, i64 count, i64 align) {
-    if (count <= 0 || size <= 0 || !is_pow2(align)) {
+    if (size <= 0 || count <= 0 || !cstl_is_pow2(align)) {
         return NULL;
     }
-    if (count > I64_MAX / size) {
+    if (size > I64_MAX / count) {
         return NULL;
     }
 

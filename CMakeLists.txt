@@ -35,8 +35,11 @@ target_link_options(${PROJECT_NAME} PRIVATE
 )
 
 # tests
-enable_testing()
-add_subdirectory(tests)
+option(CSTL_BUILD_TESTS "Build tests" OFF)
+if(CSTL_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 # benchmarking
 option(CSTL_BUILD_BENCHMARKS "Build performance benchmarks" OFF)

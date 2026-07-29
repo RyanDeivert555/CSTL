@@ -15,13 +15,34 @@ extern "C" {
 }
 #include "benchmark/benchmark.h"
 #include <map>
+#include <unordered_map>
 
-static void BM_std(benchmark::State& state) {
-    const int64_t n = state.range(0);
+static void BM_std_unordered_map(benchmark::State& state) {
+    const i64 n = state.range(0);
+    for (auto _ : state) {
+        std::unordered_map<i32, i32> m{};
+
+        for (i64 i = 0; i < n; i++) {
+            m.insert({i, i});
+        }
+
+        benchmark::ClobberMemory();
+        state.PauseTiming();
+        m = std::unordered_map<i32, i32>{};
+        state.ResumeTiming();
+    }
+
+    state.SetComplexityN(n);
+    state.SetItemsProcessed(state.iterations() * n);
+}
+BENCHMARK(BM_std_unordered_map)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+
+static void BM_std_map(benchmark::State& state) {
+    const i64 n = state.range(0);
     for (auto _ : state) {
         std::map<i32, i32> m{};
 
-        for (int64_t i = 0; i < n; ++i) {
+        for (i64 i = 0; i < n; i++) {
             m.insert({i, i});
         }
 
@@ -34,14 +55,14 @@ static void BM_std(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_map)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
 static void BM_cstl(benchmark::State& state) {
-    const int64_t n = state.range(0);
+    const i64 n = state.range(0);
     for (auto _ : state) {
         cstl_hashmap(i32, i32) m = hashmap_i32_i32_create(std_allocator());
 
-        for (int64_t i = 0; i < n; ++i) {
+        for (i64 i = 0; i < n; i++) {
             hashmap_i32_i32_set(&m, i, i);
         }
 

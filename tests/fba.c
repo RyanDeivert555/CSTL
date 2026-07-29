@@ -14,7 +14,7 @@ void test_fba(void) {
     const i64 buffer_size = 1 << 16;
     u8* const buffer = malloc(buffer_size);
     fba f = fba_new(buffer, buffer_size);
-    allocator a = fba_as_allocator(&f);
+    const allocator a = fba_as_allocator(&f);
 
     {
         i32* const memory = cstl_alloc(i32, a, 1);

@@ -1,5 +1,4 @@
 #include "CSTL/random.h"
-#include "CSTL/common.h"
 
 void test_random(void);
 
@@ -10,13 +9,19 @@ int main(void) {
 }
 
 void test_random(void) {
-    random_state rand = std_random_state(42);
+    random_state rand = shared_random_state(42);
 
     i32 a = 0;
     set_random_bytes(&rand, &a, sizeof(i32));
-    cstl_assert(a == 691102790);
+    cstl_assert(a == 1148610719);
     set_random_bytes(&rand, &a, sizeof(i32));
-    cstl_assert(a == -1662155164);
+    cstl_assert(a == 1466906513);
     set_random_bytes(&rand, &a, sizeof(i32));
-    cstl_assert(a == 130162647);
+    cstl_assert(a == 203746700);
+    set_random_bytes(&rand, &a, sizeof(i32));
+    cstl_assert(a == 215496120);
+    set_random_bytes(&rand, &a, sizeof(i32));
+    cstl_assert(a == 1954835059);
+    set_random_bytes(&rand, &a, sizeof(i32));
+    cstl_assert(a == 1313922685);
 }

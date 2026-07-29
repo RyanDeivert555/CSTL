@@ -49,7 +49,7 @@
             q->front = 0;                                                                                              \
             q->back = 0;                                                                                               \
         } else {                                                                                                       \
-            q->back = (q->back + 1) % q->capacity;                                                                     \
+            q->back = (q->back + 1) & (q->capacity - 1);                                                               \
         }                                                                                                              \
                                                                                                                        \
         q->buffer[q->back] = elem;                                                                                     \
@@ -59,7 +59,7 @@
     T queue_##T##_pop(queue_##T* q) {                                                                                  \
         cstl_assert(q->length > 0);                                                                                    \
         const T result = q->buffer[q->front];                                                                          \
-        q->front = (q->front + 1) % q->capacity;                                                                       \
+        q->front = (q->front + 1) & (q->capacity - 1);                                                                 \
         q->length--;                                                                                                   \
                                                                                                                        \
         return result;                                                                                                 \
@@ -80,13 +80,14 @@
                                                                                                                        \
     void queue_##T##_reserve(queue_##T* q, i64 new_capacity) {                                                         \
         cstl_assert(new_capacity >= q->length);                                                                        \
+        new_capacity = cstl_next_pow2(new_capacity);                                                                   \
         if (new_capacity <= q->capacity) {                                                                             \
             return;                                                                                                    \
         }                                                                                                              \
                                                                                                                        \
         T* const new_buffer = cstl_alloc(T, q->alloc, new_capacity);                                                   \
         for (i64 i = 0; i < q->length; i++) {                                                                          \
-            new_buffer[i] = q->buffer[(q->front + i) % q->capacity];                                                   \
+            new_buffer[i] = q->buffer[(q->front + i) & (q->capacity - 1)];                                             \
         }                                                                                                              \
                                                                                                                        \
         cstl_free(T, q->alloc, q->buffer, q->capacity);                                                                \

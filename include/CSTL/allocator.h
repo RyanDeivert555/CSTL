@@ -15,6 +15,9 @@ typedef struct allocator {
     const allocator_vtable* vtable;
 } allocator;
 
+bool cstl_is_pow2(i64 n);
+i64 cstl_next_pow2(i64 n);
+
 u8* cstl_raw_alloc(allocator a, i64 size, i64 count, i64 align);
 void cstl_raw_free(allocator a, u8* ptr, i64 size, i64 count, i64 align);
 

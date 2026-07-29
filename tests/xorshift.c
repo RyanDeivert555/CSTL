@@ -20,4 +20,10 @@ void test_xorshift(void) {
     cstl_assert(a == 1466906513);
     set_random_bytes(&rand, &a, sizeof(i32));
     cstl_assert(a == 203746700);
+    set_random_bytes(&rand, &a, sizeof(i32));
+    cstl_assert(a == 215496120);
+    set_random_bytes(&rand, &a, sizeof(i32));
+    cstl_assert(a == 1954835059);
+    set_random_bytes(&rand, &a, sizeof(i32));
+    cstl_assert(a == 1313922685);
 }

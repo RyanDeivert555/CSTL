@@ -37,6 +37,7 @@ void test_hashmap(void) {
 
     hashmap_string_i32_set(&map, "Ryan", 19);
     hashmap_string_i32_set(&map, "Aidan", 16);
+    cstl_assert(cstl_is_pow2(map.capacity));
 
     i32* v1 = hashmap_string_i32_get(&map, "Ryan");
     cstl_assert(v1 != NULL);
@@ -71,6 +72,7 @@ void test_hashmap(void) {
     hashmap_string_i32_set(&map, "Momo", 39);
     hashmap_string_i32_set(&map, "Bobo", 12);
     cstl_assert(map.count == 4);
+    cstl_assert(cstl_is_pow2(map.capacity));
 
     hashmap_string_i32_iterator it = hashmap_string_i32_iterator_new(&map);
 

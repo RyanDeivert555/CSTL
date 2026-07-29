@@ -38,7 +38,7 @@
                                                                                                                        \
     void vec_##T##_push(vec_##T* vec, T elem) {                                                                        \
         if (vec->length == vec->capacity) {                                                                            \
-            const i64 new_capacity = (vec->capacity == 0) ? 1 : vec->capacity * 2;                                     \
+            const i64 new_capacity = (vec->capacity == 0) ? CSTL_INITIAL_CAPACITY : vec->capacity * 2;                 \
             vec_##T##_reserve(vec, new_capacity);                                                                      \
         }                                                                                                              \
         vec->buffer[vec->length] = elem;                                                                               \

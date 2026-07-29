@@ -18,9 +18,11 @@ typedef size_t usize;
 typedef float f32;
 typedef double f64;
 
+// TODO: i should probably use this, or remove it...
 typedef isize cstl_size;
 
 #define CSTL_INITIAL_CAPACITY 8
+#define CSTL_LOAD_FACTOR 7
 
 #define U8_MAX UINT8_MAX
 #define U16_MAX UINT16_MAX

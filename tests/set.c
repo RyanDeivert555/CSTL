@@ -1,6 +1,4 @@
 #include "CSTL/set.h"
-#include "CSTL/allocator.h"
-#include "CSTL/common.h"
 
 typedef const char* string;
 u64 string_hash(string key) {
@@ -40,6 +38,7 @@ void test_set(void) {
 
     set_string_insert(&s, "ryan");
     set_string_insert(&s, "aidan");
+    cstl_assert(cstl_is_pow2(s.capacity));
 
     cstl_assert(set_string_contains(s, "ryan"));
     cstl_assert(set_string_contains(s, "aidan"));
@@ -54,6 +53,7 @@ void test_set(void) {
     set_string_insert(&s, "aidan");
     set_string_insert(&s, "joe");
     set_string_insert(&s, "moe");
+    cstl_assert(cstl_is_pow2(s.capacity));
 
     set_string_iterator it = set_string_iterator_new(&s);
     cstl_assert(set_string_iterator_next(&it));

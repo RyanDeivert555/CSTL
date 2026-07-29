@@ -7,15 +7,12 @@ extern "C" {
 #include "benchmark/benchmark.h"
 #include <queue>
 
-// This tests shows the preallocation abilities of cstl_queue
-
-static void BM_std(benchmark::State& state) {
+static void BM_std_queue(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        // std::queue cannot pre-allocate
         std::queue<int> q{};
 
-        for (i64 i = 0; i < n; ++i) {
+        for (i64 i = 0; i < n; i++) {
             q.push(static_cast<i32>(i));
         }
         benchmark::ClobberMemory();
@@ -28,17 +25,14 @@ static void BM_std(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_queue)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
-static void BM_cstl(benchmark::State& state) {
+static void BM_cstl_no_prealloc(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        state.PauseTiming();
         cstl_queue(i32) v = queue_i32_create(std_allocator());
-        queue_i32_reserve(&v, n);
-        state.ResumeTiming();
 
-        for (i64 i = 0; i < n; ++i) {
+        for (i64 i = 0; i < n; i++) {
             queue_i32_push(&v, static_cast<i32>(i));
         }
         benchmark::ClobberMemory();
@@ -51,6 +45,27 @@ static void BM_cstl(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_no_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+
+static void BM_cstl_prealloc(benchmark::State& state) {
+    const i64 n = state.range(0);
+    for (auto _ : state) {
+        cstl_queue(i32) v = queue_i32_create(std_allocator());
+        queue_i32_reserve(&v, n);
+
+        for (i64 i = 0; i < n; i++) {
+            queue_i32_push(&v, static_cast<i32>(i));
+        }
+        benchmark::ClobberMemory();
+
+        state.PauseTiming();
+        queue_i32_free(&v);
+        state.ResumeTiming();
+    }
+
+    state.SetComplexityN(n);
+    state.SetItemsProcessed(state.iterations() * n);
+}
+BENCHMARK(BM_cstl_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
 BENCHMARK_MAIN();

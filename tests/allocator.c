@@ -9,7 +9,7 @@ int main(void) {
 }
 
 void test_allocator(void) {
-    allocator a = std_allocator();
+    const allocator a = std_allocator();
     {
         i32* const num = (i32*)cstl_raw_alloc(a, sizeof(i32), 1, alignof(i32));
         cstl_assert(num != NULL);

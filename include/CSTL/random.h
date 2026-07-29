@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 
-typedef void (*random_bytes_func)(void* ctx, void* ptr, i64 size);
+typedef void (*random_bytes_func)(void* ctx, void* buffer, i64 size);
 
 typedef struct random_state {
     void* ctx;
@@ -9,4 +9,4 @@ typedef struct random_state {
 } random_state;
 
 void set_random_bytes(random_state* rand, void* buffer, i64 size);
-random_state std_random_state(u32 seed);
+random_state shared_random_state(u64 seed);

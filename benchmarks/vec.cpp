@@ -14,10 +14,11 @@ static void BM_std(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         state.PauseTiming();
-        std::vector<int> v(n);
+        std::vector<int> v{};
+        v.reserve(n);
         state.ResumeTiming();
 
-        for (i64 i = 0; i < n; ++i) {
+        for (i64 i = 0; i < n; i++) {
             v.push_back(static_cast<i32>(i));
         }
         benchmark::ClobberMemory();
@@ -40,7 +41,7 @@ static void BM_cstl(benchmark::State& state) {
         vec_i32_reserve(&v, n);
         state.ResumeTiming();
 
-        for (i64 i = 0; i < n; ++i) {
+        for (i64 i = 0; i < n; i++) {
             vec_i32_push(&v, static_cast<i32>(i));
         }
         benchmark::ClobberMemory();
