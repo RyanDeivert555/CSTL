@@ -4,6 +4,12 @@
 #include <string.h>    // IWYU pragma: keep
 
 #define cstl_queue(T) queue_##T
+#define cstl_queue_create(T, alloc) queue_##T##_create(alloc)
+#define cstl_queue_free(T, q) queue_##T##_free(q)
+#define cstl_queue_push(T, q, elem) queue_##T##_push(q, elem)
+#define cstl_queue_pop(T, q) queue_##T##_pop(q)
+#define cstl_queue_try_pop(T, q, out) queue_##T##_try_pop(q, out)
+#define cstl_queue_reserve(T, q, new_capacity) queue_##T##_reserve(q, new_capacity)
 
 #define QUEUE_DEFINE(T)                                                                                                \
     typedef struct queue_##T {                                                                                         \

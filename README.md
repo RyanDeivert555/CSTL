@@ -2,7 +2,7 @@
 
 A library with generic implementations of common data structures
 
-## Why use these when you can just use C++'s STL?
+## Why use this library when you can just use C++'s STL?
 Ultimately, that is up to you. If you want to use C and not C++, and need generic data structures, use this.
 This library contains benchmarks comparing itself to data structures in the STL, and the performance should be comparable.
 
@@ -18,3 +18,6 @@ Type erased structures used to be added, but they were removed because the cost 
 
 ## Will you add support for [insert build system]?
 Maybe. I might at least add support for makefiles. As always, PRs welcome.
+
+## Does this library have any dependencies?
+The only dependency is C standard library.

@@ -4,6 +4,16 @@
 #include <string.h>    // IWYU pragma: keep
 
 #define cstl_hashmap(K, V) hashmap_##K##_##V
+#define cstl_hashmap_create(K, V, alloc) hashmap_##K##_##V##_create(alloc)
+#define cstl_hashmap_free(K, V, m) hashmap_##K##_##V##_free(m)
+#define cstl_hashmap_get(K, V, m, key) hashmap_##K##_##V##_get(m, key)
+#define cstl_hashmap_realloc(K, V, m, new_capacity) hashmap_##K##_##V##_realloc(m, new_capacity)
+#define cstl_hashmap_set(K, V, m, key, value) hashmap_##K##_##V##_set(m, key, value)
+#define cstl_hashmap_try_remove(K, V, m, key, out_value) hashmap_##K##_##V##_try_remove(m, key, out_value)
+
+#define cstl_hashmap_iterator(K, V) hashmap_##K##_##V##_iterator
+#define cstl_hashmap_iterator_new(K, V, m) hashmap_##K##_##V##_iterator_new(m)
+#define cstl_hashmap_iterator_next(K, V, it) hashmap_##K##_##V##_iterator_next(it)
 
 typedef enum hashmap_state : u8 {
     hashmap_state_empty,
@@ -65,14 +75,14 @@ typedef enum hashmap_state : u8 {
         }                                                                                                              \
                                                                                                                        \
         const u64 hash = hash_func(key);                                                                               \
-        u64 index = hash % map->capacity;                                                                              \
+        u64 index = hash & (u64)(map->capacity - 1);                                                                   \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
                 return &map->values[index];                                                                            \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) % map->capacity;                                                                       \
+            index = (index + 1) & (u64)(map->capacity - 1);                                                            \
         }                                                                                                              \
                                                                                                                        \
         return NULL;                                                                                                   \

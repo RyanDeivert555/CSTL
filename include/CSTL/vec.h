@@ -4,6 +4,14 @@
 #include <string.h>    // IWYU pragma: keep
 
 #define cstl_vec(T) vec_##T
+#define cstl_vec_create(T, alloc) vec_##T##_create(alloc)
+#define cstl_vec_free(T, v) vec_##T##_free(v)
+#define cstl_vec_push(T, v, elem) vec_##T##_push(v, elem)
+#define cstl_vec_pop(T, v) vec_##T##_pop(v)
+#define cstl_vec_insert(T, v, elem, index) vec_##T##_insert(v, elem, index)
+#define cstl_vec_ordered_remove(T, v, index) vec_##T##_ordered_remove(v, index)
+#define cstl_vec_swap_remove(T, v, index) vec_##T##_swap_remove(v, index)
+#define cstl_vec_reserve(T, v, new_capacity) vec_##T##_reserve(v, new_capacity)
 
 #define VEC_DEFINE(T)                                                                                                  \
     typedef struct vec_##T {                                                                                           \
@@ -18,7 +26,8 @@
     void vec_##T##_push(vec_##T* vec, T elem);                                                                         \
     T vec_##T##_pop(vec_##T* vec);                                                                                     \
     void vec_##T##_insert(vec_##T* vec, T elem, i64 index);                                                            \
-    T vec_##T##_remove(vec_##T* vec, i64 index);                                                                       \
+    T vec_##T##_ordered_remove(vec_##T* vec, i64 index);                                                               \
+    T vec_##T##_swap_remove(vec_##T* vec, i64 index);                                                                  \
     void vec_##T##_reserve(vec_##T* vec, i64 new_capacity);
 
 #define VEC_IMPL(T)                                                                                                    \
@@ -65,11 +74,20 @@
         vec->length++;                                                                                                 \
     }                                                                                                                  \
                                                                                                                        \
-    T vec_##T##_remove(vec_##T* vec, i64 index) {                                                                      \
+    T vec_##T##_ordered_remove(vec_##T* vec, i64 index) {                                                              \
         cstl_assert(index >= 0 && index < vec->length);                                                                \
         vec->length--;                                                                                                 \
         const T res = vec->buffer[index];                                                                              \
         memmove(&vec->buffer[index], &vec->buffer[index + 1], (vec->length - index) * sizeof(T));                      \
+                                                                                                                       \
+        return res;                                                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    T vec_##T##_swap_remove(vec_##T* vec, i64 index) {                                                                 \
+        cstl_assert(index >= 0 && index < vec->length);                                                                \
+        const T res = vec->buffer[index];                                                                              \
+        vec->buffer[index] = vec->buffer[vec->length - 1];                                                             \
+        vec->length--;                                                                                                 \
                                                                                                                        \
         return res;                                                                                                    \
     }                                                                                                                  \

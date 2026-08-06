@@ -21,6 +21,9 @@ typedef double f64;
 // TODO: i should probably use this, or remove it...
 typedef isize cstl_size;
 
+// For cstl_hashmap and cstl_set as an easy compare function
+#define cstl_compare(a, b) ((a) == (b))
+
 #define CSTL_INITIAL_CAPACITY 8
 #define CSTL_LOAD_FACTOR 7
 
@@ -38,8 +41,8 @@ typedef isize cstl_size;
 #define I64_MIN INT64_MIN
 #define I64_MAX INT64_MAX
 
-#define USIZE_MAX SIZE_MAX
 #define ISIZE_MAX PTRDIFF_MAX
+#define USIZE_MAX SIZE_MAX
 
 #define F32_MIN FLT_MIN
 #define F32_MAX FLT_MAX

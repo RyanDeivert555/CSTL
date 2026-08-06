@@ -4,6 +4,16 @@
 #include <string.h>    // IWYU pragma: keep
 
 #define cstl_set(T) set_##T
+#define cstl_set_create(T, alloc) set_##T##_create(alloc)
+#define cstl_set_free(T, s) set_##T##_free(s)
+#define cstl_set_realloc(T, s, new_capacity) set_##T##_realloc(s, new_capacity)
+#define cstl_set_insert(T, s, elem) set_##T##_insert(s, elem)
+#define cstl_set_contains(T, s, elem) set_##T##_contains(s, elem)
+#define cstl_set_remove(T, s, elem) set_##T##_remove(s, elem)
+
+#define cstl_set_iterator(T) set_##T##_iterator
+#define cstl_set_iterator_new(T, s) set_##T##_iterator_new(s)
+#define cstl_set_iterator_next(T, it) set_##T##_iterator_next(it)
 
 typedef enum set_state : u8 {
     set_state_empty,
@@ -26,7 +36,7 @@ typedef enum set_state : u8 {
     void set_##T##_realloc(set_##T* set, i64 new_capacity);                                                            \
     void set_##T##_insert(set_##T* set, T elem);                                                                       \
     bool set_##T##_contains(set_##T set, T elem);                                                                      \
-    T* set_##T##_remove(set_##T* set, T elem);                                                                         \
+    bool set_##T##_remove(set_##T* set, T elem);                                                                       \
                                                                                                                        \
     typedef struct set_##T##_iterator {                                                                                \
         const set_##T* inner;                                                                                          \
@@ -153,9 +163,9 @@ typedef enum set_state : u8 {
         return false;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    T* set_##T##_remove(set_##T* set, T elem) {                                                                        \
+    bool set_##T##_remove(set_##T* set, T elem) {                                                                      \
         if (set->capacity == 0) {                                                                                      \
-            return NULL;                                                                                               \
+            return false;                                                                                              \
         }                                                                                                              \
                                                                                                                        \
         const u64 hash = hash_func(elem);                                                                              \
@@ -167,13 +177,13 @@ typedef enum set_state : u8 {
                 set->tombstone_count++;                                                                                \
                 set->count--;                                                                                          \
                                                                                                                        \
-                return &set->values[index];                                                                            \
+                return true;                                                                                           \
             }                                                                                                          \
                                                                                                                        \
             index = (index + 1) & (u64)(set->capacity - 1);                                                            \
         }                                                                                                              \
                                                                                                                        \
-        return NULL;                                                                                                   \
+        return false;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
     set_##T##_iterator set_##T##_iterator_new(const set_##T* set) {                                                    \

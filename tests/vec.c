@@ -46,17 +46,17 @@ void test_vec(void) {
     cstl_assert(v.length == 10002);
     cstl_assert(v.buffer[10001] == 999);
 
-    const i32 removed_front = vec_i32_remove(&v, 0);
+    const i32 removed_front = vec_i32_ordered_remove(&v, 0);
     cstl_assert(removed_front == 777);
     cstl_assert(v.length == 10001);
     cstl_assert(v.buffer[0] == 0);
 
-    const i32 removed_mid = vec_i32_remove(&v, 4999);
+    const i32 removed_mid = vec_i32_ordered_remove(&v, 4999);
     cstl_assert(removed_mid == 888);
     cstl_assert(v.length == 10000);
     cstl_assert(v.buffer[4999] == 4999);
 
-    const i32 removed_end = vec_i32_remove(&v, v.length - 1);
+    const i32 removed_end = vec_i32_ordered_remove(&v, v.length - 1);
     cstl_assert(removed_end == 999);
     cstl_assert(v.length == 9999);
 

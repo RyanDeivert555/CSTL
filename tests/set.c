@@ -42,8 +42,8 @@ void test_set(void) {
 
     cstl_assert(set_string_contains(s, "ryan"));
     cstl_assert(set_string_contains(s, "aidan"));
-    cstl_assert(string_equal(*set_string_remove(&s, "ryan"), "ryan"));
-    cstl_assert(string_equal(*set_string_remove(&s, "aidan"), "aidan"));
+    cstl_assert(set_string_remove(&s, "ryan"));
+    cstl_assert(set_string_remove(&s, "aidan"));
     cstl_assert(!set_string_contains(s, "ryan"));
     cstl_assert(!set_string_contains(s, "aidan"));
     cstl_assert(!set_string_remove(&s, "ryan"));
