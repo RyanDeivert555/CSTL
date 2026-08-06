@@ -8,6 +8,7 @@
 #define cstl_vec_free(T, v) vec_##T##_free(v)
 #define cstl_vec_push(T, v, elem) vec_##T##_push(v, elem)
 #define cstl_vec_pop(T, v) vec_##T##_pop(v)
+#define cstl_vec_try_pop(T, v, out) vec_##T##_try_pop(v, out)
 #define cstl_vec_insert(T, v, elem, index) vec_##T##_insert(v, elem, index)
 #define cstl_vec_ordered_remove(T, v, index) vec_##T##_ordered_remove(v, index)
 #define cstl_vec_swap_remove(T, v, index) vec_##T##_swap_remove(v, index)
@@ -25,6 +26,7 @@
     void vec_##T##_free(vec_##T* vec);                                                                                 \
     void vec_##T##_push(vec_##T* vec, T elem);                                                                         \
     T vec_##T##_pop(vec_##T* vec);                                                                                     \
+    bool vec_##T##_try_pop(vec_##T* vec, T* out);                                                                      \
     void vec_##T##_insert(vec_##T* vec, T elem, i64 index);                                                            \
     T vec_##T##_ordered_remove(vec_##T* vec, i64 index);                                                               \
     T vec_##T##_swap_remove(vec_##T* vec, i64 index);                                                                  \
@@ -61,6 +63,19 @@
         vec->length--;                                                                                                 \
                                                                                                                        \
         return value;                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    bool vec_##T##_try_pop(vec_##T* vec, T* out) {                                                                     \
+        if (vec->length > 0) {                                                                                         \
+            const T result = vec_##T##_pop(vec);                                                                       \
+            if (out) {                                                                                                 \
+                *out = result;                                                                                         \
+            }                                                                                                          \
+                                                                                                                       \
+            return true;                                                                                               \
+        } else {                                                                                                       \
+            return false;                                                                                              \
+        }                                                                                                              \
     }                                                                                                                  \
                                                                                                                        \
     void vec_##T##_insert(vec_##T* vec, T elem, i64 index) {                                                           \
