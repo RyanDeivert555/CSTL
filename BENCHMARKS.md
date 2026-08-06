@@ -79,6 +79,9 @@ BM_cstl_prealloc_RMS               6 %             6 %
 
 ## std::unordered_map vs std::map vs cstl_hashmap
 ```
+-------------------------------------------------------------------------------------
+Benchmark                           Time             CPU   Iterations UserCounters...
+-------------------------------------------------------------------------------------
 BM_std_unordered_map/8            241 ns          243 ns      2916245 items_per_second=32.9464M/s
 BM_std_unordered_map/16           352 ns          353 ns      1975535 items_per_second=45.2779M/s
 BM_std_unordered_map/64          1316 ns         1317 ns       515531 items_per_second=48.6M/s
@@ -147,3 +150,9 @@ BM_cstl/32768                   80355 ns        80393 ns         8917 items_per_
 BM_cstl_BigO                     2.45 N          2.45 N
 BM_cstl_RMS                         2 %             2 %
 ```
+
+## Important Notes
+
+The `std::vector` vs `cstl_vec` benches are not very meaningful. 
+The vectors need to preallocate memory as to not test the underlying allocators.
+So all that is being tested is appending elements, which is dirt cheap.
