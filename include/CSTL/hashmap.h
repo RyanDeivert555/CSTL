@@ -15,17 +15,19 @@
 #define cstl_hashmap_iterator_new(K, V, m) hashmap_##K##_##V##_iterator_new(m)
 #define cstl_hashmap_iterator_next(K, V, it) hashmap_##K##_##V##_iterator_next(it)
 
-typedef enum hashmap_state : u8 {
+typedef enum hashmap_state {
     hashmap_state_empty,
     hashmap_state_occupied,
     hashmap_state_tombstone,
 } hashmap_state;
 
+typedef u8 hashmap_state_type;
+
 #define HASHMAP_DEFINE(K, V)                                                                                           \
     typedef struct hashmap_##K##_##V {                                                                                 \
         K* keys;                                                                                                       \
         V* values;                                                                                                     \
-        hashmap_state* states;                                                                                         \
+        hashmap_state_type* states;                                                                                    \
         i64 capacity;                                                                                                  \
         i64 count;                                                                                                     \
         i64 tombstone_count;                                                                                           \
@@ -60,7 +62,7 @@ typedef enum hashmap_state : u8 {
     void hashmap_##K##_##V##_free(hashmap_##K##_##V* map) {                                                            \
         cstl_free(K, map->alloc, map->keys, map->capacity);                                                            \
         cstl_free(V, map->alloc, map->values, map->capacity);                                                          \
-        cstl_free(hashmap_state, map->alloc, map->states, map->capacity);                                              \
+        cstl_free(hashmap_state_type, map->alloc, map->states, map->capacity);                                         \
         map->keys = NULL;                                                                                              \
         map->values = NULL;                                                                                            \
         map->states = NULL;                                                                                            \
@@ -97,8 +99,8 @@ typedef enum hashmap_state : u8 {
                                                                                                                        \
         K* const new_keys = cstl_alloc(K, map->alloc, new_capacity);                                                   \
         V* const new_values = cstl_alloc(V, map->alloc, new_capacity);                                                 \
-        hashmap_state* const new_states = cstl_alloc(hashmap_state, map->alloc, new_capacity);                         \
-        memset(new_states, hashmap_state_empty, new_capacity * sizeof(hashmap_state));                                 \
+        hashmap_state_type* const new_states = cstl_alloc(hashmap_state_type, map->alloc, new_capacity);               \
+        memset(new_states, hashmap_state_empty, new_capacity * sizeof(hashmap_state_type));                            \
                                                                                                                        \
         if (map->count != 0) {                                                                                         \
             for (i64 i = 0; i < map->capacity; i++) {                                                                  \
@@ -123,7 +125,7 @@ typedef enum hashmap_state : u8 {
                                                                                                                        \
         cstl_free(K, map->alloc, map->keys, map->capacity);                                                            \
         cstl_free(V, map->alloc, map->values, map->capacity);                                                          \
-        cstl_free(hashmap_state, map->alloc, map->states, map->capacity);                                              \
+        cstl_free(hashmap_state_type, map->alloc, map->states, map->capacity);                                         \
                                                                                                                        \
         map->keys = new_keys;                                                                                          \
         map->values = new_values;                                                                                      \

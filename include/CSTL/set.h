@@ -15,16 +15,18 @@
 #define cstl_set_iterator_new(T, s) set_##T##_iterator_new(s)
 #define cstl_set_iterator_next(T, it) set_##T##_iterator_next(it)
 
-typedef enum set_state : u8 {
+typedef enum set_state {
     set_state_empty,
     set_state_occupied,
     set_state_tombstone,
 } set_state;
 
+typedef u8 set_state_type;
+
 #define SET_DEFINE(T)                                                                                                  \
     typedef struct set_##T {                                                                                           \
         T* values;                                                                                                     \
-        set_state* states;                                                                                             \
+        set_state_type* states;                                                                                        \
         i64 capacity;                                                                                                  \
         i64 count;                                                                                                     \
         i64 tombstone_count;                                                                                           \
@@ -57,7 +59,7 @@ typedef enum set_state : u8 {
                                                                                                                        \
     void set_##T##_free(set_##T* set) {                                                                                \
         cstl_free(T, set->alloc, set->values, set->capacity);                                                          \
-        cstl_free(set_state, set->alloc, set->states, set->capacity);                                                  \
+        cstl_free(set_state_type, set->alloc, set->states, set->capacity);                                             \
         set->values = NULL;                                                                                            \
         set->states = NULL;                                                                                            \
         set->capacity = 0;                                                                                             \
@@ -73,8 +75,8 @@ typedef enum set_state : u8 {
         }                                                                                                              \
                                                                                                                        \
         T* const new_values = cstl_alloc(T, set->alloc, new_capacity);                                                 \
-        set_state* const new_states = cstl_alloc(set_state, set->alloc, new_capacity);                                 \
-        memset(new_states, set_state_empty, new_capacity * sizeof(set_state));                                         \
+        set_state_type* const new_states = cstl_alloc(set_state_type, set->alloc, new_capacity);                       \
+        memset(new_states, set_state_empty, new_capacity * sizeof(set_state_type));                                    \
                                                                                                                        \
         if (set->count != 0) {                                                                                         \
             for (i64 i = 0; i < set->capacity; i++) {                                                                  \
@@ -96,7 +98,7 @@ typedef enum set_state : u8 {
         }                                                                                                              \
                                                                                                                        \
         cstl_free(T, set->alloc, set->values, set->capacity);                                                          \
-        cstl_free(set_state, set->alloc, set->states, set->capacity);                                                  \
+        cstl_free(set_state_type, set->alloc, set->states, set->capacity);                                             \
                                                                                                                        \
         set->values = new_values;                                                                                      \
         set->states = new_states;                                                                                      \

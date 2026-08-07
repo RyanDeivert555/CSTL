@@ -20,4 +20,4 @@ Type erased structures used to be added, but they were removed because the cost 
 Maybe. I might at least add support for makefiles. As always, PRs welcome.
 
 ## Does this library have any dependencies?
-The only dependency is C standard library.
+The only dependency is C standard library, using C11.

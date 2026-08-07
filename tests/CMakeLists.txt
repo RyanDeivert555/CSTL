@@ -12,7 +12,7 @@ set(CSTL_TESTS
 foreach(TEST_NAME IN LISTS CSTL_TESTS)
     add_executable(test_${TEST_NAME} ${TEST_NAME}.c)
     set_target_properties(test_${TEST_NAME} PROPERTIES
-        C_STANDARD 23
+        C_STANDARD 11
         C_STANDARD_REQUIRED YES
         C_EXTENSIONS NO
     )

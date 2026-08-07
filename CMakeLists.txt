@@ -12,7 +12,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 add_library(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    C_STANDARD 23
+    C_STANDARD 11
     C_STANDARD_REQUIRED YES
     C_EXTENSIONS NO
 )
