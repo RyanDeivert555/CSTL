@@ -3,9 +3,9 @@
 #include <stdatomic.h>
 #include <threads.h>
 
-void set_random_bytes(random_state* rand, void* buffer, i64 size) {
+void set_random_bytes(random_state rand, void* buffer, i64 size) {
     cstl_assert(size >= 0);
-    rand->rand(rand->ctx, buffer, size);
+    rand.rand(rand.ctx, buffer, size);
 }
 
 static xorshift_state global_shared_state = {0};
@@ -27,9 +27,22 @@ static void shared_random_bytes(void* ctx, void* buffer, i64 size) {
     mtx_unlock(&rand_lock);
 }
 
-random_state shared_random_state(u64 seed) {
-    global_seed = seed;
+static void ensure_initialized(void) {
     call_once(&init_flag, once_init);
+}
+
+void shared_random_set_seed(u64 seed) {
+    global_seed = seed;
+    ensure_initialized();
+}
+
+void shared_random_set_bytes(void* buffer, i64 size) {
+    ensure_initialized();
+    shared_random_bytes(&global_shared_state, buffer, size);
+}
+
+random_state shared_random_state(u64 seed) {
+    shared_random_set_seed(seed);
 
     return (random_state){
         .ctx = &global_shared_state,
