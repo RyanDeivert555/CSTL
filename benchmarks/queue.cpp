@@ -27,7 +27,7 @@ static void BM_std_queue(benchmark::State& state) {
 }
 BENCHMARK(BM_std_queue)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
-static void BM_cstl_no_prealloc(benchmark::State& state) {
+static void BM_cstl_queue_no_prealloc(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         cstl_queue(i32) v = queue_i32_create(std_allocator());
@@ -45,9 +45,9 @@ static void BM_cstl_no_prealloc(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_no_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_queue_no_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
-static void BM_cstl_prealloc(benchmark::State& state) {
+static void BM_cstl_queue_prealloc(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         cstl_queue(i32) v = queue_i32_create(std_allocator());
@@ -66,6 +66,4 @@ static void BM_cstl_prealloc(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
-
-BENCHMARK_MAIN();
+BENCHMARK(BM_cstl_queue_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();

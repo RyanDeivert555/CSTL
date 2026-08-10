@@ -57,7 +57,7 @@ static void BM_std_set(benchmark::State& state) {
 }
 BENCHMARK(BM_std_set)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
-static void BM_cstl(benchmark::State& state) {
+static void BM_cstl_set(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         cstl_set(i32) s = set_i32_create(std_allocator());
@@ -75,6 +75,4 @@ static void BM_cstl(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
-
-BENCHMARK_MAIN();
+BENCHMARK(BM_cstl_set)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();

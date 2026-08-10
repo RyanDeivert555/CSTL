@@ -57,7 +57,7 @@ static void BM_std_map(benchmark::State& state) {
 }
 BENCHMARK(BM_std_map)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
-static void BM_cstl(benchmark::State& state) {
+static void BM_cstl_hashmap(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         cstl_hashmap(i32, i32) m = hashmap_i32_i32_create(std_allocator());
@@ -75,6 +75,4 @@ static void BM_cstl(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
-
-BENCHMARK_MAIN();
+BENCHMARK(BM_cstl_hashmap)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();

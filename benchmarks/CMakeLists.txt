@@ -1,10 +1,3 @@
-set(CSTL_BENCHMARKS
-    vec
-    hashmap
-    queue
-    set
-)
-
 include(FetchContent)
 
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
@@ -19,12 +12,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googlebenchmark)
 
-foreach(BENCH_NAME IN LISTS CSTL_BENCHMARKS)
-    add_executable(bench_${BENCH_NAME} ${BENCH_NAME}.cpp)
-    if(NOT MSVC)
-        target_compile_options(bench_${BENCH_NAME} PRIVATE -O3)
-    else()
-        target_compile_options(bench_${BENCH_NAME} PRIVATE /O2)
-    endif()
-    target_link_libraries(bench_${BENCH_NAME} PRIVATE cstl benchmark::benchmark)
-endforeach()
+add_executable(benchmarks 
+    vec.cpp
+    queue.cpp
+    hashmap.cpp
+    set.cpp
+)
+if(NOT MSVC)
+    target_compile_options(benchmarks PRIVATE -O3)
+else()
+    target_compile_options(benchmarks PRIVATE /O2)
+endif()
+target_link_libraries(benchmarks PRIVATE cstl benchmark::benchmark_main)

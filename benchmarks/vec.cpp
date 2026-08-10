@@ -10,7 +10,7 @@ extern "C" {
 // This doesn't test anything meanful
 // I do not want to testing the underlying allocators, and testing pushing is trivial
 
-static void BM_std(benchmark::State& state) {
+static void BM_std_vector(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         state.PauseTiming();
@@ -31,9 +31,9 @@ static void BM_std(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_vector)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
 
-static void BM_cstl(benchmark::State& state) {
+static void BM_cstl_vec(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         state.PauseTiming();
@@ -54,6 +54,4 @@ static void BM_cstl(benchmark::State& state) {
     state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
-
-BENCHMARK_MAIN();
+BENCHMARK(BM_cstl_vec)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
