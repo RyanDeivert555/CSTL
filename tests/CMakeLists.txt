@@ -7,6 +7,7 @@ set(CSTL_TESTS
     hashmap
     queue
     set
+    memory
 )
 
 foreach(TEST_NAME IN LISTS CSTL_TESTS)

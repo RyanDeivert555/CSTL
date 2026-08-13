@@ -23,6 +23,7 @@ target_sources(${PROJECT_NAME}
     src/fba.c
     src/random.c
     src/xorshift.c
+    src/memory.c
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include/)
