@@ -3,10 +3,10 @@
 #include "common.h"
 
 typedef struct fba {
-    u8* buffer;
-    i64 size;
-    i64 capacity;
+    cstl_byte* buffer;
+    isize size;
+    isize capacity;
 } fba;
 
-fba fba_new(u8* buffer, i64 capacity);
+fba fba_new(cstl_byte* buffer, isize capacity);
 allocator fba_as_allocator(fba* instance);

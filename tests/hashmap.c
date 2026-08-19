@@ -2,8 +2,8 @@
 #include "CSTL/allocator.h"
 
 typedef const char* string;
-u64 string_hash(string key) {
-    u64 result = 5381;
+usize string_hash(string key) {
+    usize result = 5381;
 
     while (*key) {
         result = ((result << 5) + result) + *key;

@@ -27,15 +27,15 @@ typedef u8 set_state_type;
     typedef struct set_##T {                                                                                           \
         T* values;                                                                                                     \
         set_state_type* states;                                                                                        \
-        i64 capacity;                                                                                                  \
-        i64 count;                                                                                                     \
-        i64 tombstone_count;                                                                                           \
+        isize capacity;                                                                                                \
+        isize count;                                                                                                   \
+        isize tombstone_count;                                                                                         \
         allocator alloc;                                                                                               \
     } set_##T;                                                                                                         \
                                                                                                                        \
     set_##T set_##T##_create(allocator a);                                                                             \
     void set_##T##_free(set_##T* set);                                                                                 \
-    void set_##T##_realloc(set_##T* set, i64 new_capacity);                                                            \
+    void set_##T##_realloc(set_##T* set, isize new_capacity);                                                          \
     void set_##T##_insert(set_##T* set, T elem);                                                                       \
     bool set_##T##_contains(set_##T set, T elem);                                                                      \
     bool set_##T##_remove(set_##T* set, T elem);                                                                       \
@@ -43,7 +43,7 @@ typedef u8 set_state_type;
     typedef struct set_##T##_iterator {                                                                                \
         const set_##T* inner;                                                                                          \
         T value;                                                                                                       \
-        i64 index;                                                                                                     \
+        isize index;                                                                                                   \
     } set_##T##_iterator;                                                                                              \
                                                                                                                        \
     set_##T##_iterator set_##T##_iterator_new(const set_##T* set);                                                     \
@@ -67,7 +67,7 @@ typedef u8 set_state_type;
         set->tombstone_count = 0;                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
-    void set_##T##_realloc(set_##T* set, i64 new_capacity) {                                                           \
+    void set_##T##_realloc(set_##T* set, isize new_capacity) {                                                         \
         cstl_assert(new_capacity > set->count);                                                                        \
         new_capacity = cstl_next_pow2(new_capacity);                                                                   \
         if (new_capacity <= set->capacity) {                                                                           \
@@ -79,17 +79,17 @@ typedef u8 set_state_type;
         memset(new_states, set_state_empty, new_capacity * sizeof(set_state_type));                                    \
                                                                                                                        \
         if (set->count != 0) {                                                                                         \
-            for (i64 i = 0; i < set->capacity; i++) {                                                                  \
+            for (isize i = 0; i < set->capacity; i++) {                                                                \
                 if (set->states[i] != set_state_occupied) {                                                            \
                     continue;                                                                                          \
                 }                                                                                                      \
                 const T value = set->values[i];                                                                        \
                                                                                                                        \
-                const u64 hash = hash_func(value);                                                                     \
-                u64 index = hash & (u64)(new_capacity - 1);                                                            \
+                const usize hash = hash_func(value);                                                                   \
+                usize index = hash & (usize)(new_capacity - 1);                                                        \
                                                                                                                        \
                 while (new_states[index] == set_state_occupied) {                                                      \
-                    index = (index + 1) & (u64)(new_capacity - 1);                                                     \
+                    index = (index + 1) & (usize)(new_capacity - 1);                                                   \
                 }                                                                                                      \
                                                                                                                        \
                 new_values[index] = value;                                                                             \
@@ -107,37 +107,37 @@ typedef u8 set_state_type;
     }                                                                                                                  \
                                                                                                                        \
     void set_##T##_insert(set_##T* set, T elem) {                                                                      \
-        const u64 hash = hash_func(elem);                                                                              \
+        const usize hash = hash_func(elem);                                                                            \
                                                                                                                        \
         if (set->capacity > 0) {                                                                                       \
-            u64 index = hash & (u64)(set->capacity - 1);                                                               \
+            usize index = hash & (usize)(set->capacity - 1);                                                           \
                                                                                                                        \
             while (set->states[index] != set_state_empty) {                                                            \
                 if (set->states[index] == set_state_occupied && compare_func(elem, set->values[index])) {              \
                     return;                                                                                            \
                 }                                                                                                      \
                                                                                                                        \
-                index = (index + 1) & (u64)(set->capacity - 1);                                                        \
+                index = (index + 1) & (usize)(set->capacity - 1);                                                      \
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
         if (set->count + set->tombstone_count >= (set->capacity * CSTL_LOAD_FACTOR) / 10) {                            \
-            const i64 new_capacity = (set->capacity == 0) ? CSTL_INITIAL_CAPACITY : set->capacity * 2;                 \
+            const isize new_capacity = (set->capacity == 0) ? CSTL_INITIAL_CAPACITY : set->capacity * 2;               \
             set_##T##_realloc(set, new_capacity);                                                                      \
         }                                                                                                              \
                                                                                                                        \
-        u64 index = hash & (u64)(set->capacity - 1);                                                                   \
-        i64 tombstone = -1;                                                                                            \
+        usize index = hash & (usize)(set->capacity - 1);                                                               \
+        isize tombstone = -1;                                                                                          \
                                                                                                                        \
         while (set->states[index] != set_state_empty) {                                                                \
             if (set->states[index] == set_state_tombstone && tombstone == -1) {                                        \
                 tombstone = index;                                                                                     \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) & (u64)(set->capacity - 1);                                                            \
+            index = (index + 1) & (usize)(set->capacity - 1);                                                          \
         }                                                                                                              \
                                                                                                                        \
-        const i64 target = tombstone != -1 ? tombstone : (i64)index;                                                   \
+        const isize target = tombstone != -1 ? tombstone : (isize)index;                                               \
         if (target == tombstone) {                                                                                     \
             set->tombstone_count--;                                                                                    \
         }                                                                                                              \
@@ -151,15 +151,15 @@ typedef u8 set_state_type;
             return false;                                                                                              \
         }                                                                                                              \
                                                                                                                        \
-        const u64 hash = hash_func(elem);                                                                              \
-        u64 index = hash & (u64)(set.capacity - 1);                                                                    \
+        const usize hash = hash_func(elem);                                                                            \
+        usize index = hash & (usize)(set.capacity - 1);                                                                \
                                                                                                                        \
         while (set.states[index] != set_state_empty) {                                                                 \
             if (set.states[index] == set_state_occupied && compare_func(elem, set.values[index])) {                    \
                 return true;                                                                                           \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) & (u64)(set.capacity - 1);                                                             \
+            index = (index + 1) & (usize)(set.capacity - 1);                                                           \
         }                                                                                                              \
                                                                                                                        \
         return false;                                                                                                  \
@@ -170,8 +170,8 @@ typedef u8 set_state_type;
             return false;                                                                                              \
         }                                                                                                              \
                                                                                                                        \
-        const u64 hash = hash_func(elem);                                                                              \
-        u64 index = hash & (u64)(set->capacity - 1);                                                                   \
+        const usize hash = hash_func(elem);                                                                            \
+        usize index = hash & (usize)(set->capacity - 1);                                                               \
                                                                                                                        \
         while (set->states[index] != set_state_empty) {                                                                \
             if (set->states[index] == set_state_occupied && compare_func(elem, set->values[index])) {                  \
@@ -182,7 +182,7 @@ typedef u8 set_state_type;
                 return true;                                                                                           \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) & (u64)(set->capacity - 1);                                                            \
+            index = (index + 1) & (usize)(set->capacity - 1);                                                          \
         }                                                                                                              \
                                                                                                                        \
         return false;                                                                                                  \
@@ -199,7 +199,7 @@ typedef u8 set_state_type;
         const set_##T* const inner = it->inner;                                                                        \
                                                                                                                        \
         while (it->index < inner->capacity) {                                                                          \
-            const i64 curr = it->index;                                                                                \
+            const isize curr = it->index;                                                                              \
             it->index++;                                                                                               \
                                                                                                                        \
             if (inner->states[curr] == set_state_occupied) {                                                           \

@@ -17,9 +17,7 @@ typedef ptrdiff_t isize;
 typedef size_t usize;
 typedef float f32;
 typedef double f64;
-
-// TODO: i should probably use this, or remove it...
-typedef isize cstl_size;
+typedef unsigned char cstl_byte;
 
 // For cstl_hashmap and cstl_set as an easy compare function
 #define cstl_compare(a, b) ((a) == (b))
@@ -48,6 +46,8 @@ typedef isize cstl_size;
 #define F32_MAX FLT_MAX
 #define F64_MIN DBL_MIN
 #define F64_MAX DBL_MAX
+
+#define CSTL_BYTE_MAX (255)
 
 #if defined(__GNUC__) || defined(__clang__)
 #define cstl_assert(c)                                                                                                 \

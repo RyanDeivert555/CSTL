@@ -1,11 +1,11 @@
 #include "CSTL/allocator.h"
 #include <stdlib.h>
 
-bool cstl_is_pow2(i64 x) {
+bool cstl_is_pow2(isize x) {
     return x > 0 && (x & (x - 1)) == 0;
 }
 
-i64 cstl_next_pow2(i64 n) {
+isize cstl_next_pow2(isize n) {
     if (n <= 1) {
         return 1;
     }
@@ -21,46 +21,46 @@ i64 cstl_next_pow2(i64 n) {
     return n + 1;
 }
 
-u8* cstl_raw_alloc(allocator a, i64 size, i64 count, i64 align) {
+cstl_byte* cstl_raw_alloc(allocator a, isize size, isize count, isize align) {
     if (size <= 0 || count <= 0 || !cstl_is_pow2(align)) {
         return NULL;
     }
-    if (size > I64_MAX / count) {
+    if (size > ISIZE_MAX / count) {
         return NULL;
     }
 
     return a.vtable->alloc(a.ctx, size, count, align);
 }
 
-void cstl_raw_free(allocator a, u8* ptr, i64 size, i64 count, i64 align) {
+void cstl_raw_free(allocator a, cstl_byte* ptr, isize size, isize count, isize align) {
     a.vtable->free(a.ctx, ptr, size, count, align);
 }
 
-static u8* std_alloc(void* ctx, i64 size, i64 count, i64 align) {
+static cstl_byte* std_alloc(void* ctx, isize size, isize count, isize align) {
     cstl_unused(ctx);
 
-    const i64 total = size * count;
+    const isize total = size * count;
 
-    if (align <= (i64)alignof(max_align_t)) {
-        return (u8*)malloc(total);
+    if (align <= (isize)alignof(max_align_t)) {
+        return (cstl_byte*)malloc(total);
     } else {
 #if defined(_WIN32)
-        return (u8*)_aligned_malloc(total, align);
+        return (cstl_byte*)_aligned_malloc(total, align);
 #else
-        const i64 aligned_total = (total + align - 1) & ~(align - 1);
+        const isize aligned_total = (total + align - 1) & ~(align - 1);
 
-        return (u8*)aligned_alloc(align, aligned_total);
+        return (cstl_byte*)aligned_alloc(align, aligned_total);
 #endif
     }
 }
 
-static void std_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
+static void std_free(void* ctx, cstl_byte* ptr, isize size, isize count, isize align) {
     cstl_unused(ctx);
     cstl_unused(size);
     cstl_unused(count);
 
 #if defined(_WIN32)
-    if (align > (i64)alignof(max_align_t)) {
+    if (align > (isize)alignof(max_align_t)) {
         _aligned_free(ptr);
         return;
     } else {

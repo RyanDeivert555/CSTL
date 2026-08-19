@@ -28,16 +28,16 @@ typedef u8 hashmap_state_type;
         K* keys;                                                                                                       \
         V* values;                                                                                                     \
         hashmap_state_type* states;                                                                                    \
-        i64 capacity;                                                                                                  \
-        i64 count;                                                                                                     \
-        i64 tombstone_count;                                                                                           \
+        isize capacity;                                                                                                \
+        isize count;                                                                                                   \
+        isize tombstone_count;                                                                                         \
         allocator alloc;                                                                                               \
     } hashmap_##K##_##V;                                                                                               \
                                                                                                                        \
     hashmap_##K##_##V hashmap_##K##_##V##_create(allocator a);                                                         \
     void hashmap_##K##_##V##_free(hashmap_##K##_##V* map);                                                             \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key);                                                         \
-    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, i64 new_capacity);                                        \
+    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, isize new_capacity);                                      \
     void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, K key, V value);                                              \
     bool hashmap_##K##_##V##_try_remove(hashmap_##K##_##V* map, K key, V* out_value);                                  \
                                                                                                                        \
@@ -45,7 +45,7 @@ typedef u8 hashmap_state_type;
         const hashmap_##K##_##V* inner;                                                                                \
         K key;                                                                                                         \
         V value;                                                                                                       \
-        i64 index;                                                                                                     \
+        isize index;                                                                                                   \
     } hashmap_##K##_##V##_iterator;                                                                                    \
                                                                                                                        \
     hashmap_##K##_##V##_iterator hashmap_##K##_##V##_iterator_new(const hashmap_##K##_##V* map);                       \
@@ -76,21 +76,21 @@ typedef u8 hashmap_state_type;
             return NULL;                                                                                               \
         }                                                                                                              \
                                                                                                                        \
-        const u64 hash = hash_func(key);                                                                               \
-        u64 index = hash & (u64)(map->capacity - 1);                                                                   \
+        const usize hash = hash_func(key);                                                                             \
+        usize index = hash & (usize)(map->capacity - 1);                                                               \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
                 return &map->values[index];                                                                            \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) & (u64)(map->capacity - 1);                                                            \
+            index = (index + 1) & (usize)(map->capacity - 1);                                                          \
         }                                                                                                              \
                                                                                                                        \
         return NULL;                                                                                                   \
     }                                                                                                                  \
                                                                                                                        \
-    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, i64 new_capacity) {                                       \
+    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, isize new_capacity) {                                     \
         cstl_assert(new_capacity > map->count);                                                                        \
         new_capacity = cstl_next_pow2(new_capacity);                                                                   \
         if (new_capacity <= map->capacity) {                                                                           \
@@ -103,18 +103,18 @@ typedef u8 hashmap_state_type;
         memset(new_states, hashmap_state_empty, new_capacity * sizeof(hashmap_state_type));                            \
                                                                                                                        \
         if (map->count != 0) {                                                                                         \
-            for (i64 i = 0; i < map->capacity; i++) {                                                                  \
+            for (isize i = 0; i < map->capacity; i++) {                                                                \
                 if (map->states[i] != hashmap_state_occupied) {                                                        \
                     continue;                                                                                          \
                 }                                                                                                      \
                 const K key = map->keys[i];                                                                            \
                 const V value = map->values[i];                                                                        \
                                                                                                                        \
-                const u64 hash = hash_func(key);                                                                       \
-                u64 index = hash & (u64)(new_capacity - 1);                                                            \
+                const usize hash = hash_func(key);                                                                     \
+                usize index = hash & (usize)(new_capacity - 1);                                                        \
                                                                                                                        \
                 while (new_states[index] == hashmap_state_occupied) {                                                  \
-                    index = (index + 1) & (u64)(new_capacity - 1);                                                     \
+                    index = (index + 1) & (usize)(new_capacity - 1);                                                   \
                 }                                                                                                      \
                                                                                                                        \
                 new_keys[index] = key;                                                                                 \
@@ -135,10 +135,10 @@ typedef u8 hashmap_state_type;
     }                                                                                                                  \
                                                                                                                        \
     void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, K key, V value) {                                             \
-        const u64 hash = hash_func(key);                                                                               \
+        const usize hash = hash_func(key);                                                                             \
                                                                                                                        \
         if (map->capacity > 0) {                                                                                       \
-            u64 index = hash & (u64)(map->capacity - 1);                                                               \
+            usize index = hash & (usize)(map->capacity - 1);                                                           \
                                                                                                                        \
             while (map->states[index] != hashmap_state_empty) {                                                        \
                 if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {             \
@@ -146,27 +146,27 @@ typedef u8 hashmap_state_type;
                     return;                                                                                            \
                 }                                                                                                      \
                                                                                                                        \
-                index = (index + 1) & (u64)(map->capacity - 1);                                                        \
+                index = (index + 1) & (usize)(map->capacity - 1);                                                      \
             }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
         if (map->count + map->tombstone_count >= (map->capacity * CSTL_LOAD_FACTOR) / 10) {                            \
-            const i64 new_capacity = (map->capacity == 0) ? CSTL_INITIAL_CAPACITY : map->capacity * 2;                 \
+            const isize new_capacity = (map->capacity == 0) ? CSTL_INITIAL_CAPACITY : map->capacity * 2;               \
             hashmap_##K##_##V##_realloc(map, new_capacity);                                                            \
         }                                                                                                              \
                                                                                                                        \
-        u64 index = hash & (u64)(map->capacity - 1);                                                                   \
-        i64 tombstone = -1;                                                                                            \
+        usize index = hash & (usize)(map->capacity - 1);                                                               \
+        isize tombstone = -1;                                                                                          \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_tombstone && tombstone == -1) {                                    \
                 tombstone = index;                                                                                     \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) & (u64)(map->capacity - 1);                                                            \
+            index = (index + 1) & (usize)(map->capacity - 1);                                                          \
         }                                                                                                              \
                                                                                                                        \
-        const i64 target = tombstone != -1 ? tombstone : (i64)index;                                                   \
+        const isize target = tombstone != -1 ? tombstone : (isize)index;                                               \
         if (target == tombstone) {                                                                                     \
             map->tombstone_count--;                                                                                    \
         }                                                                                                              \
@@ -181,8 +181,8 @@ typedef u8 hashmap_state_type;
             return false;                                                                                              \
         }                                                                                                              \
                                                                                                                        \
-        const u64 hash = hash_func(key);                                                                               \
-        u64 index = hash & (u64)(map->capacity - 1);                                                                   \
+        const usize hash = hash_func(key);                                                                             \
+        usize index = hash & (usize)(map->capacity - 1);                                                               \
                                                                                                                        \
         while (map->states[index] != hashmap_state_empty) {                                                            \
             if (map->states[index] == hashmap_state_occupied && compare_func(key, map->keys[index])) {                 \
@@ -196,7 +196,7 @@ typedef u8 hashmap_state_type;
                 return true;                                                                                           \
             }                                                                                                          \
                                                                                                                        \
-            index = (index + 1) & (u64)(map->capacity - 1);                                                            \
+            index = (index + 1) & (usize)(map->capacity - 1);                                                          \
         }                                                                                                              \
                                                                                                                        \
         return false;                                                                                                  \
@@ -213,7 +213,7 @@ typedef u8 hashmap_state_type;
         const hashmap_##K##_##V* const inner = it->inner;                                                              \
                                                                                                                        \
         while (it->index < inner->capacity) {                                                                          \
-            const i64 curr = it->index;                                                                                \
+            const isize curr = it->index;                                                                              \
             it->index++;                                                                                               \
                                                                                                                        \
             if (inner->states[curr] == hashmap_state_occupied) {                                                       \

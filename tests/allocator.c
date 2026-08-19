@@ -27,7 +27,7 @@ void test_allocator(void) {
         num[0] = 1;
         cstl_assert(num[0] == 1);
 
-        cstl_raw_free(a, (u8*)num, sizeof(i32), 1, alignof(i32));
+        cstl_raw_free(a, (cstl_byte*)num, sizeof(i32), 1, alignof(i32));
     }
     {
         const usize len = 10;

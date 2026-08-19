@@ -14,10 +14,10 @@
 #define QUEUE_DEFINE(T)                                                                                                \
     typedef struct queue_##T {                                                                                         \
         T* buffer;                                                                                                     \
-        i64 length;                                                                                                    \
-        i64 capacity;                                                                                                  \
-        i64 front;                                                                                                     \
-        i64 back;                                                                                                      \
+        isize length;                                                                                                  \
+        isize capacity;                                                                                                \
+        isize front;                                                                                                   \
+        isize back;                                                                                                    \
         allocator alloc;                                                                                               \
     } queue_##T;                                                                                                       \
                                                                                                                        \
@@ -26,7 +26,7 @@
     void queue_##T##_push(queue_##T* q, T elem);                                                                       \
     T queue_##T##_pop(queue_##T* q);                                                                                   \
     bool queue_##T##_try_pop(queue_##T* q, T* out);                                                                    \
-    void queue_##T##_reserve(queue_##T* q, i64 new_capacity);
+    void queue_##T##_reserve(queue_##T* q, isize new_capacity);
 
 #define QUEUE_IMPL(T)                                                                                                  \
     queue_##T queue_##T##_create(allocator a) {                                                                        \
@@ -47,7 +47,7 @@
                                                                                                                        \
     void queue_##T##_push(queue_##T* q, T elem) {                                                                      \
         if (q->length == q->capacity) {                                                                                \
-            const i64 new_capacity = q->capacity == 0 ? CSTL_INITIAL_CAPACITY : q->capacity * 2;                       \
+            const isize new_capacity = q->capacity == 0 ? CSTL_INITIAL_CAPACITY : q->capacity * 2;                     \
             queue_##T##_reserve(q, new_capacity);                                                                      \
         }                                                                                                              \
                                                                                                                        \
@@ -84,7 +84,7 @@
         }                                                                                                              \
     }                                                                                                                  \
                                                                                                                        \
-    void queue_##T##_reserve(queue_##T* q, i64 new_capacity) {                                                         \
+    void queue_##T##_reserve(queue_##T* q, isize new_capacity) {                                                       \
         cstl_assert(new_capacity >= q->length);                                                                        \
         new_capacity = cstl_next_pow2(new_capacity);                                                                   \
         if (new_capacity <= q->capacity) {                                                                             \
@@ -92,7 +92,7 @@
         }                                                                                                              \
                                                                                                                        \
         T* const new_buffer = cstl_alloc(T, q->alloc, new_capacity);                                                   \
-        for (i64 i = 0; i < q->length; i++) {                                                                          \
+        for (isize i = 0; i < q->length; i++) {                                                                        \
             new_buffer[i] = q->buffer[(q->front + i) & (q->capacity - 1)];                                             \
         }                                                                                                              \
                                                                                                                        \

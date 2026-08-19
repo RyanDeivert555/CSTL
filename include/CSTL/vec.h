@@ -17,8 +17,8 @@
 #define VEC_DEFINE(T)                                                                                                  \
     typedef struct vec_##T {                                                                                           \
         T* buffer;                                                                                                     \
-        i64 length;                                                                                                    \
-        i64 capacity;                                                                                                  \
+        isize length;                                                                                                  \
+        isize capacity;                                                                                                \
         allocator alloc;                                                                                               \
     } vec_##T;                                                                                                         \
                                                                                                                        \
@@ -27,10 +27,10 @@
     void vec_##T##_push(vec_##T* vec, T elem);                                                                         \
     T vec_##T##_pop(vec_##T* vec);                                                                                     \
     bool vec_##T##_try_pop(vec_##T* vec, T* out);                                                                      \
-    void vec_##T##_insert(vec_##T* vec, T elem, i64 index);                                                            \
-    T vec_##T##_ordered_remove(vec_##T* vec, i64 index);                                                               \
-    T vec_##T##_swap_remove(vec_##T* vec, i64 index);                                                                  \
-    void vec_##T##_reserve(vec_##T* vec, i64 new_capacity);
+    void vec_##T##_insert(vec_##T* vec, T elem, isize index);                                                          \
+    T vec_##T##_ordered_remove(vec_##T* vec, isize index);                                                             \
+    T vec_##T##_swap_remove(vec_##T* vec, isize index);                                                                \
+    void vec_##T##_reserve(vec_##T* vec, isize new_capacity);
 
 #define VEC_IMPL(T)                                                                                                    \
     vec_##T vec_##T##_create(allocator a) {                                                                            \
@@ -49,7 +49,7 @@
                                                                                                                        \
     void vec_##T##_push(vec_##T* vec, T elem) {                                                                        \
         if (vec->length == vec->capacity) {                                                                            \
-            const i64 new_capacity = (vec->capacity == 0) ? CSTL_INITIAL_CAPACITY : vec->capacity * 2;                 \
+            const isize new_capacity = (vec->capacity == 0) ? CSTL_INITIAL_CAPACITY : vec->capacity * 2;               \
             vec_##T##_reserve(vec, new_capacity);                                                                      \
         }                                                                                                              \
         vec->buffer[vec->length] = elem;                                                                               \
@@ -58,7 +58,7 @@
                                                                                                                        \
     T vec_##T##_pop(vec_##T* vec) {                                                                                    \
         cstl_assert(vec->length > 0);                                                                                  \
-        const i64 last_index = vec->length - 1;                                                                        \
+        const isize last_index = vec->length - 1;                                                                      \
         const T value = vec->buffer[last_index];                                                                       \
         vec->length--;                                                                                                 \
                                                                                                                        \
@@ -78,10 +78,10 @@
         }                                                                                                              \
     }                                                                                                                  \
                                                                                                                        \
-    void vec_##T##_insert(vec_##T* vec, T elem, i64 index) {                                                           \
+    void vec_##T##_insert(vec_##T* vec, T elem, isize index) {                                                         \
         cstl_assert(index >= 0 && index <= vec->length);                                                               \
         if (vec->length == vec->capacity) {                                                                            \
-            const i64 new_capacity = (vec->capacity == 0) ? CSTL_INITIAL_CAPACITY : vec->capacity * 2;                 \
+            const isize new_capacity = (vec->capacity == 0) ? CSTL_INITIAL_CAPACITY : vec->capacity * 2;               \
             vec_##T##_reserve(vec, new_capacity);                                                                      \
         }                                                                                                              \
         memmove(&vec->buffer[index + 1], &vec->buffer[index], (vec->length - index) * sizeof(T));                      \
@@ -89,7 +89,7 @@
         vec->length++;                                                                                                 \
     }                                                                                                                  \
                                                                                                                        \
-    T vec_##T##_ordered_remove(vec_##T* vec, i64 index) {                                                              \
+    T vec_##T##_ordered_remove(vec_##T* vec, isize index) {                                                            \
         cstl_assert(index >= 0 && index < vec->length);                                                                \
         vec->length--;                                                                                                 \
         const T res = vec->buffer[index];                                                                              \
@@ -98,7 +98,7 @@
         return res;                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
-    T vec_##T##_swap_remove(vec_##T* vec, i64 index) {                                                                 \
+    T vec_##T##_swap_remove(vec_##T* vec, isize index) {                                                               \
         cstl_assert(index >= 0 && index < vec->length);                                                                \
         const T res = vec->buffer[index];                                                                              \
         vec->buffer[index] = vec->buffer[vec->length - 1];                                                             \
@@ -107,7 +107,7 @@
         return res;                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
-    void vec_##T##_reserve(vec_##T* vec, i64 new_capacity) {                                                           \
+    void vec_##T##_reserve(vec_##T* vec, isize new_capacity) {                                                         \
         cstl_assert(new_capacity >= vec->length);                                                                      \
         if (new_capacity <= vec->capacity) {                                                                           \
             return;                                                                                                    \

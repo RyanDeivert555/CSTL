@@ -1,7 +1,7 @@
 #include "CSTL/fba.h"
 #include "CSTL/allocator.h"
 
-fba fba_new(u8* buffer, i64 capacity) {
+fba fba_new(cstl_byte* buffer, isize capacity) {
     const fba result = {
         .buffer = buffer,
         .capacity = capacity,
@@ -11,28 +11,28 @@ fba fba_new(u8* buffer, i64 capacity) {
     return result;
 }
 
-static u8* fba_alloc(void* ctx, i64 size, i64 count, i64 align) {
+static cstl_byte* fba_alloc(void* ctx, isize size, isize count, isize align) {
     fba* const instance = ctx;
 
-    u8* const current = instance->buffer + instance->size;
-    const i64 padding = -(usize)current & (align - 1);
-    const i64 offset = padding + (size * count);
+    cstl_byte* const current = instance->buffer + instance->size;
+    const isize padding = -(usize)current & (align - 1);
+    const isize offset = padding + (size * count);
 
     if (instance->size + offset > instance->capacity) {
         return NULL;
     }
 
-    u8* const data = current + padding;
+    cstl_byte* const data = current + padding;
     instance->size += offset;
 
     return data;
 }
 
-static bool fba_is_last_alloc(fba* self, u8* buffer, i64 size) {
+static bool fba_is_last_alloc(fba* self, cstl_byte* buffer, isize size) {
     return buffer + size == self->buffer + self->size;
 }
 
-static void fba_free(void* ctx, u8* ptr, i64 size, i64 count, i64 align) {
+static void fba_free(void* ctx, cstl_byte* ptr, isize size, isize count, isize align) {
     cstl_unused(align);
 
     fba* const instance = ctx;
