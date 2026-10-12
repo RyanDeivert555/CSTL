@@ -19,14 +19,12 @@ RESULTS = [
 
 with open(PROJECT_ROOT / "BENCHMARKS.md", "w") as md:
     md.write(
-        "Outputs of running the benchmark on my machine.\n\n"
-        "```text\n"
-        "Compiler: gcc 16.1.1 20260725\n"
-        "Target:   x86_64-pc-linux-gnu\n"
-        "Flags:    -O3\n"
-        "```\n\n"
+        "## Outputs of running the benchmark on my machine.\n\n"
+        "### Compiler: `gcc 16.1.1 20260725`\n"
+        "### Triple Target: `x86_64-pc-linux-gnu`\n"
+        "### Flags: `-O3`\n"
     )
     for res in RESULTS:
         md.write("```text\n")
-        md.write(res.stdout.rstrip("\n") + "\n")
+        md.write(res.stdout)
         md.write("```\n\n")
