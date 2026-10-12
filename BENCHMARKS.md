@@ -1,158 +1,142 @@
-# Benchmarks
-
 Outputs of running the benchmark on my machine.
 
+```text
 Compiler: gcc 16.1.1 20260725
 Target:   x86_64-pc-linux-gnu
 Flags:    -O3
-
-Run on (16 X 2496.01 MHz CPU s)
-CPU Caches:
-L1 Data 48 KiB (x8)
-L1 Instruction 32 KiB (x8)
-L2 Unified 1280 KiB (x8)
-L3 Unified 18432 KiB (x1)
-
-## std::vector vs cstl_vec (both preallocated as to not test internal allocators)
-```
-------------------------------------------------------------------------
-Benchmark              Time             CPU   Iterations UserCounters...
-------------------------------------------------------------------------
-BM_std/8             338 ns          342 ns      2041583 items_per_second=23.395M/s
-BM_std/16            343 ns          345 ns      1967723 items_per_second=46.3158M/s
-BM_std/64            352 ns          355 ns      1950591 items_per_second=180.034M/s
-BM_std/256           402 ns          405 ns      1742784 items_per_second=632.285M/s
-BM_std/1024          568 ns          570 ns      1235698 items_per_second=1.7978G/s
-BM_std/4096         1231 ns         1232 ns       567501 items_per_second=3.3253G/s
-BM_std/16384        3928 ns         3946 ns       178349 items_per_second=4.15185G/s
-BM_std/32768        7574 ns         7597 ns        92265 items_per_second=4.31313G/s
-BM_std_BigO         0.23 N          0.23 N
-BM_std_RMS            16 %            16 %
-BM_cstl/8            335 ns          338 ns      2065829 items_per_second=23.6419M/s
-BM_cstl/16           337 ns          339 ns      2020883 items_per_second=47.1384M/s
-BM_cstl/64           349 ns          352 ns      1993378 items_per_second=181.914M/s
-BM_cstl/256          398 ns          401 ns      1751574 items_per_second=638.484M/s
-BM_cstl/1024         568 ns          570 ns      1242589 items_per_second=1.79695G/s
-BM_cstl/4096        1242 ns         1244 ns       556337 items_per_second=3.29305G/s
-BM_cstl/16384       4054 ns         4072 ns       173263 items_per_second=4.0238G/s
-BM_cstl/32768       7642 ns         7661 ns        93227 items_per_second=4.277G/s
-BM_cstl_BigO        0.24 N          0.24 N
-BM_cstl_RMS           16 %            16 %
 ```
 
-## std::queue vs cstl_queue (no prealloc) vs cstl_queue (prealloc)
-```
-------------------------------------------------------------------------------------
-Benchmark                          Time             CPU   Iterations UserCounters...
-------------------------------------------------------------------------------------
-BM_std_queue/8                   184 ns          186 ns      3743024 items_per_second=43.054M/s
-BM_std_queue/16                  187 ns          189 ns      3696959 items_per_second=84.7879M/s
-BM_std_queue/64                  198 ns          200 ns      3482402 items_per_second=319.739M/s
-BM_std_queue/256                 276 ns          278 ns      2527952 items_per_second=922.443M/s
-BM_std_queue/1024                540 ns          541 ns      1319870 items_per_second=1.89188G/s
-BM_std_queue/4096               1849 ns         1851 ns       368241 items_per_second=2.21263G/s
-BM_std_queue/16384              7017 ns         7033 ns       100403 items_per_second=2.32951G/s
-BM_std_queue/32768             14019 ns        14040 ns        51058 items_per_second=2.33397G/s
-BM_std_queue_BigO               0.43 N          0.43 N
-BM_std_queue_RMS                   4 %             4 %
-BM_cstl_no_prealloc/8            177 ns          178 ns      3914390 items_per_second=44.8204M/s
-BM_cstl_no_prealloc/16           193 ns          195 ns      3602215 items_per_second=82.0686M/s
-BM_cstl_no_prealloc/64           239 ns          241 ns      2983333 items_per_second=266.034M/s
-BM_cstl_no_prealloc/256          361 ns          363 ns      1952167 items_per_second=705.676M/s
-BM_cstl_no_prealloc/1024         821 ns          818 ns       862317 items_per_second=1.25145G/s
-BM_cstl_no_prealloc/4096        2453 ns         2455 ns       283425 items_per_second=1.66855G/s
-BM_cstl_no_prealloc/16384       9651 ns         9667 ns        71050 items_per_second=1.69477G/s
-BM_cstl_no_prealloc/32768      40793 ns        40501 ns        17325 items_per_second=809.069M/s
-BM_cstl_no_prealloc_BigO        0.00 N^2        0.00 N^2
-BM_cstl_no_prealloc_RMS           11 %            11 %
-BM_cstl_prealloc/8               181 ns          181 ns      3592529 items_per_second=44.2016M/s
-BM_cstl_prealloc/16              186 ns          187 ns      3810434 items_per_second=85.5586M/s
-BM_cstl_prealloc/64              211 ns          212 ns      3336832 items_per_second=301.717M/s
-BM_cstl_prealloc/256             290 ns          291 ns      2418883 items_per_second=878.318M/s
-BM_cstl_prealloc/1024            554 ns          555 ns      1277527 items_per_second=1.84474G/s
-BM_cstl_prealloc/4096           1623 ns         1625 ns       441737 items_per_second=2.52033G/s
-BM_cstl_prealloc/16384          6020 ns         6037 ns       119145 items_per_second=2.71395G/s
-BM_cstl_prealloc/32768         11813 ns        11837 ns        58734 items_per_second=2.76829G/s
-BM_cstl_prealloc_BigO           0.36 N          0.36 N
-BM_cstl_prealloc_RMS               6 %             6 %
+```text
+------------------------------------------------------------------------------
+Benchmark                    Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------
+BM_std_vector/8            335 ns          336 ns      2064979 items_per_second=23.7841M/s
+BM_std_vector/16           336 ns          338 ns      2086289 items_per_second=47.2954M/s
+BM_std_vector/64           346 ns          349 ns      1984136 items_per_second=183.358M/s
+BM_std_vector/256          396 ns          398 ns      1741918 items_per_second=643.032M/s
+BM_std_vector/1024         565 ns          568 ns      1246499 items_per_second=1.80247G/s
+BM_std_vector/4096        1229 ns         1232 ns       569935 items_per_second=3.32486G/s
+BM_std_vector/16384       3912 ns         3928 ns       179420 items_per_second=4.17063G/s
+BM_std_vector/32768       7485 ns         7506 ns        94010 items_per_second=4.36535G/s
+BM_std_vector_BigO        0.23 N          0.23 N    
+BM_std_vector_RMS           16 %            16 %    
+BM_cstl_vec/8              332 ns          335 ns      2095170 items_per_second=23.901M/s
+BM_cstl_vec/16             337 ns          339 ns      2070154 items_per_second=47.1319M/s
+BM_cstl_vec/64             346 ns          348 ns      1996539 items_per_second=183.655M/s
+BM_cstl_vec/256            397 ns          400 ns      1760700 items_per_second=639.495M/s
+BM_cstl_vec/1024           563 ns          565 ns      1228204 items_per_second=1.81318G/s
+BM_cstl_vec/4096          1236 ns         1238 ns       568845 items_per_second=3.30779G/s
+BM_cstl_vec/16384         3959 ns         3978 ns       177708 items_per_second=4.11903G/s
+BM_cstl_vec/32768         7638 ns         7660 ns        93345 items_per_second=4.27759G/s
+BM_cstl_vec_BigO          0.24 N          0.24 N    
+BM_cstl_vec_RMS             15 %            15 %    
 ```
 
-## std::unordered_map vs std::map vs cstl_hashmap
-```
+```text
 -------------------------------------------------------------------------------------
 Benchmark                           Time             CPU   Iterations UserCounters...
 -------------------------------------------------------------------------------------
-BM_std_unordered_map/8            241 ns          243 ns      2916245 items_per_second=32.9464M/s
-BM_std_unordered_map/16           352 ns          353 ns      1975535 items_per_second=45.2779M/s
-BM_std_unordered_map/64          1316 ns         1317 ns       515531 items_per_second=48.6M/s
-BM_std_unordered_map/256         4410 ns         4414 ns       158727 items_per_second=58.0036M/s
-BM_std_unordered_map/1024       15925 ns        15938 ns        42207 items_per_second=64.2509M/s
-BM_std_unordered_map/4096       61839 ns        61849 ns        11255 items_per_second=66.2256M/s
-BM_std_unordered_map/16384     249906 ns       249927 ns         2824 items_per_second=65.5552M/s
-BM_std_unordered_map/32768     503188 ns       503260 ns         1294 items_per_second=65.1115M/s
-BM_std_unordered_map_BigO       15.33 N         15.33 N
-BM_std_unordered_map_RMS            1 %             1 %
-BM_std_map/8                      255 ns          256 ns      2749733 items_per_second=31.1982M/s
-BM_std_map/16                     387 ns          388 ns      1845476 items_per_second=41.2864M/s
-BM_std_map/64                    1486 ns         1489 ns       470112 items_per_second=42.9898M/s
-BM_std_map/256                   6888 ns         6891 ns       102651 items_per_second=37.1509M/s
-BM_std_map/1024                 29415 ns        29420 ns        23702 items_per_second=34.8058M/s
-BM_std_map/4096                136271 ns       136292 ns         5114 items_per_second=30.0531M/s
-BM_std_map/16384               633111 ns       633194 ns         1104 items_per_second=25.8752M/s
-BM_std_map/32768              1553803 ns      1553884 ns          448 items_per_second=21.0878M/s
-BM_std_map_BigO                  3.09 NlgN       3.09 NlgN
-BM_std_map_RMS                     10 %            10 %
-BM_cstl/8                         236 ns          238 ns      2991484 items_per_second=33.6696M/s
-BM_cstl/16                        274 ns          276 ns      2590047 items_per_second=58.0361M/s
-BM_cstl/64                        442 ns          445 ns      1562746 items_per_second=143.871M/s
-BM_cstl/256                      1002 ns         1005 ns       707600 items_per_second=254.815M/s
-BM_cstl/1024                     2981 ns         2984 ns       240942 items_per_second=343.208M/s
-BM_cstl/4096                    11786 ns        11815 ns        60421 items_per_second=346.688M/s
-BM_cstl/16384                   43757 ns        43789 ns        15727 items_per_second=374.156M/s
-BM_cstl/32768                   88627 ns        88692 ns         7960 items_per_second=369.457M/s
-BM_cstl_BigO                     2.70 N          2.70 N
-BM_cstl_RMS                         2 %             2 %
+BM_std_unordered_map/8            240 ns          241 ns      2961845 items_per_second=33.1654M/s
+BM_std_unordered_map/16           330 ns          331 ns      2091229 items_per_second=48.2816M/s
+BM_std_unordered_map/64          1273 ns         1275 ns       550019 items_per_second=50.188M/s
+BM_std_unordered_map/256         4247 ns         4250 ns       166701 items_per_second=60.2337M/s
+BM_std_unordered_map/1024       16784 ns        16807 ns        40762 items_per_second=60.928M/s
+BM_std_unordered_map/4096       64258 ns        64268 ns        10868 items_per_second=63.7327M/s
+BM_std_unordered_map/16384     246505 ns       246515 ns         2747 items_per_second=66.4625M/s
+BM_std_unordered_map/32768     497743 ns       497856 ns         1422 items_per_second=65.8182M/s
+BM_std_unordered_map_BigO       15.17 N         15.17 N    
+BM_std_unordered_map_RMS            1 %             1 %    
+BM_std_map/8                      257 ns          259 ns      2893026 items_per_second=30.8354M/s
+BM_std_map/16                     373 ns          374 ns      1880838 items_per_second=42.7598M/s
+BM_std_map/64                    1432 ns         1434 ns       502825 items_per_second=44.6175M/s
+BM_std_map/256                   6582 ns         6587 ns       106913 items_per_second=38.865M/s
+BM_std_map/1024                 27724 ns        27727 ns        25344 items_per_second=36.9317M/s
+BM_std_map/4096                129393 ns       129399 ns         5183 items_per_second=31.6539M/s
+BM_std_map/16384               612090 ns       612170 ns         1108 items_per_second=26.7638M/s
+BM_std_map/32768              1534121 ns      1534123 ns          462 items_per_second=21.3594M/s
+BM_std_map_BigO                  3.04 NlgN       3.04 NlgN 
+BM_std_map_RMS                     12 %            12 %    
+BM_cstl_hashmap/8                 233 ns          235 ns      3016910 items_per_second=34.1117M/s
+BM_cstl_hashmap/16                269 ns          271 ns      2576611 items_per_second=59.0551M/s
+BM_cstl_hashmap/64                460 ns          462 ns      1555353 items_per_second=138.458M/s
+BM_cstl_hashmap/256              1031 ns         1032 ns       681392 items_per_second=247.979M/s
+BM_cstl_hashmap/1024             3100 ns         3102 ns       227700 items_per_second=330.135M/s
+BM_cstl_hashmap/4096            13101 ns        13120 ns        57127 items_per_second=312.198M/s
+BM_cstl_hashmap/16384           49991 ns        50023 ns        14320 items_per_second=327.532M/s
+BM_cstl_hashmap/32768          101210 ns       101257 ns         6800 items_per_second=323.612M/s
+BM_cstl_hashmap_BigO             3.08 N          3.08 N    
+BM_cstl_hashmap_RMS                 1 %             1 %    
 ```
 
-## std::unordered_set vs std::set vs cstl_set
-```
+```text
 -------------------------------------------------------------------------------------
 Benchmark                           Time             CPU   Iterations UserCounters...
 -------------------------------------------------------------------------------------
-BM_std_unordered_set/8            241 ns          242 ns      2936683 items_per_second=33.0796M/s
-BM_std_unordered_set/16           339 ns          340 ns      2028653 items_per_second=47.1086M/s
-BM_std_unordered_set/64          1314 ns         1317 ns       522510 items_per_second=48.6002M/s
-BM_std_unordered_set/256         4305 ns         4307 ns       159594 items_per_second=59.4402M/s
-BM_std_unordered_set/1024       16094 ns        16100 ns        43532 items_per_second=63.6034M/s
-BM_std_unordered_set/4096       66858 ns        66865 ns        10119 items_per_second=61.2575M/s
-BM_std_unordered_set/16384     253197 ns       253213 ns         2746 items_per_second=64.7045M/s
-BM_std_unordered_set/32768     509893 ns       509913 ns         1290 items_per_second=64.262M/s
-BM_std_unordered_set_BigO       15.55 N         15.55 N
-BM_std_unordered_set_RMS            1 %             1 %
-BM_std_set/8                      251 ns          253 ns      2783831 items_per_second=31.657M/s
-BM_std_set/16                     365 ns          366 ns      1957648 items_per_second=43.7016M/s
-BM_std_set/64                    1483 ns         1484 ns       477689 items_per_second=43.1257M/s
-BM_std_set/256                   6729 ns         6728 ns       108432 items_per_second=38.0528M/s
-BM_std_set/1024                 28304 ns        28312 ns        24618 items_per_second=36.1683M/s
-BM_std_set/4096                133904 ns       133915 ns         5144 items_per_second=30.5866M/s
-BM_std_set/16384               612244 ns       612310 ns         1172 items_per_second=26.7577M/s
-BM_std_set/32768              1374883 ns      1374941 ns          528 items_per_second=23.8323M/s
-BM_std_set_BigO                  2.77 NlgN       2.77 NlgN
-BM_std_set_RMS                      4 %             4 %
-BM_cstl/8                         224 ns          225 ns      3073494 items_per_second=35.4805M/s
-BM_cstl/16                        262 ns          264 ns      2755508 items_per_second=60.6843M/s
-BM_cstl/64                        411 ns          414 ns      1697093 items_per_second=154.692M/s
-BM_cstl/256                       941 ns          943 ns       757050 items_per_second=271.539M/s
-BM_cstl/1024                     2708 ns         2711 ns       254692 items_per_second=377.732M/s
-BM_cstl/4096                     9296 ns         9307 ns        77282 items_per_second=440.114M/s
-BM_cstl/16384                   39773 ns        39799 ns        17772 items_per_second=411.664M/s
-BM_cstl/32768                   80355 ns        80393 ns         8917 items_per_second=407.599M/s
-BM_cstl_BigO                     2.45 N          2.45 N
-BM_cstl_RMS                         2 %             2 %
+BM_std_unordered_set/8            245 ns          246 ns      2886636 items_per_second=32.4702M/s
+BM_std_unordered_set/16           349 ns          352 ns      1892433 items_per_second=45.4247M/s
+BM_std_unordered_set/64          1420 ns         1421 ns       483432 items_per_second=45.0244M/s
+BM_std_unordered_set/256         4471 ns         4474 ns       155995 items_per_second=57.215M/s
+BM_std_unordered_set/1024       16625 ns        16635 ns        43022 items_per_second=61.5572M/s
+BM_std_unordered_set/4096       67358 ns        67364 ns        10651 items_per_second=60.8042M/s
+BM_std_unordered_set/16384     254504 ns       254519 ns         2749 items_per_second=64.3724M/s
+BM_std_unordered_set/32768     501155 ns       501237 ns         1329 items_per_second=65.3742M/s
+BM_std_unordered_set_BigO       15.36 N         15.36 N    
+BM_std_unordered_set_RMS            2 %             2 %    
+BM_std_set/8                      251 ns          251 ns      2771385 items_per_second=31.8899M/s
+BM_std_set/16                     363 ns          364 ns      1928226 items_per_second=43.9626M/s
+BM_std_set/64                    1459 ns         1460 ns       472445 items_per_second=43.833M/s
+BM_std_set/256                   6689 ns         6690 ns       100981 items_per_second=38.268M/s
+BM_std_set/1024                 27654 ns        27657 ns        24900 items_per_second=37.0249M/s
+BM_std_set/4096                131017 ns       131030 ns         5393 items_per_second=31.26M/s
+BM_std_set/16384               615579 ns       615613 ns         1138 items_per_second=26.6141M/s
+BM_std_set/32768              1399888 ns      1399924 ns          534 items_per_second=23.407M/s
+BM_std_set_BigO                  2.82 NlgN       2.82 NlgN 
+BM_std_set_RMS                      5 %             5 %    
+BM_cstl_set/8                     225 ns          227 ns      3050450 items_per_second=35.2118M/s
+BM_cstl_set/16                    263 ns          266 ns      2601624 items_per_second=60.2487M/s
+BM_cstl_set/64                    421 ns          423 ns      1661334 items_per_second=151.387M/s
+BM_cstl_set/256                   965 ns          967 ns       725987 items_per_second=264.61M/s
+BM_cstl_set/1024                 2833 ns         2836 ns       246216 items_per_second=361.031M/s
+BM_cstl_set/4096                 9827 ns         9839 ns        70863 items_per_second=416.297M/s
+BM_cstl_set/16384               52570 ns        52592 ns        13208 items_per_second=311.53M/s
+BM_cstl_set/32768               93012 ns        93045 ns         7670 items_per_second=352.172M/s
+BM_cstl_set_BigO                 2.91 N          2.91 N    
+BM_cstl_set_RMS                    10 %            10 %    
 ```
 
-## Important Notes
+```text
+------------------------------------------------------------------------------------------
+Benchmark                                Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------
+BM_std_queue/8                         192 ns          193 ns      3645859 items_per_second=41.4384M/s
+BM_std_queue/16                        195 ns          196 ns      3567232 items_per_second=81.466M/s
+BM_std_queue/64                        207 ns          209 ns      3366016 items_per_second=306.463M/s
+BM_std_queue/256                       293 ns          295 ns      2404721 items_per_second=868.57M/s
+BM_std_queue/1024                      582 ns          584 ns      1218564 items_per_second=1.75289G/s
+BM_std_queue/4096                     1995 ns         1997 ns       349093 items_per_second=2.05155G/s
+BM_std_queue/16384                    7485 ns         7503 ns        94035 items_per_second=2.18366G/s
+BM_std_queue/32768                   14729 ns        14746 ns        48040 items_per_second=2.22224G/s
+BM_std_queue_BigO                     0.45 N          0.45 N    
+BM_std_queue_RMS                         5 %             5 %    
+BM_cstl_queue_no_prealloc/8            184 ns          185 ns      3745906 items_per_second=43.1721M/s
+BM_cstl_queue_no_prealloc/16           203 ns          205 ns      3446405 items_per_second=77.9608M/s
+BM_cstl_queue_no_prealloc/64           255 ns          256 ns      2776692 items_per_second=250.128M/s
+BM_cstl_queue_no_prealloc/256          396 ns          399 ns      1717111 items_per_second=641.972M/s
+BM_cstl_queue_no_prealloc/1024         912 ns          914 ns       765303 items_per_second=1.11988G/s
+BM_cstl_queue_no_prealloc/4096        2672 ns         2675 ns       263714 items_per_second=1.53121G/s
+BM_cstl_queue_no_prealloc/16384       9253 ns         9271 ns        76085 items_per_second=1.76728G/s
+BM_cstl_queue_no_prealloc/32768      41513 ns        41249 ns        16933 items_per_second=794.397M/s
+BM_cstl_queue_no_prealloc_BigO        0.00 N^2        0.00 N^2  
+BM_cstl_queue_no_prealloc_RMS           13 %            13 %    
+BM_cstl_queue_prealloc/8               185 ns          187 ns      3685760 items_per_second=42.8793M/s
+BM_cstl_queue_prealloc/16              186 ns          187 ns      3740150 items_per_second=85.3878M/s
+BM_cstl_queue_prealloc/64              211 ns          213 ns      3232832 items_per_second=300.847M/s
+BM_cstl_queue_prealloc/256             307 ns          308 ns      2278157 items_per_second=831.243M/s
+BM_cstl_queue_prealloc/1024            699 ns          701 ns       980747 items_per_second=1.46081G/s
+BM_cstl_queue_prealloc/4096           2310 ns         2314 ns       331266 items_per_second=1.77018G/s
+BM_cstl_queue_prealloc/16384          7953 ns         7973 ns        84874 items_per_second=2.05493G/s
+BM_cstl_queue_prealloc/32768         15339 ns        15361 ns        46951 items_per_second=2.13313G/s
+BM_cstl_queue_prealloc_BigO           0.47 N          0.47 N    
+BM_cstl_queue_prealloc_RMS               6 %             6 %    
+```
 
-The `std::vector` vs `cstl_vec` benches are not very meaningful. 
-The vectors need to preallocate memory as to not test the underlying allocators.
-So all that is being tested is appending elements, which is dirt cheap.
