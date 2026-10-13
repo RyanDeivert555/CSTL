@@ -6,7 +6,7 @@
 #define cstl_set(T) set_##T
 #define cstl_set_create(T, alloc) set_##T##_create(alloc)
 #define cstl_set_free(T, s) set_##T##_free(s)
-#define cstl_set_realloc(T, s, new_capacity) set_##T##_realloc(s, new_capacity)
+#define cstl_set_realloc(T, s, new_capacity) set_##T##_reserve(s, new_capacity)
 #define cstl_set_insert(T, s, elem) set_##T##_insert(s, elem)
 #define cstl_set_contains(T, s, elem) set_##T##_contains(s, elem)
 #define cstl_set_remove(T, s, elem) set_##T##_remove(s, elem)
@@ -35,7 +35,7 @@ typedef u8 set_state_type;
                                                                                                                        \
     set_##T set_##T##_create(allocator a);                                                                             \
     void set_##T##_free(set_##T* set);                                                                                 \
-    void set_##T##_realloc(set_##T* set, isize new_capacity);                                                          \
+    void set_##T##_reserve(set_##T* set, isize new_capacity);                                                          \
     void set_##T##_insert(set_##T* set, T elem);                                                                       \
     bool set_##T##_contains(set_##T set, T elem);                                                                      \
     bool set_##T##_remove(set_##T* set, T elem);                                                                       \
@@ -67,7 +67,7 @@ typedef u8 set_state_type;
         set->tombstone_count = 0;                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
-    void set_##T##_realloc(set_##T* set, isize new_capacity) {                                                         \
+    void set_##T##_reserve(set_##T* set, isize new_capacity) {                                                         \
         cstl_assert(new_capacity > set->count);                                                                        \
         new_capacity = cstl_next_pow2(new_capacity);                                                                   \
         if (new_capacity <= set->capacity) {                                                                           \
@@ -123,7 +123,7 @@ typedef u8 set_state_type;
                                                                                                                        \
         if (set->count + set->tombstone_count >= (set->capacity * CSTL_LOAD_FACTOR) / 10) {                            \
             const isize new_capacity = (set->capacity == 0) ? CSTL_INITIAL_CAPACITY : set->capacity * 2;               \
-            set_##T##_realloc(set, new_capacity);                                                                      \
+            set_##T##_reserve(set, new_capacity);                                                                      \
         }                                                                                                              \
                                                                                                                        \
         usize index = hash & (usize)(set->capacity - 1);                                                               \

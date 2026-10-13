@@ -20,42 +20,42 @@ extern "C" {
 static void BM_std_unordered_set(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        std::unordered_set<int> s{};
+        std::unordered_set<i32> s{};
 
         for (i64 i = 0; i < n; i++) {
             s.insert(static_cast<i32>(i));
         }
 
+        benchmark::DoNotOptimize(s);
         benchmark::ClobberMemory();
         state.PauseTiming();
         s = std::unordered_set<i32>();
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std_unordered_set)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_unordered_set)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_std_set(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        std::set<int> s{};
+        std::set<i32> s{};
 
         for (i64 i = 0; i < n; i++) {
             s.insert(static_cast<i32>(i));
         }
 
+        benchmark::DoNotOptimize(s);
         benchmark::ClobberMemory();
         state.PauseTiming();
         s = std::set<i32>();
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std_set)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_set)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_cstl_set(benchmark::State& state) {
     const i64 n = state.range(0);
@@ -66,13 +66,13 @@ static void BM_cstl_set(benchmark::State& state) {
             set_i32_insert(&s, static_cast<i32>(i));
         }
 
+        benchmark::DoNotOptimize(s);
         benchmark::ClobberMemory();
         state.PauseTiming();
         set_i32_free(&s);
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_set)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_set)->RangeMultiplier(4)->Range(8, 10 << 20);

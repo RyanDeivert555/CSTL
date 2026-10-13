@@ -26,16 +26,16 @@ static void BM_std_unordered_map(benchmark::State& state) {
             m.insert({i, i});
         }
 
+        benchmark::DoNotOptimize(m);
         benchmark::ClobberMemory();
         state.PauseTiming();
         m = std::unordered_map<i32, i32>{};
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std_unordered_map)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_unordered_map)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_std_map(benchmark::State& state) {
     const i64 n = state.range(0);
@@ -46,16 +46,16 @@ static void BM_std_map(benchmark::State& state) {
             m.insert({i, i});
         }
 
+        benchmark::DoNotOptimize(m);
         benchmark::ClobberMemory();
         state.PauseTiming();
         m = std::map<i32, i32>{};
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std_map)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_map)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_cstl_hashmap(benchmark::State& state) {
     const i64 n = state.range(0);
@@ -66,13 +66,13 @@ static void BM_cstl_hashmap(benchmark::State& state) {
             hashmap_i32_i32_set(&m, i, i);
         }
 
+        benchmark::DoNotOptimize(m);
         benchmark::ClobberMemory();
         state.PauseTiming();
         hashmap_i32_i32_free(&m);
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_hashmap)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_hashmap)->RangeMultiplier(4)->Range(8, 10 << 20);

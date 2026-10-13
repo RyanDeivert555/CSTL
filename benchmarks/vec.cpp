@@ -14,24 +14,24 @@ static void BM_std_vector(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
         state.PauseTiming();
-        std::vector<int> v{};
+        std::vector<i32> v{};
         v.reserve(n);
         state.ResumeTiming();
 
         for (i64 i = 0; i < n; i++) {
             v.push_back(static_cast<i32>(i));
         }
-        benchmark::ClobberMemory();
 
+        benchmark::DoNotOptimize(v);
+        benchmark::ClobberMemory();
         state.PauseTiming();
-        v = std::vector<int>();
+        v = std::vector<i32>();
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std_vector)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_vector)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_cstl_vec(benchmark::State& state) {
     const i64 n = state.range(0);
@@ -44,14 +44,14 @@ static void BM_cstl_vec(benchmark::State& state) {
         for (i64 i = 0; i < n; i++) {
             vec_i32_push(&v, static_cast<i32>(i));
         }
-        benchmark::ClobberMemory();
 
+        benchmark::DoNotOptimize(v);
+        benchmark::ClobberMemory();
         state.PauseTiming();
         vec_i32_free(&v);
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_vec)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_vec)->RangeMultiplier(4)->Range(8, 10 << 20);

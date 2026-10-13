@@ -7,7 +7,7 @@
 #define cstl_hashmap_create(K, V, alloc) hashmap_##K##_##V##_create(alloc)
 #define cstl_hashmap_free(K, V, m) hashmap_##K##_##V##_free(m)
 #define cstl_hashmap_get(K, V, m, key) hashmap_##K##_##V##_get(m, key)
-#define cstl_hashmap_realloc(K, V, m, new_capacity) hashmap_##K##_##V##_realloc(m, new_capacity)
+#define cstl_hashmap_reserve(K, V, m, new_capacity) hashmap_##K##_##V##_reserve(m, new_capacity)
 #define cstl_hashmap_set(K, V, m, key, value) hashmap_##K##_##V##_set(m, key, value)
 #define cstl_hashmap_try_remove(K, V, m, key, out_value) hashmap_##K##_##V##_try_remove(m, key, out_value)
 
@@ -37,7 +37,7 @@ typedef u8 hashmap_state_type;
     hashmap_##K##_##V hashmap_##K##_##V##_create(allocator a);                                                         \
     void hashmap_##K##_##V##_free(hashmap_##K##_##V* map);                                                             \
     V* hashmap_##K##_##V##_get(hashmap_##K##_##V* map, K key);                                                         \
-    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, isize new_capacity);                                      \
+    void hashmap_##K##_##V##_reserve(hashmap_##K##_##V* map, isize new_capacity);                                      \
     void hashmap_##K##_##V##_set(hashmap_##K##_##V* map, K key, V value);                                              \
     bool hashmap_##K##_##V##_try_remove(hashmap_##K##_##V* map, K key, V* out_value);                                  \
                                                                                                                        \
@@ -90,7 +90,7 @@ typedef u8 hashmap_state_type;
         return NULL;                                                                                                   \
     }                                                                                                                  \
                                                                                                                        \
-    void hashmap_##K##_##V##_realloc(hashmap_##K##_##V* map, isize new_capacity) {                                     \
+    void hashmap_##K##_##V##_reserve(hashmap_##K##_##V* map, isize new_capacity) {                                     \
         cstl_assert(new_capacity > map->count);                                                                        \
         new_capacity = cstl_next_pow2(new_capacity);                                                                   \
         if (new_capacity <= map->capacity) {                                                                           \
@@ -152,7 +152,7 @@ typedef u8 hashmap_state_type;
                                                                                                                        \
         if (map->count + map->tombstone_count >= (map->capacity * CSTL_LOAD_FACTOR) / 10) {                            \
             const isize new_capacity = (map->capacity == 0) ? CSTL_INITIAL_CAPACITY : map->capacity * 2;               \
-            hashmap_##K##_##V##_realloc(map, new_capacity);                                                            \
+            hashmap_##K##_##V##_reserve(map, new_capacity);                                                            \
         }                                                                                                              \
                                                                                                                        \
         usize index = hash & (usize)(map->capacity - 1);                                                               \

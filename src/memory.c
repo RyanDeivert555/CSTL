@@ -3,7 +3,7 @@
 #include <string.h>
 
 void cstl_raw_memcpy(void* restrict dest, const void* restrict src, isize size, isize count) {
-    cstl_assert(size >= 0 && count >= 0);
+    cstl_assert(size >= 0 && count > 0);
 
     if (count == 0) {
         return;
@@ -13,7 +13,7 @@ void cstl_raw_memcpy(void* restrict dest, const void* restrict src, isize size, 
 }
 
 void cstl_raw_memmove(void* dest, const void* src, isize size, isize count) {
-    cstl_assert(size >= 0 && count >= 0);
+    cstl_assert(size >= 0 && count > 0);
 
     if (count == 0) {
         return;
@@ -23,7 +23,7 @@ void cstl_raw_memmove(void* dest, const void* src, isize size, isize count) {
 }
 
 bool cstl_raw_memcmp(const void* p0, const void* p1, isize size, isize count) {
-    cstl_assert(size >= 0 && count >= 0);
+    cstl_assert(size >= 0 && count > 0);
 
     if (count == 0) {
         return true;

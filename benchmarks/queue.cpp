@@ -10,60 +10,60 @@ extern "C" {
 static void BM_std_queue(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        std::queue<int> q{};
+        std::queue<i32> q{};
 
         for (i64 i = 0; i < n; i++) {
             q.push(static_cast<i32>(i));
         }
-        benchmark::ClobberMemory();
 
+        benchmark::DoNotOptimize(q);
+        benchmark::ClobberMemory();
         state.PauseTiming();
-        q = std::queue<int>();
+        q = std::queue<i32>();
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_std_queue)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_std_queue)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_cstl_queue_no_prealloc(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        cstl_queue(i32) v = queue_i32_create(std_allocator());
+        cstl_queue(i32) q = queue_i32_create(std_allocator());
 
         for (i64 i = 0; i < n; i++) {
-            queue_i32_push(&v, static_cast<i32>(i));
+            queue_i32_push(&q, static_cast<i32>(i));
         }
-        benchmark::ClobberMemory();
 
+        benchmark::DoNotOptimize(q);
+        benchmark::ClobberMemory();
         state.PauseTiming();
-        queue_i32_free(&v);
+        queue_i32_free(&q);
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_queue_no_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_queue_no_prealloc)->RangeMultiplier(4)->Range(8, 10 << 20);
 
 static void BM_cstl_queue_prealloc(benchmark::State& state) {
     const i64 n = state.range(0);
     for (auto _ : state) {
-        cstl_queue(i32) v = queue_i32_create(std_allocator());
-        queue_i32_reserve(&v, n);
+        cstl_queue(i32) q = queue_i32_create(std_allocator());
+        queue_i32_reserve(&q, n);
 
         for (i64 i = 0; i < n; i++) {
-            queue_i32_push(&v, static_cast<i32>(i));
+            queue_i32_push(&q, static_cast<i32>(i));
         }
-        benchmark::ClobberMemory();
 
+        benchmark::DoNotOptimize(q);
+        benchmark::ClobberMemory();
         state.PauseTiming();
-        queue_i32_free(&v);
+        queue_i32_free(&q);
         state.ResumeTiming();
     }
 
-    state.SetComplexityN(n);
     state.SetItemsProcessed(state.iterations() * n);
 }
-BENCHMARK(BM_cstl_queue_prealloc)->RangeMultiplier(4)->Range(8, 8 << 12)->Complexity();
+BENCHMARK(BM_cstl_queue_prealloc)->RangeMultiplier(4)->Range(8, 10 << 20);
