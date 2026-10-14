@@ -1,4 +1,5 @@
-/build
-/.cache
-w64-toolchain.cmake
-
+__pycache__/
+.cache/
+.venv/
+build/
+scripts/out/

@@ -1,23 +1,18 @@
 # TODO: make invokeable from CMake
+import config
 import subprocess
-import pathlib
 
-PROJECT_ROOT = pathlib.Path("../")
-BUILD_DIR = pathlib.Path("../build")
-BENCH_DIR = PROJECT_ROOT / "benchmarks"
-# HACK: needs to be updated alongside benchmarks
-TESTS = [
-    "BM_std_vector|BM_cstl_vec", 
-    "BM_std_unordered_map|BM_std_map|BM_cstl_hashmap",
-    "BM_std_unordered_set|BM_std_set|BM_cstl_set",
-    "BM_std_queue|BM_cstl_queue_no_prealloc|BM_cstl_queue_prealloc",
-]
 RESULTS = [
-    subprocess.run([BUILD_DIR / "benchmarks/benchmarks", f"--benchmark_filter={test}"], capture_output=True, text=True, check=True) 
-    for test in TESTS
+    subprocess.run(
+        [config.BUILD_DIR / "benchmarks/benchmarks", f"--benchmark_repetitions={config.REPETITIONS}", f"--benchmark_filter={test}"], 
+        capture_output=True, 
+        text=True, 
+        check=True
+    ) 
+    for test in config.TESTS
 ]
 
-with open(PROJECT_ROOT / "BENCHMARKS.md", "w") as md:
+with open(config.PROJECT_ROOT / "BENCHMARKS.md", "w") as md:
     md.write(
         "## Outputs of running the benchmark on my machine.\n\n"
         "### Compiler: `gcc 16.2.1 20260810`\n"
